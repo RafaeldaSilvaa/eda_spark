@@ -1,0 +1,52 @@
+# openspec/config.yaml
+schema: spec-driven
+
+context: |
+  Project: eda_spark
+  Stack: undetected (no project files found — name suggests PySpark/EDA)
+  Architecture: undetected (greenfield project)
+  Testing: not configured
+  Style: undetected
+  Status: This is an empty project. No code, dependencies, or configuration files exist yet.
+
+strict_tdd: false
+
+testing:
+  test_runner:
+    detected: false
+    reason: "No project config files found (package.json, pyproject.toml, go.mod, Cargo.toml, etc.). No test runner, test framework, or test files detected."
+  layers:
+    unit: false
+    integration: false
+    e2e: false
+  coverage:
+    available: false
+    command: ""
+  quality:
+    linter: false
+    type_checker: false
+    formatter: false
+
+rules:
+  proposal:
+    - Define EDA scope and dataset sources
+    - State expected output artifacts (charts, insights, data frames)
+  specs:
+    - Use Given/When/Then for scenarios where applicable
+    - Use RFC 2119 keywords (MUST, SHALL, SHOULD, MAY)
+  design:
+    - Follow PySpark/Scala Spark coding patterns once stack is confirmed
+    - Document dataset size and schema assumptions
+  tasks:
+    - Group by phase (setup, ETL, analysis, visualization, reporting)
+    - Keep tasks completable in one session
+  apply:
+    - Follow existing code patterns once established
+    tdd: false
+    test_command: ""
+  verify:
+    test_command: ""
+    build_command: ""
+    coverage_threshold: 0
+  archive:
+    - Warn before merging destructive deltas

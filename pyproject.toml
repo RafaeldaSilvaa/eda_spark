@@ -1,0 +1,91 @@
+[build-system]
+requires = ["setuptools>=75.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "spark-eda"
+version = "0.1.0"
+description = "Exploratory Data Analysis toolkit built on PySpark"
+readme = "README.md"
+requires-python = ">=3.12"
+
+dependencies = [
+    "pyspark>=4.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=6.0",
+    "pytest-mock>=3.14",
+    "mypy>=1.15",
+    "ruff>=0.11",
+]
+test = [
+    "pytest>=8.0",
+    "pytest-cov>=6.0",
+    "pytest-mock>=3.14",
+    "faker>=22.0",
+]
+benchmark = [
+    "pytest-benchmark>=5.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["spark_eda*"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py314"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "SIM", "ARG", "PTH", "PL", "RUF"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.mypy]
+strict = true
+python_version = "3.14"
+warn_unused_configs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+disallow_any_generics = true
+disallow_subclassing_any = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_return_any = true
+show_error_codes = true
+ignore_missing_imports = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short --strict-markers"
+filterwarnings = ["error"]
+markers = [
+    "unit: marks tests as unit tests",
+    "integration: marks tests as integration tests (requires Spark session)",
+    "contract: marks tests as contract/schema tests",
+    "benchmark: marks tests as benchmark tests",
+    "slow: marks tests as slow (excluded from default run)",
+]
+
+[tool.coverage.run]
+source = ["spark_eda"]
+branch = true
+command_line = "-m pytest"
+
+[tool.coverage.report]
+fail_under = 77
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if __name__ == .__main__.:",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+]

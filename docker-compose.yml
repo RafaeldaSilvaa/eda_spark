@@ -1,0 +1,57 @@
+x-spark-env: &spark-env
+  JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
+  PYSPARK_PYTHON: python3
+  PYSPARK_DRIVER_PYTHON: python3
+
+services:
+  test:
+    build:
+      context: .
+      dockerfile: tests/Dockerfile
+    image: spark-eda:test
+    container_name: spark-eda-test
+    environment:
+      <<: *spark-env
+    volumes:
+      - ./src:/app/src
+      - ./tests:/app/tests
+      - ./pyproject.toml:/app/pyproject.toml
+      - ./README.md:/app/README.md
+    command: ["pytest", "tests/", "--cov=spark_eda", "--cov-fail-under=77", "-v"]
+
+  shell:
+    build:
+      context: .
+      dockerfile: tests/Dockerfile
+    image: spark-eda:shell
+    container_name: spark-eda-shell
+    environment:
+      <<: *spark-env
+    volumes:
+      - ./src:/app/src
+      - ./tests:/app/tests
+      - ./pyproject.toml:/app/pyproject.toml
+      - ./README.md:/app/README.md
+      - ./data:/app/data
+    stdin_open: true
+    tty: true
+    entrypoint: ["/bin/bash"]
+
+  benchmark:
+    build:
+      context: .
+      dockerfile: tests/Dockerfile
+    image: spark-eda:benchmark
+    container_name: spark-eda-benchmark
+    environment:
+      <<: *spark-env
+    volumes:
+      - ./src:/app/src
+      - ./tests:/app/tests
+      - ./pyproject.toml:/app/pyproject.toml
+      - ./README.md:/app/README.md
+      - ./bench_results:/app/bench_results
+    command: >
+      pytest tests/ --benchmark-only --benchmark-json=bench_results/benchmark.json
+    profiles:
+      - benchmark
