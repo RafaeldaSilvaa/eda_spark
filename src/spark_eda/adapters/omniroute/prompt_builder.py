@@ -80,9 +80,7 @@ class PromptBuilder:
         for col in schema.columns:
             inferred: str = f" (inferred: {col.inferred_type})" if col.inferred_type else ""
             nullable: str = "nullable" if col.nullable else "required"
-            lines.append(
-                f"  - {col.name}: {col.type} ({nullable}, nulls={col.null_count}){inferred}"
-            )
+            lines.append(f"  - {col.name}: {col.type} ({nullable}, nulls={col.null_count}){inferred}")
         return "\n".join(lines) + "\n"
 
     @staticmethod
@@ -125,8 +123,7 @@ class PromptBuilder:
             lines.append("  Temporal columns:")
             for t in stats.temporal:
                 lines.append(
-                    f"    - {t.column_name}: [{t.min_date} .. {t.max_date}], "
-                    f"range={t.range_days}d, gaps={t.gap_count}"
+                    f"    - {t.column_name}: [{t.min_date} .. {t.max_date}], range={t.range_days}d, gaps={t.gap_count}"
                 )
         if stats.text:
             lines.append("  Text columns:")
@@ -139,8 +136,7 @@ class PromptBuilder:
             lines.append("  Boolean columns:")
             for b in stats.boolean:
                 lines.append(
-                    f"    - {b.column_name}: true={b.true_count}, "
-                    f"false={b.false_count}, true_ratio={b.true_ratio:.2%}"
+                    f"    - {b.column_name}: true={b.true_count}, false={b.false_count}, true_ratio={b.true_ratio:.2%}"
                 )
         return "\n".join(lines) + "\n"
 
@@ -153,9 +149,7 @@ class PromptBuilder:
                 if bins:
                     values: list[float] = [b.count for b in bins]
                     max_count: float = max(values)
-                    bins_str: str = ", ".join(
-                        f"[{b.lower:.4g}..{b.upper:.4g}]:{b.count}" for b in bins[:5]
-                    )
+                    bins_str: str = ", ".join(f"[{b.lower:.4g}..{b.upper:.4g}]:{b.count}" for b in bins[:5])
                     suffix: str = " (+more)" if len(bins) > 5 else ""  # noqa: PLR2004
                     lines.append(f"  - {col_name}: {len(bins)} bins, peak={max_count}{suffix}")
                     lines.append(f"    bins: {bins_str}")
@@ -163,16 +157,12 @@ class PromptBuilder:
             for col_name, entries in dist.frequencies.items():
                 if entries:
                     lines.append(
-                        f"  - {col_name}: {len(entries)} categories, "
-                        f"top={entries[0].label} ({entries[0].count})"
+                        f"  - {col_name}: {len(entries)} categories, top={entries[0].label} ({entries[0].count})"
                     )
         if dist.temporal_charts:
             for col_name, points in dist.temporal_charts.items():
                 if points:
-                    lines.append(
-                        f"  - {col_name}: {len(points)} periods, "
-                        f"[{points[0].period}..{points[-1].period}]"
-                    )
+                    lines.append(f"  - {col_name}: {len(points)} periods, [{points[0].period}..{points[-1].period}]")
         return "\n".join(lines) + "\n"
 
     @staticmethod
@@ -200,10 +190,7 @@ class PromptBuilder:
                     if o.bounds_lower is not None and o.bounds_upper is not None
                     else ""
                 )
-                lines.append(
-                    f"  - {o.column_name}: {o.count} ({o.ratio:.2%}) "
-                    f"method={o.method}{bounds}"
-                )
+                lines.append(f"  - {o.column_name}: {o.count} ({o.ratio:.2%}) method={o.method}{bounds}")
         else:
             lines.append("  No outliers detected.")
         return "\n".join(lines) + "\n"
@@ -226,10 +213,7 @@ class PromptBuilder:
         if report.recommendations.recommendations:
             for rec in report.recommendations.recommendations:
                 col: str = f" [{rec.column}]" if rec.column else ""
-                lines.append(
-                    f"  P{rec.priority} [{rec.category}]{col}: "
-                    f"{rec.message} -> {rec.action}"
-                )
+                lines.append(f"  P{rec.priority} [{rec.category}]{col}: {rec.message} -> {rec.action}")
         else:
             lines.append("  No recommendations.")
         return "\n".join(lines) + "\n"

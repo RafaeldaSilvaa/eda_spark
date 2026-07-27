@@ -91,7 +91,7 @@ class HTMLRenderer:
         return (
             '<div class="ai-commentary">'
             '<span style="color:var(--muted);font-size:12px;">[AI-generated suggestion]</span>'
-            f"<p style=\"margin-top:8px;\">{content}</p>"
+            f'<p style="margin-top:8px;">{content}</p>'
             "</div>"
         )
 

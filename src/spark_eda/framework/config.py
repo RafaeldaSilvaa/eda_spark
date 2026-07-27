@@ -34,9 +34,6 @@ class EDAConfig:
     omniroute_url: str = "http://localhost:20128/v1"
     omniroute_timeout: int = 30
     omniroute_cache_dir: str | None = None
-    ai_enabled: bool = True
-    omniroute_url: str = "http://localhost:20128/v1"
-    omniroute_timeout: int = 30
 
 
 @dataclass(frozen=True)

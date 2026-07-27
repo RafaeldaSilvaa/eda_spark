@@ -35,9 +35,7 @@ class TestAnalysisPresenterAI:
         config = EDAConfig(ai_enabled=False)
 
         with (
-            mock.patch(
-                "spark_eda.adapters.presenters.analysis_presenter.OmniRouteManager"
-            ) as mock_manager_cls,
+            mock.patch("spark_eda.adapters.presenters.analysis_presenter.OmniRouteManager") as mock_manager_cls,
         ):
             presenter = AnalysisPresenter()
             report = presenter.present(analysis, config=config)
@@ -52,9 +50,7 @@ class TestAnalysisPresenterAI:
         config = EDAConfig(ai_enabled=True)
 
         with (
-            mock.patch(
-                "spark_eda.adapters.presenters.analysis_presenter.OmniRouteManager"
-            ) as mock_manager_cls,
+            mock.patch("spark_eda.adapters.presenters.analysis_presenter.OmniRouteManager") as mock_manager_cls,
         ):
             mock_manager = mock.MagicMock()
             mock_manager.ensure_running.return_value = False
@@ -77,12 +73,8 @@ class TestAnalysisPresenterAI:
         )
 
         with (
-            mock.patch(
-                "spark_eda.adapters.presenters.analysis_presenter.OmniRouteManager"
-            ) as mock_manager_cls,
-            mock.patch(
-                "spark_eda.adapters.presenters.analysis_presenter.OmniRouteClient"
-            ) as mock_client_cls,
+            mock.patch("spark_eda.adapters.presenters.analysis_presenter.OmniRouteManager") as mock_manager_cls,
+            mock.patch("spark_eda.adapters.presenters.analysis_presenter.OmniRouteClient") as mock_client_cls,
         ):
             mock_manager = mock.MagicMock()
             mock_manager.ensure_running.return_value = True
@@ -122,12 +114,8 @@ class TestAnalysisPresenterAI:
         config = EDAConfig(ai_enabled=True, omniroute_url="http://custom:9999/v1", omniroute_timeout=60)
 
         with (
-            mock.patch(
-                "spark_eda.adapters.presenters.analysis_presenter.OmniRouteManager"
-            ) as mock_manager_cls,
-            mock.patch(
-                "spark_eda.adapters.presenters.analysis_presenter.OmniRouteClient"
-            ) as mock_client_cls,
+            mock.patch("spark_eda.adapters.presenters.analysis_presenter.OmniRouteManager") as mock_manager_cls,
+            mock.patch("spark_eda.adapters.presenters.analysis_presenter.OmniRouteClient") as mock_client_cls,
         ):
             mock_manager = mock.MagicMock()
             mock_manager.ensure_running.return_value = True
@@ -149,12 +137,8 @@ class TestAnalysisPresenterAI:
         config = EDAConfig(ai_enabled=True)
 
         with (
-            mock.patch(
-                "spark_eda.adapters.presenters.analysis_presenter.OmniRouteManager"
-            ) as mock_manager_cls,
-            mock.patch(
-                "spark_eda.adapters.presenters.analysis_presenter.OmniRouteClient"
-            ) as mock_client_cls,
+            mock.patch("spark_eda.adapters.presenters.analysis_presenter.OmniRouteManager") as mock_manager_cls,
+            mock.patch("spark_eda.adapters.presenters.analysis_presenter.OmniRouteClient") as mock_client_cls,
         ):
             mock_manager = mock.MagicMock()
             mock_manager.ensure_running.return_value = True
@@ -175,9 +159,7 @@ class TestAnalysisPresenterAI:
         analysis = _make_mock_analysis()
 
         with (
-            mock.patch(
-                "spark_eda.adapters.presenters.analysis_presenter.OmniRouteManager"
-            ) as mock_manager_cls,
+            mock.patch("spark_eda.adapters.presenters.analysis_presenter.OmniRouteManager") as mock_manager_cls,
         ):
             presenter = AnalysisPresenter()
             report = presenter.present_analysis(analysis)

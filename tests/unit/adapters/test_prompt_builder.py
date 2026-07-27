@@ -481,9 +481,7 @@ class TestPromptBuilder:
             (),
             {"period": "2024-01", "count": 100},
         )()
-        distributions = replace(
-            base.distributions, temporal_charts={"data": [point, point]}
-        )
+        distributions = replace(base.distributions, temporal_charts={"data": [point, point]})
         report = replace(base, distributions=distributions)
         prompt = PromptBuilder.build(report)
 

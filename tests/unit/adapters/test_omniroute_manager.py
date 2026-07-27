@@ -126,8 +126,7 @@ class TestOmniRouteManager:
             # objects are different on each access
             stop_qualname = f"{type(manager).__name__}.stop"
             assert any(
-                getattr(f, "__qualname__", None) == stop_qualname
-                or getattr(f, "__name__", None) == "stop"
+                getattr(f, "__qualname__", None) == stop_qualname or getattr(f, "__name__", None) == "stop"
                 for f in registered_funcs
             )
 

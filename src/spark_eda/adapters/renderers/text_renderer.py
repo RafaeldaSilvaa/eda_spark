@@ -124,21 +124,25 @@ class TextRenderer:
             lines.append(f"{_gray('\u2500' * 40)}{_maybe(_ANSI_RESET)}")
             lines.append(content)
             if ai_text:
-                lines.extend([
-                    "",
-                    f"  {_dim('[AI-generated suggestion]')}",
-                    f"  {ai_text}",
-                ])
+                lines.extend(
+                    [
+                        "",
+                        f"  {_dim('[AI-generated suggestion]')}",
+                        f"  {ai_text}",
+                    ]
+                )
             lines.append("")
 
         if commentary and commentary.executive_analysis:
             lines.append(f"{_H2}10. Executive Analysis{_maybe(_ANSI_RESET)}")
             lines.append(f"{_gray('\u2500' * 40)}{_maybe(_ANSI_RESET)}")
-            lines.extend([
-                f"  {_dim('[AI-generated suggestion]')}",
-                f"  {commentary.executive_analysis}",
-                "",
-            ])
+            lines.extend(
+                [
+                    f"  {_dim('[AI-generated suggestion]')}",
+                    f"  {commentary.executive_analysis}",
+                    "",
+                ]
+            )
 
         return "\n".join(lines)
 

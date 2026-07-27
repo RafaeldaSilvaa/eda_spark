@@ -43,7 +43,8 @@ def _npm_install(cache_dir: str) -> bool:
             capture_output=True,
             timeout=120,
         )
-        return result.returncode == 0
+        rc: int = getattr(result, "returncode", 1)
+        return rc == 0
     except Exception:
         return False
 

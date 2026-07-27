@@ -34,10 +34,10 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/usuario/spark-eda"
-Repository = "https://github.com/usuario/spark-eda"
-Documentation = "https://github.com/usuario/spark-eda#readme"
-Tracker = "https://github.com/usuario/spark-eda/issues"
+Homepage = "https://github.com/RafaeldaSilvaa/eda_spark"
+Repository = "https://github.com/RafaeldaSilvaa/eda_spark"
+Documentation = "https://github.com/RafaeldaSilvaa/eda_spark#readme"
+Tracker = "https://github.com/RafaeldaSilvaa/eda_spark/issues"
 
 [project.optional-dependencies]
 dev = [
@@ -89,6 +89,10 @@ no_implicit_optional = true
 warn_return_any = true
 show_error_codes = true
 ignore_missing_imports = false
+
+[[tool.mypy.overrides]]
+module = ["nodejs"]
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
