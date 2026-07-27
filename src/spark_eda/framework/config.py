@@ -18,6 +18,9 @@ class EDAConfig:
         sampling_threshold: Limite de linhas acima do qual o dataset
             é amostrado para análise.
         cache_ttl_seconds: Tempo de vida do cache em segundos.
+        ai_enabled: Habilita a geração de comentários por IA.
+        omniroute_url: URL base para a API do OmniRoute.
+        omniroute_timeout: Timeout em segundos para chamadas HTTP.
     """
 
     max_categories: int = 30
@@ -27,6 +30,13 @@ class EDAConfig:
     enable_recommendations: bool = True
     sampling_threshold: int = 1_000_000
     cache_ttl_seconds: int = 3600
+    ai_enabled: bool = True
+    omniroute_url: str = "http://localhost:20128/v1"
+    omniroute_timeout: int = 30
+    omniroute_cache_dir: str | None = None
+    ai_enabled: bool = True
+    omniroute_url: str = "http://localhost:20128/v1"
+    omniroute_timeout: int = 30
 
 
 @dataclass(frozen=True)

@@ -1,5 +1,6 @@
 """Objetos de transferência de dados da camada de aplicação."""
 
+from spark_eda.adapters.omniroute.models import AiCommentary
 from spark_eda.application.dto.correlation_section import CorrelationEntry, CorrelationSection
 from spark_eda.application.dto.distribution_section import (
     DistributionSection,
@@ -24,6 +25,7 @@ from spark_eda.application.dto.stats_section import (
 )
 
 __all__ = [
+    "AiCommentary",
     "BooleanStatsDTO",
     "CategoricalStatsDTO",
     "CorrelationEntry",

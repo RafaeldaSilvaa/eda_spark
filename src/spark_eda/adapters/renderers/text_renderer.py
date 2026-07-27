@@ -90,47 +90,56 @@ class TextRenderer:
         Returns:
             String formatada para terminal.
         """
+        commentary = eda_report.commentary
+
+        section_data: list[tuple[str, str, str | None]] = [
+            ("1. Overview", eda_report.overview.__str__(), commentary.overview if commentary else None),
+            ("2. Schema", eda_report.schema.__str__(), commentary.schema if commentary else None),
+            (
+                "3. Quality",
+                TextRenderer.render_quality_report(eda_report.quality),
+                commentary.quality if commentary else None,
+            ),
+            ("4. Statistics", eda_report.stats.__str__(), commentary.stats if commentary else None),
+            ("5. Distributions", eda_report.distributions.__str__(), commentary.distributions if commentary else None),
+            ("6. Correlations", eda_report.correlations.__str__(), commentary.correlations if commentary else None),
+            ("7. Outliers", eda_report.outliers.__str__(), commentary.outliers if commentary else None),
+            ("8. Insights", eda_report.insights.__str__(), commentary.insights if commentary else None),
+            (
+                "9. Recommendations",
+                eda_report.recommendations.__str__(),
+                commentary.recommendations if commentary else None,
+            ),
+        ]
+
         lines: list[str] = [
             f"{_H1}{'=' * 60}{_maybe(_ANSI_RESET)}",
             f"{_H1}  spark_eda \u2014 Exploratory Data Analysis Report{_maybe(_ANSI_RESET)}",
             f"{_H1}{'=' * 60}{_maybe(_ANSI_RESET)}",
             "",
-            f"{_H2}1. Overview{_maybe(_ANSI_RESET)}",
-            f"{_gray('\u2500' * 40)}{_maybe(_ANSI_RESET)}",
-            eda_report.overview.__str__(),
-            "",
-            f"{_H2}2. Schema{_maybe(_ANSI_RESET)}",
-            f"{_gray('\u2500' * 40)}{_maybe(_ANSI_RESET)}",
-            eda_report.schema.__str__(),
-            "",
-            f"{_H2}3. Quality{_maybe(_ANSI_RESET)}",
-            f"{_gray('\u2500' * 40)}{_maybe(_ANSI_RESET)}",
-            TextRenderer.render_quality_report(eda_report.quality),
-            "",
-            f"{_H2}4. Statistics{_maybe(_ANSI_RESET)}",
-            f"{_gray('\u2500' * 40)}{_maybe(_ANSI_RESET)}",
-            eda_report.stats.__str__(),
-            "",
-            f"{_H2}5. Distributions{_maybe(_ANSI_RESET)}",
-            f"{_gray('\u2500' * 40)}{_maybe(_ANSI_RESET)}",
-            eda_report.distributions.__str__(),
-            "",
-            f"{_H2}6. Correlations{_maybe(_ANSI_RESET)}",
-            f"{_gray('\u2500' * 40)}{_maybe(_ANSI_RESET)}",
-            eda_report.correlations.__str__(),
-            "",
-            f"{_H2}7. Outliers{_maybe(_ANSI_RESET)}",
-            f"{_gray('\u2500' * 40)}{_maybe(_ANSI_RESET)}",
-            eda_report.outliers.__str__(),
-            "",
-            f"{_H2}8. Insights{_maybe(_ANSI_RESET)}",
-            f"{_gray('\u2500' * 40)}{_maybe(_ANSI_RESET)}",
-            eda_report.insights.__str__(),
-            "",
-            f"{_H2}9. Recommendations{_maybe(_ANSI_RESET)}",
-            f"{_gray('\u2500' * 40)}{_maybe(_ANSI_RESET)}",
-            eda_report.recommendations.__str__(),
         ]
+
+        for heading, content, ai_text in section_data:
+            lines.append(f"{_H2}{heading}{_maybe(_ANSI_RESET)}")
+            lines.append(f"{_gray('\u2500' * 40)}{_maybe(_ANSI_RESET)}")
+            lines.append(content)
+            if ai_text:
+                lines.extend([
+                    "",
+                    f"  {_dim('[AI-generated suggestion]')}",
+                    f"  {ai_text}",
+                ])
+            lines.append("")
+
+        if commentary and commentary.executive_analysis:
+            lines.append(f"{_H2}10. Executive Analysis{_maybe(_ANSI_RESET)}")
+            lines.append(f"{_gray('\u2500' * 40)}{_maybe(_ANSI_RESET)}")
+            lines.extend([
+                f"  {_dim('[AI-generated suggestion]')}",
+                f"  {commentary.executive_analysis}",
+                "",
+            ])
+
         return "\n".join(lines)
 
     @staticmethod

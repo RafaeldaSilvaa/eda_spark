@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from spark_eda.adapters.omniroute.models import AiCommentary
 from spark_eda.application.dto.correlation_section import CorrelationSection
 from spark_eda.application.dto.distribution_section import DistributionSection
 from spark_eda.application.dto.insights_section import InsightsSection
@@ -42,3 +43,4 @@ class EDAReport:
     outliers: OutlierSection
     insights: InsightsSection
     recommendations: RecommendationsSection
+    commentary: AiCommentary | None = None

@@ -2,8 +2,13 @@
 
 from __future__ import annotations
 
+import dataclasses
+import logging
 from typing import Any
 
+from spark_eda.adapters.omniroute.client import OmniRouteClient
+from spark_eda.adapters.omniroute.manager import OmniRouteManager
+from spark_eda.adapters.omniroute.prompt_builder import PromptBuilder
 from spark_eda.adapters.presenters.quality_presenter import QualityPresenter
 from spark_eda.application.dto.correlation_section import CorrelationEntry, CorrelationSection
 from spark_eda.application.dto.distribution_section import (
@@ -52,6 +57,9 @@ from spark_eda.domain.entities.statistic import (
     TextStats,
 )
 from spark_eda.domain.value_objects.data_type import DataType
+from spark_eda.framework.config import EDAConfig
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class AnalysisPresenter(OutputPresenter):
@@ -62,15 +70,18 @@ class AnalysisPresenter(OutputPresenter):
     os dados para apresentação.
     """
 
-    def present(self, analysis: DatasetAnalysis) -> EDAReport:
+    def present(self, analysis: DatasetAnalysis, config: EDAConfig | None = None) -> EDAReport:
         """Converte a análise completa em um ``EDAReport``.
 
         Args:
             analysis: Análise exploratória completa com perfil,
                 qualidade, correlações, insights e recomendações.
+            config: Configuração opcional. Se ``ai_enabled=True``,
+                gera comentários por IA via OmniRoute.
 
         Returns:
-            ``EDAReport`` com todas as seções preenchidas.
+            ``EDAReport`` com todas as seções preenchidas, opcionalmente
+            com comentários de IA.
         """
         overview: OverviewSection = self._build_overview(analysis)
         schema: SchemaSection = self._build_schema(analysis.profile)
@@ -82,7 +93,7 @@ class AnalysisPresenter(OutputPresenter):
         insights: InsightsSection = self._build_insights(analysis)
         recommendations: RecommendationsSection = self._build_recommendations(analysis)
 
-        return EDAReport(
+        report: EDAReport = EDAReport(
             overview=overview,
             schema=schema,
             quality=quality,
@@ -94,16 +105,38 @@ class AnalysisPresenter(OutputPresenter):
             recommendations=recommendations,
         )
 
-    def present_analysis(self, analysis: DatasetAnalysis) -> Any:
+        if config is not None and config.ai_enabled:
+            report = self._inject_ai_commentary(report, config)
+
+        return report
+
+    def _inject_ai_commentary(self, report: EDAReport, config: EDAConfig) -> EDAReport:
+        """Tenta gerar e anexar comentários de IA ao relatório.
+
+        Degrada graciosamente: se OmniRoute não estiver disponível,
+        retorna o relatório sem commentary.
+        """
+        manager: OmniRouteManager = OmniRouteManager()
+        if not manager.ensure_running():
+            _LOGGER.warning("OmniRoute não disponível — relatório sem commentary IA")
+            return report
+
+        client: OmniRouteClient = OmniRouteClient(config.omniroute_url, config.omniroute_timeout)
+        prompt: str = PromptBuilder.build(report)
+        commentary = client.analyze(prompt)
+        return dataclasses.replace(report, commentary=commentary)
+
+    def present_analysis(self, analysis: DatasetAnalysis, config: EDAConfig | None = None) -> Any:
         """Implementa o contrato ``OutputPresenter.present_analysis``.
 
         Args:
             analysis: Análise exploratória a ser apresentada.
+            config: Configuração opcional repassada para ``present``.
 
         Returns:
             ``EDAReport`` formatado.
         """
-        return self.present(analysis)
+        return self.present(analysis, config=config)
 
     def present_quality(self, quality: Any) -> Any:
         """Implementa o contrato ``OutputPresenter.present_quality``.

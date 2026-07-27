@@ -87,6 +87,15 @@ class HTMLRenderer:
     """
 
     @staticmethod
+    def _ai_block(content: str) -> str:
+        return (
+            '<div class="ai-commentary">'
+            '<span style="color:var(--muted);font-size:12px;">[AI-generated suggestion]</span>'
+            f"<p style=\"margin-top:8px;\">{content}</p>"
+            "</div>"
+        )
+
+    @staticmethod
     def render_report(eda_report: EDAReport) -> str:
         """Renderiza o relatório completo como uma página HTML.
 
@@ -96,17 +105,49 @@ class HTMLRenderer:
         Returns:
             String HTML completa com estilos inline.
         """
+        commentary = eda_report.commentary
+
+        def _sec(title: str, content: str, ai_text: str | None) -> str:
+            if ai_text:
+                content = f"{content}{HTMLRenderer._ai_block(ai_text)}"
+            return HTMLRenderer._wrap_section(title, content)
+
         sections: list[str] = [
-            HTMLRenderer._wrap_section("Overview", eda_report.overview._repr_html_()),
-            HTMLRenderer._wrap_section("Schema", eda_report.schema._repr_html_()),
-            HTMLRenderer._wrap_section("Quality", HTMLRenderer.render_quality_report(eda_report.quality)),
-            HTMLRenderer._wrap_section("Statistics", eda_report.stats._repr_html_()),
-            HTMLRenderer._wrap_section("Distributions", eda_report.distributions._repr_html_()),
-            HTMLRenderer._wrap_section("Correlations", eda_report.correlations._repr_html_()),
-            HTMLRenderer._wrap_section("Outliers", eda_report.outliers._repr_html_()),
-            HTMLRenderer._wrap_section("Insights", eda_report.insights._repr_html_()),
-            HTMLRenderer._wrap_section("Recommendations", eda_report.recommendations._repr_html_()),
+            _sec("Overview", eda_report.overview._repr_html_(), commentary.overview if commentary else None),
+            _sec("Schema", eda_report.schema._repr_html_(), commentary.schema if commentary else None),
+            _sec(
+                "Quality",
+                HTMLRenderer.render_quality_report(eda_report.quality),
+                commentary.quality if commentary else None,
+            ),
+            _sec("Statistics", eda_report.stats._repr_html_(), commentary.stats if commentary else None),
+            _sec(
+                "Distributions",
+                eda_report.distributions._repr_html_(),
+                commentary.distributions if commentary else None,
+            ),
+            _sec(
+                "Correlations",
+                eda_report.correlations._repr_html_(),
+                commentary.correlations if commentary else None,
+            ),
+            _sec("Outliers", eda_report.outliers._repr_html_(), commentary.outliers if commentary else None),
+            _sec("Insights", eda_report.insights._repr_html_(), commentary.insights if commentary else None),
+            _sec(
+                "Recommendations",
+                eda_report.recommendations._repr_html_(),
+                commentary.recommendations if commentary else None,
+            ),
         ]
+
+        if commentary and commentary.executive_analysis:
+            sections.append(
+                HTMLRenderer._wrap_section(
+                    "Executive Analysis",
+                    HTMLRenderer._ai_block(commentary.executive_analysis),
+                )
+            )
+
         sections_html: str = "".join(sections)
         return HTMLRenderer._document(sections_html)
 
