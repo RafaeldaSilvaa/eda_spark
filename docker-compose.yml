@@ -59,6 +59,21 @@ services:
     stdin_open: true
     tty: true
 
+  demo:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.demo
+    image: spark-eda:demo
+    container_name: spark-eda-demo
+    environment:
+      <<: *spark-env
+    volumes:
+      - ./demo.py:/app/demo.py
+      - ./src:/app/src
+      - ./pyproject.toml:/app/pyproject.toml
+      - ./reports:/app/reports
+    command: ["python", "demo.py"]
+
   benchmark:
     build:
       context: .
