@@ -55,3 +55,7 @@ Thumbs.db
 # Build
 *.whl
 *.tar.gz
+
+# Demo output
+demo_report.html
+demo_report.json
