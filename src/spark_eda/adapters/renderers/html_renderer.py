@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from spark_eda.application.dto.eda_report import EDAReport
-from spark_eda.application.dto.quality_section import QualityFactorReport, QualityReport
+from spark_eda.application.dto.quality_section import QualityReport
 from spark_eda.utils.formatting import format_number, format_percentage
 
 
@@ -74,6 +74,9 @@ h3 { font-size: 15px; font-weight: 600; margin: 16px 0 8px; }
 }
 """
 
+_GAUGE_LOW_THRESHOLD: int = 40
+_GAUGE_MEDIUM_THRESHOLD: int = 70
+
 
 class HTMLRenderer:
     """Renderizador de relatórios em HTML com estilos inline.
@@ -140,13 +143,14 @@ class HTMLRenderer:
         gauge_value: float = max(0.0, min(100.0, quality.overall))
         gauge_deg: float = (gauge_value / 100.0) * 180.0
         gauge_color: str = (
-            "#dc2626" if gauge_value < 40
-            else "#d97706" if gauge_value < 70
+            "#dc2626" if gauge_value < _GAUGE_LOW_THRESHOLD
+            else "#d97706" if gauge_value < _GAUGE_MEDIUM_THRESHOLD
             else "#16a34a"
         )
         gauge_svg: str = (
             f'<svg width="160" height="90" viewBox="0 0 160 90" style="display:block;margin:0 auto;">'
-            f'<path d="M 15 85 A 65 65 0 0 1 145 85" fill="none" stroke="#e2e8f0" stroke-width="12" stroke-linecap="round"/>'
+            f'<path d="M 15 85 A 65 65 0 0 1 145 85" fill="none" '
+            f'stroke="#e2e8f0" stroke-width="12" stroke-linecap="round"/>'
             f'<path d="M 15 85 A 65 65 0 0 1 145 85" fill="none" stroke="{gauge_color}" '
             f'stroke-width="12" stroke-dasharray="{gauge_deg / 180.0 * 204.0} 204" stroke-linecap="round"/>'
             f'<text x="80" y="55" text-anchor="middle" font-size="28" font-weight="700" '
@@ -164,8 +168,9 @@ class HTMLRenderer:
             f'<span>{format_number(dim.score, 1)}</span>'
             f"</div>"
             f'<div style="height:6px;background:var(--border,#e2e8f0);border-radius:3px;overflow:hidden;">'
-            f'<div style="height:100%;width:{dim.score}%;background:{gauge_color if dim.score < 70 else "#16a34a"};'
-            f'border-radius:3px;transition:width 0.3s;"></div>'
+             f'<div style="height:100%;width:{dim.score}%;'
+             f'background:{gauge_color if dim.score < _GAUGE_MEDIUM_THRESHOLD else "#16a34a"};'
+             f'border-radius:3px;transition:width 0.3s;"></div>'
             f"</div>"
             f"</div>"
             for dim in quality.dimensions
@@ -209,7 +214,7 @@ class HTMLRenderer:
             Fragmento HTML da seção.
         """
         if hasattr(section, "_repr_html_"):
-            return section._repr_html_()
+            return section._repr_html_()  # type: ignore[no-any-return]
         return f"<div>{section!r}</div>"
 
     @staticmethod

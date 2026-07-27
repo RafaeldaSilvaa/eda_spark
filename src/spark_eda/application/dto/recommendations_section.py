@@ -3,42 +3,51 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+_PRIORITY_CRITICAL: int = 1
+_PRIORITY_HIGH: int = 2
+_PRIORITY_MEDIUM: int = 3
+_PRIORITY_LOW: int = 4
+
 
 def _priority_color(priority: int) -> str:
     """Retorna a cor CSS para o nível de prioridade."""
-    if priority <= 1:
+    if priority <= _PRIORITY_CRITICAL:
         return "#dc2626"
-    if priority <= 2:
+    if priority <= _PRIORITY_HIGH:
         return "#d97706"
-    if priority <= 3:
+    if priority <= _PRIORITY_MEDIUM:
         return "#eab308"
-    if priority <= 4:
+    if priority <= _PRIORITY_LOW:
         return "#22c55e"
     return "#64748b"
 
 
 def _priority_label(priority: int) -> str:
     """Retorna o rótulo textual para o nível de prioridade."""
-    if priority <= 1:
+    if priority <= _PRIORITY_CRITICAL:
         return "Critical"
-    if priority <= 2:
+    if priority <= _PRIORITY_HIGH:
         return "High"
-    if priority <= 3:
+    if priority <= _PRIORITY_MEDIUM:
         return "Medium"
-    if priority <= 4:
+    if priority <= _PRIORITY_LOW:
         return "Low"
     return "Informational"
 
 
 def _priority_marker(priority: int) -> str:
     """Retorna o marcador para exibição no terminal."""
-    if priority <= 1:
+    if priority <= _PRIORITY_CRITICAL:
         return "!!!"
-    if priority <= 2:
+    if priority <= _PRIORITY_HIGH:
         return "!!"
-    if priority <= 3:
+    if priority <= _PRIORITY_MEDIUM:
         return "! "
     return "  "
+
+
+def _column_tag(col: str | None) -> str:
+    return f'<span style="font-size:11px;color:var(--muted,#64748b);">| {col}</span>' if col else ""
 
 
 @dataclass(frozen=True)
@@ -89,7 +98,7 @@ class RecommendationsSection:
             f'<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;flex-wrap:wrap;">'
             f'<span style="font-size:11px;font-weight:600;color:var(--muted,#64748b);'
             f'text-transform:uppercase;">{rec.category.replace("_", " ")}</span>'
-            f'{"<span style=\"font-size:11px;color:var(--muted,#64748b);\">| " + rec.column + "</span>" if rec.column else ""}'
+            f'{_column_tag(rec.column)}'
             f'</div>'
             f'<div style="font-size:13px;color:var(--text,#1a1a2e);font-weight:500;margin-bottom:4px;">'
             f'{rec.message}</div>'

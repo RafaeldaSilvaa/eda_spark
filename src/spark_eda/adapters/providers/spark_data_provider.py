@@ -12,7 +12,7 @@ import json
 from typing import Any
 
 from pyspark.sql import DataFrame
-from pyspark.sql import functions as F
+from pyspark.sql import functions as F  # noqa: N812
 from pyspark.sql.types import (
     BooleanType,
     DateType,
@@ -26,6 +26,7 @@ from pyspark.sql.types import (
     TimestampType,
 )
 
+from spark_eda.application.ports.data_provider import DataProvider
 from spark_eda.domain.entities.column_metadata import ColumnMetadata
 from spark_eda.domain.entities.column_profile import ColumnProfile
 from spark_eda.domain.entities.correlation import Correlation
@@ -50,8 +51,6 @@ from spark_eda.domain.value_objects.correlation_method import CorrelationMethod
 from spark_eda.domain.value_objects.data_type import DataType
 from spark_eda.domain.value_objects.inferred_type import InferredType
 from spark_eda.domain.value_objects.outlier_method import OutlierMethod
-from spark_eda.application.ports.data_provider import DataProvider
-
 
 _SPARK_TYPE_TO_DOMAIN: dict[type, DataType] = {
     IntegerType: DataType.INTEGER,
@@ -79,6 +78,9 @@ _TEMPORAL_TYPES: set[DataType] = {
 
 _ZSCORE_THRESHOLD: float = 3.0
 _MAD_THRESHOLD: float = 3.5
+_MIN_QUARTILES: int = 3
+_QUARTILE_Q75_IDX: int = 2
+_TEXT_LENGTH_THRESHOLD: int = 50
 
 
 def _infer_data_type(spark_field_type: object) -> DataType:
@@ -100,7 +102,7 @@ def _infer_data_type(spark_field_type: object) -> DataType:
 
 def _build_numeric_agg_expressions(
     column_name: str,
-    expression_list: list,
+    expression_list: list[Any],
 ) -> None:
     """Adiciona expressões de agregação numérica para uma coluna.
 
@@ -131,7 +133,7 @@ def _build_numeric_agg_expressions(
 
 def _build_string_agg_expressions(
     column_name: str,
-    expression_list: list,
+    expression_list: list[Any],
 ) -> None:
     """Adiciona expressões de agregação para colunas de texto.
 
@@ -168,7 +170,7 @@ def _build_string_agg_expressions(
 
 def _build_boolean_agg_expressions(
     column_name: str,
-    expression_list: list,
+    expression_list: list[Any],
 ) -> None:
     """Adiciona expressões de agregação para colunas booleanas.
 
@@ -183,12 +185,12 @@ def _build_boolean_agg_expressions(
         ),
     )
     expression_list.append(
-        F.sum(F.when(F.col(column_name) == True, 1).otherwise(0)).alias(
+        F.sum(F.when(F.col(column_name), 1).otherwise(0)).alias(
             f"{column_name}__true_count",
         ),
     )
     expression_list.append(
-        F.sum(F.when(F.col(column_name) == False, 1).otherwise(0)).alias(
+        F.sum(F.when(~F.col(column_name), 1).otherwise(0)).alias(
             f"{column_name}__false_count",
         ),
     )
@@ -196,7 +198,7 @@ def _build_boolean_agg_expressions(
 
 def _build_temporal_agg_expressions(
     column_name: str,
-    expression_list: list,
+    expression_list: list[Any],
 ) -> None:
     """Adiciona expressões de agregação para colunas temporais (date, timestamp).
 
@@ -235,8 +237,7 @@ def _build_value_counts(dataframe: DataFrame, column_name: str) -> dict[str, int
         Dicionário mapeando cada valor distinto à sua contagem.
     """
     rows: list[Any] = (
-        dataframe.select(column_name)
-        .groupBy(column_name)
+        dataframe.groupBy(column_name)
         .agg(F.count(F.lit(1)).alias("count"))
         .orderBy(F.col("count").desc())
         .limit(50)
@@ -256,7 +257,7 @@ def _build_value_counts(dataframe: DataFrame, column_name: str) -> dict[str, int
 def _extract_numeric_stats(
     aggregation_row: Any,
     column_name: str,
-    total_rows: int,
+    _total_rows: int,
 ) -> NumericStats:
     """Extrai estatísticas numéricas da linha de agregação em única passagem.
 
@@ -285,7 +286,7 @@ def _extract_categorical_stats(
     aggregation_row: Any,
     column_name: str,
     value_counts: dict[str, int],
-    total_rows: int,
+    _total_rows: int,
 ) -> CategoricalStats:
     """Extrai estatísticas categóricas da linha de agregação.
 
@@ -417,7 +418,7 @@ def _compute_outliers_iqr(
         relativeError=0.01,
     )
 
-    if len(quartiles) < 3:
+    if len(quartiles) < _MIN_QUARTILES:
         return None
 
     q25: float = quartiles[0]
@@ -585,7 +586,7 @@ def _compute_outliers(
     Returns:
         :class:`OutlierInfo` ou None.
     """
-    outlier_method: str = method or getattr(config, "outlier_method", "iqr")
+    outlier_method = method or getattr(config, "outlier_method", "iqr")
 
     if outlier_method == "zscore":
         return _compute_outliers_zscore(dataframe, column_name, config)
@@ -659,11 +660,11 @@ def _compute_distribution(
             others_count=others_count,
         )
 
-    # Bug 1 fix: TemporalDistribution for temporal types
+    # TemporalDistribution for temporal types
     if domain_type in _TEMPORAL_TYPES:
         return _compute_temporal_distribution(dataframe, column_name)
 
-    return None
+    return None  # pragma: no cover
 
 
 def _compute_temporal_distribution(
@@ -685,11 +686,8 @@ def _compute_temporal_distribution(
 
         # Yearly aggregation
         yearly_rows: list[Any] = (
-            dataframe.select(
-                F.year(column_name).alias("year"),
-                F.count(F.lit(1)).alias("count"),
-            )
-            .groupBy("year")
+            dataframe.groupBy(F.year(column_name).alias("year"))
+            .agg(F.count(F.lit(1)).alias("count"))
             .orderBy("year")
             .collect()
         )
@@ -704,11 +702,8 @@ def _compute_temporal_distribution(
         # If yearly is too coarse (single year), try monthly
         if len(periods) <= 1:
             monthly_rows: list[Any] = (
-                dataframe.select(
-                    F.date_format(column_name, "yyyy-MM").alias("month"),
-                    F.count(F.lit(1)).alias("count"),
-                )
-                .groupBy("month")
+                dataframe.groupBy(F.date_format(column_name, "yyyy-MM").alias("month"))
+                .agg(F.count(F.lit(1)).alias("count"))
                 .orderBy("month")
                 .collect()
             )
@@ -727,27 +722,6 @@ def _compute_temporal_distribution(
 
     except Exception:
         return None
-
-
-def _compute_row_duplicates(dataframe: DataFrame) -> float:
-    """Computa a proporção aproximada de linhas duplicadas.
-
-    Usa countDistinct vs count do Spark para estimar duplicatas.
-
-    Args:
-        dataframe: DataFrame PySpark.
-
-    Returns:
-        Proporção de duplicatas em [0.0, 1.0].
-    """
-    total_count: int = dataframe.count()
-    if total_count == 0:
-        return 0.0
-
-    distinct_count: int = dataframe.distinct().count()
-    duplicate_ratio: float = 1.0 - (distinct_count / total_count)
-
-    return round(duplicate_ratio, 4)
 
 
 def _compute_both_string_stats(
@@ -794,7 +768,7 @@ class SparkDataProvider(DataProvider):
             column_classifier or ColumnClassifier()
         )
 
-    def compute_profile(
+    def compute_profile(  # noqa: PLR0912, PLR0915
         self,
         dataframe: DataFrame,
         columns: list[str] | None,
@@ -836,9 +810,10 @@ class SparkDataProvider(DataProvider):
 
         # Sampling: if the dataset is too large, work on a sample
         total_rows: int = dataframe.count()
+        profile_row_count: int = total_rows
         sampling_threshold: int = getattr(config, "sampling_threshold", 1_000_000)
         working_df: DataFrame = dataframe
-        if total_rows > sampling_threshold and sampling_threshold > 0:
+        if total_rows > sampling_threshold > 0:
             fraction: float = sampling_threshold / total_rows
             working_df = dataframe.sample(withReplacement=False, fraction=fraction, seed=42)
             total_rows = working_df.count()
@@ -881,14 +856,14 @@ class SparkDataProvider(DataProvider):
                 column_profiles=column_profiles_result,
             )
 
-        expression_list: list = [F.count(F.lit(1)).alias("__total_rows__")]
+        expression_list: list[Any] = [F.count(F.lit(1)).alias("__total_rows__")]
 
         column_domain_types: dict[str, DataType] = {}
         nullable_info: dict[str, bool] = {}
 
         for column_name in column_names:
-            field_type: Any = spark_schema[column_name].dataType
-            domain_type: DataType = _infer_data_type(field_type)
+            field_type = spark_schema[column_name].dataType
+            domain_type = _infer_data_type(field_type)
             column_domain_types[column_name] = domain_type
             nullable_info[column_name] = spark_schema[column_name].nullable
 
@@ -907,9 +882,9 @@ class SparkDataProvider(DataProvider):
         column_profiles_processed: dict[str, ColumnProfile] = {}
 
         for column_name in column_names:
-            domain_type: DataType = column_domain_types[column_name]
-            nullable: bool = nullable_info[column_name]
-            inferred: InferredType | None = inferred_types.get(column_name)
+            domain_type = column_domain_types[column_name]
+            nullable = nullable_info[column_name]
+            inferred = inferred_types.get(column_name)
 
             null_count: int = 0
             non_null_count: int = 0
@@ -941,7 +916,7 @@ class SparkDataProvider(DataProvider):
                     min=stats_numeric.min,
                     q25=float(quartiles[0]) if len(quartiles) > 0 else stats_numeric.q25,
                     q50=float(quartiles[1]) if len(quartiles) > 1 else stats_numeric.q50,
-                    q75=float(quartiles[2]) if len(quartiles) > 2 else stats_numeric.q75,
+                    q75=float(quartiles[2]) if len(quartiles) > _QUARTILE_Q75_IDX else stats_numeric.q75,
                     max=stats_numeric.max,
                     skewness=stats_numeric.skewness,
                     kurtosis=stats_numeric.kurtosis,
@@ -980,10 +955,7 @@ class SparkDataProvider(DataProvider):
                 )
 
                 # Store TextStats when column has long strings
-                if text_stats.avg_length > 50:
-                    stats = text_stats
-                else:
-                    stats = categorical_stats
+                stats = text_stats if text_stats.avg_length > _TEXT_LENGTH_THRESHOLD else categorical_stats
 
                 distribution = _compute_distribution(
                     working_df,
@@ -1052,7 +1024,7 @@ class SparkDataProvider(DataProvider):
         return DataProfile(
             id=profile_id,
             columns=tuple(columns_processed),
-            row_count=total_rows,
+            row_count=profile_row_count,
             column_profiles=column_profiles_processed,
         )
 

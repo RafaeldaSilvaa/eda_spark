@@ -10,6 +10,10 @@ import re
 
 from spark_eda.domain.value_objects.inferred_type import InferredType
 
+_AUTO_INCREMENT_MAX_LEN = 6
+_MIN_SAMPLES_FOR_CLASSIFICATION = 3
+_CLASSIFICATION_MATCH_THRESHOLD = 0.5
+
 
 class ColumnClassifier:
     """Classificador semântico de colunas, sem estado.
@@ -62,7 +66,7 @@ class ColumnClassifier:
                 if pattern in normalized_name:
                     return inferred_type
 
-        if normalized_name == "id" or normalized_name.endswith("id") and len(normalized_name) <= 6:
+        if normalized_name == "id" or (normalized_name.endswith("id") and len(normalized_name) <= _AUTO_INCREMENT_MAX_LEN):  # noqa: E501
             return InferredType.AUTO_INCREMENT
 
         return None
@@ -86,7 +90,7 @@ class ColumnClassifier:
             v for v in sample_values if v is not None
         ]
 
-        if len(non_null_values) < 3:
+        if len(non_null_values) < _MIN_SAMPLES_FOR_CLASSIFICATION:
             return None
 
         regex_patterns: dict[InferredType, re.Pattern[str]] = {
@@ -129,7 +133,7 @@ class ColumnClassifier:
             )
             match_rate: float = matches / len(non_null_values)
 
-            if match_rate > best_match_rate and match_rate > 0.5:
+            if match_rate > best_match_rate and match_rate > _CLASSIFICATION_MATCH_THRESHOLD:
                 best_match_rate = match_rate
                 best_type = inferred_type
 

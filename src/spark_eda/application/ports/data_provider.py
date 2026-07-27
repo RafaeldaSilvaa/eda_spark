@@ -4,6 +4,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any
 
+from spark_eda.domain.entities.correlation import Correlation
 from spark_eda.domain.entities.data_profile import DataProfile
 
 
@@ -32,8 +33,26 @@ class DataProvider(ABC):
             DataProfile com o perfil completo do dataset.
 
         Raises:
-            ValueError: Se o dataframe for inválido ou as colunas não existirem.
-            RuntimeError: Se ocorrer um erro durante o processamento.
+            ValueError: Se o dataframe for inválido.
+            RuntimeError: Se ocorrer um erro durante o cálculo.
+        """
+
+    @abstractmethod
+    def compute_correlations(
+        self,
+        dataframe: Any,
+        numeric_columns: list[str],
+        method: str = "pearson",
+    ) -> list[Correlation]:
+        """Computa correlações pareadas para colunas numéricas.
+
+        Args:
+            dataframe: Referência abstrata a um PySpark DataFrame.
+            numeric_columns: Lista de nomes de colunas numéricas.
+            method: Método de correlação ("pearson").
+
+        Returns:
+            Lista de entradas de correlação entre pares de colunas.
         """
 
     @abstractmethod

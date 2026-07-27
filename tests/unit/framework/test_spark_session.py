@@ -85,7 +85,7 @@ class TestSparkSession:
 
     def test_get_or_create_with_custom_partition_size(self) -> None:
         """get_or_create_spark_session deve usar o
-        adapter_partition_size fornecido.
+        advisory_partition_size fornecido.
         """
         # Arrange
         builder: mock.MagicMock = _make_builder_mock()
@@ -94,7 +94,7 @@ class TestSparkSession:
             builder,
         ):
             # Act
-            get_or_create_spark_session(adapter_partition_size="128MB")
+            get_or_create_spark_session(advisory_partition_size="128MB")
 
         # Assert
         builder.config.assert_any_call(

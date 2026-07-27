@@ -21,7 +21,7 @@ def _default_serializer(obj: Any) -> Any:
         TypeError: Se o tipo não puder ser serializado.
     """
     if is_dataclass(obj):
-        return asdict(obj)
+        return asdict(obj)  # type: ignore[arg-type]
     if isinstance(obj, set):
         return list(obj)
     if isinstance(obj, Enum):
@@ -48,7 +48,7 @@ class JSONSerializer:
             String JSON formatada com indentação.
         """
         return json.dumps(
-            asdict(report) if is_dataclass(report) else report,
+            asdict(report) if is_dataclass(report) else report,  # type: ignore[arg-type]
             default=_default_serializer,
             indent=2,
             ensure_ascii=False,

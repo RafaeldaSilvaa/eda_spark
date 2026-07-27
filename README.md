@@ -5,8 +5,9 @@
 [![Python 3.14+](https://img.shields.io/badge/python-3.14%2B-blue)](https://www.python.org/downloads/)
 [![PySpark](https://img.shields.io/badge/PySpark-4.0+-orange)](https://spark.apache.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![CI](https://img.shields.io/badge/CI-passing-brightgreen)](.github/workflows/ci.yml)
-[![Coverage](https://img.shields.io/badge/coverage-%3E95%25-brightgreen)](https://codecov.io/)
+[![CI](https://img.shields.io/github/actions/workflow/status/usuario/spark-eda/ci.yml?branch=main)](https://github.com/usuario/spark-eda/actions)
+[![PyPI](https://img.shields.io/pypi/v/spark-eda)](https://pypi.org/project/spark-eda/)
+[![Python Versions](https://img.shields.io/pypi/pyversions/spark-eda)](https://pypi.org/project/spark-eda/)
 
 ```python
 import spark_eda
@@ -110,7 +111,7 @@ pip install spark-eda
 ### From source
 
 ```bash
-git clone https://github.com/your-org/spark-eda.git
+git clone https://github.com/usuario/spark-eda.git
 cd spark-eda
 pip install -e ".[dev,test]"
 ```

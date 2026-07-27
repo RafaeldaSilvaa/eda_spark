@@ -10,19 +10,11 @@ from spark_eda.domain.entities.column_profile import ColumnProfile
 from spark_eda.domain.entities.data_profile import DataProfile
 from spark_eda.domain.entities.quality_score import QualityFactor
 from spark_eda.domain.entities.statistic import TemporalStats
-from spark_eda.domain.services.quality_factors import registrar
+from spark_eda.domain.services.quality_factors import _score_severity, registrar
 from spark_eda.domain.value_objects.severity import Severity
 
-
-def _severity(score: float) -> Severity:
-    """Mapeia uma pontuação em [0, 1] para um nível de severidade."""
-    if score < 0.3:
-        return Severity.CRITICAL
-    if score < 0.6:
-        return Severity.HIGH
-    if score < 0.8:
-        return Severity.MEDIUM
-    return Severity.LOW
+_TIMELINESS_THRESHOLD = 0.95
+_STALE_THRESHOLD = 0.05
 
 
 def _freshness(profile: DataProfile) -> QualityFactor:
@@ -66,7 +58,7 @@ def _freshness(profile: DataProfile) -> QualityFactor:
             f"colunas temporais possuem dados com variação positiva "
             f"(range_days > 0), indicando atualidade."
         ),
-        severity=_severity(score),
+        severity=_score_severity(score),
         affected_columns=temporal_columns,
     )
 
@@ -89,7 +81,7 @@ def _temporal_completeness(profile: DataProfile) -> QualityFactor:
                 proportion = column_metadata.non_null_count / total_column
 
             non_null_proportions.append(proportion)
-            if proportion < 0.95:
+            if proportion < _TIMELINESS_THRESHOLD:
                 affected_columns.append(column_metadata.name)
 
     if not non_null_proportions:
@@ -115,7 +107,7 @@ def _temporal_completeness(profile: DataProfile) -> QualityFactor:
             f"Média de {mean_value:.1%} de valores preenchidos em "
             f"{len(non_null_proportions)} colunas temporais."
         ),
-        severity=_severity(score),
+        severity=_score_severity(score),
         affected_columns=affected_columns,
     )
 
@@ -139,7 +131,7 @@ def _invalid_dates(profile: DataProfile) -> QualityFactor:
                 null_ratio_val = column_metadata.null_count / total_column
 
             null_ratios.append(null_ratio_val)
-            if null_ratio_val > 0.05:
+            if null_ratio_val > _STALE_THRESHOLD:
                 affected_columns.append(column_metadata.name)
 
     if not null_ratios:
@@ -166,7 +158,7 @@ def _invalid_dates(profile: DataProfile) -> QualityFactor:
             f"temporais, possivelmente indicando datas inválidas ou "
             f"mal formatadas."
         ),
-        severity=_severity(score),
+        severity=_score_severity(score),
         affected_columns=affected_columns,
     )
 
@@ -213,7 +205,7 @@ def _temporal_gaps(profile: DataProfile) -> QualityFactor:
             f"Total de {total_gaps} lacunas temporais identificadas "
             f"em {len(columns_with_gap)} colunas."
         ),
-        severity=_severity(score),
+        severity=_score_severity(score),
         affected_columns=columns_with_gap,
     )
 

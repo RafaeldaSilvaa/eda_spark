@@ -5,8 +5,8 @@ from spark_eda.utils.hashing import compute_fingerprint
 
 __all__ = [
     "compute_fingerprint",
+    "format_bytes",
     "format_number",
     "format_percentage",
-    "format_bytes",
     "truncate_text",
 ]

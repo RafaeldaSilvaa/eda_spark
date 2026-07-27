@@ -8,13 +8,12 @@ e retorna um :class:`QualityReport`.
 from __future__ import annotations
 
 import logging
-from typing import Any
 
 from pyspark.sql import DataFrame
 
+from spark_eda.adapters.presenters.quality_presenter import QualityPresenter
 from spark_eda.adapters.providers.lru_cache_provider import LRUCacheProvider
 from spark_eda.adapters.providers.spark_data_provider import SparkDataProvider
-from spark_eda.adapters.presenters.quality_presenter import QualityPresenter
 from spark_eda.application.dto.quality_section import QualityReport
 from spark_eda.application.use_cases.assess_quality import AssessQualityUseCase, QualityRequest
 from spark_eda.domain.entities.quality_score import QualityScore
@@ -81,7 +80,8 @@ class QualityController:
 
         Raises:
             ValueError: Se o DataFrame for inválido.
-            RuntimeError: Se o processamento falhar.
+            SparkEDAError: Se o processamento falhar (subclasse específica
+                conforme a etapa: DataProviderError, QualityError).
         """
         if dataframe is None:
             raise ValueError("DataFrame cannot be None.")

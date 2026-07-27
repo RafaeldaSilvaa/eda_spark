@@ -3,11 +3,16 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
+from spark_eda.application.exceptions import (
+    AnalysisError,
+    DataProviderError,
+)
 from spark_eda.application.ports.cache_provider import CacheProvider
 from spark_eda.application.ports.data_provider import DataProvider
+from spark_eda.domain.entities.correlation import Correlation
 from spark_eda.domain.entities.data_profile import DataProfile
 from spark_eda.domain.entities.dataset_analysis import DatasetAnalysis
 from spark_eda.domain.entities.quality_score import QualityScore
@@ -136,8 +141,8 @@ class AnalyzeDatasetUseCase:
             DatasetAnalysis com profile, qualidade, insights e recomendações.
 
         Raises:
-            ValueError: Se o dataframe for inválido.
-            RuntimeError: Se alguma etapa do processamento falhar.
+            DataProviderError: Se o profile não puder ser computado.
+            AnalysisError: Se qualidade, insights ou recomendações falharem.
         """
         fingerprint: str = self._data_provider.compute_fingerprint(
             dataframe,
@@ -156,41 +161,52 @@ class AnalyzeDatasetUseCase:
                 request.columns,
                 request.config,
             )
-        except ValueError:
-            raise
         except Exception as exc:
-            raise RuntimeError(
+            raise DataProviderError(
                 f"Failed to compute dataset profile: {exc}",
             ) from exc
 
         try:
             quality: QualityScore = self._quality_calculator.calculate(profile)
         except Exception as exc:
-            raise RuntimeError(
+            raise AnalysisError(
                 f"Failed to calculate data quality: {exc}",
             ) from exc
 
         try:
             insights = self._insight_engine.generate(profile, quality)
         except Exception as exc:
-            raise RuntimeError(
+            raise AnalysisError(
                 f"Failed to generate insights: {exc}",
             ) from exc
 
         try:
             recommendations = self._recommendation_engine.generate(insights, quality)
         except Exception as exc:
-            raise RuntimeError(
+            raise AnalysisError(
                 f"Failed to generate recommendations: {exc}",
             ) from exc
+
+        correlations: list[Correlation] = []
+        try:
+            numeric_columns: list[str] = [
+                col.name for col in profile.columns
+                if col.data_type.value in ("integer", "long", "double", "decimal")
+            ]
+            if numeric_columns:
+                correlations = self._data_provider.compute_correlations(
+                    dataframe, numeric_columns,
+                )
+        except Exception as exc:
+            logger.warning("Correlation computation failed (continuing): %s", exc)
 
         analysis: DatasetAnalysis = DatasetAnalysis(
             profile=profile,
             quality=quality,
-            correlations=[],  # Correlation is computed separately by SparkDataProvider
+            correlations=correlations,
             insights=insights,
             recommendations=recommendations,
-            timestamps=datetime.now(timezone.utc),
+            timestamps=datetime.now(UTC),
         )
 
         self._try_store_cache(cache_key, analysis, request.config)

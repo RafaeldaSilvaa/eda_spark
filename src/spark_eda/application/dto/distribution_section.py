@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from spark_eda.utils.formatting import format_number, format_percentage
+from spark_eda.utils.formatting import format_number
 
 
 @dataclass(frozen=True)

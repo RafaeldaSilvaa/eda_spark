@@ -45,6 +45,9 @@ def format_percentage(
     return f"{fmt % pct}%".replace(".", "," if decimal_places > 0 else ".")
 
 
+_KB: int = 1024
+
+
 def format_bytes(bytes_: int) -> str:
     """Formata um valor em bytes para uma representação legível.
 
@@ -57,7 +60,7 @@ def format_bytes(bytes_: int) -> str:
     units = ("B", "KB", "MB", "GB", "TB", "PB")
     size = float(bytes_)
     unit_idx = 0
-    while size >= 1024 and unit_idx < len(units) - 1:
+    while size >= _KB and unit_idx < len(units) - 1:
         size /= 1024.0
         unit_idx += 1
     if unit_idx == 0:

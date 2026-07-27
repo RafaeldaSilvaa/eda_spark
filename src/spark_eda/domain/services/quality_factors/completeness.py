@@ -10,19 +10,11 @@ from spark_eda.domain.entities.column_profile import ColumnProfile
 from spark_eda.domain.entities.data_profile import DataProfile
 from spark_eda.domain.entities.quality_score import QualityFactor
 from spark_eda.domain.entities.statistic import TextStats
-from spark_eda.domain.services.quality_factors import registrar
+from spark_eda.domain.services.quality_factors import _score_severity, registrar
 from spark_eda.domain.value_objects.severity import Severity
 
-
-def _severity(score: float) -> Severity:
-    """Mapeia uma pontuação em [0, 1] para um nível de severidade."""
-    if score < 0.3:
-        return Severity.CRITICAL
-    if score < 0.6:
-        return Severity.HIGH
-    if score < 0.8:
-        return Severity.MEDIUM
-    return Severity.LOW
+_COMPLETENESS_THRESHOLD = 0.95
+_EMPTY_WARN_THRESHOLD = 0.05
 
 
 def _non_null_ratio(profile: DataProfile) -> QualityFactor:
@@ -47,7 +39,7 @@ def _non_null_ratio(profile: DataProfile) -> QualityFactor:
     affected_columns: list[str] = []
 
     for column_metadata in profile.columns:
-        column_profile: ColumnProfile = profile.column_profiles[column_metadata.name]
+        profile.column_profiles[column_metadata.name]
         total_column: int = column_metadata.null_count + column_metadata.non_null_count
         if total_column == 0:
             proportion: float = 1.0
@@ -55,7 +47,7 @@ def _non_null_ratio(profile: DataProfile) -> QualityFactor:
             proportion = column_metadata.non_null_count / total_column
 
         proportions.append(proportion)
-        if proportion < 0.95:
+        if proportion < _COMPLETENESS_THRESHOLD:
             affected_columns.append(column_metadata.name)
 
     mean_value: float = sum(proportions) / len(proportions) if proportions else 1.0
@@ -66,7 +58,7 @@ def _non_null_ratio(profile: DataProfile) -> QualityFactor:
         internal_weight=0.35,
         contribution=mean_value * 0.35,
         reason=f"Média de {mean_value:.1%} de valores preenchidos entre {len(proportions)} colunas.",
-        severity=_severity(mean_value),
+        severity=_score_severity(mean_value),
         affected_columns=affected_columns,
     )
 
@@ -108,7 +100,7 @@ def _row_completeness(profile: DataProfile) -> QualityFactor:
             f"possuem valores nulos. Score baseado na fração de colunas "
             f"completamente preenchidas."
         ),
-        severity=_severity(score),
+        severity=_score_severity(score),
         affected_columns=affected_columns,
     )
 
@@ -127,7 +119,7 @@ def _empty_strings(profile: DataProfile) -> QualityFactor:
         stats = column_profile.stats
         if isinstance(stats, TextStats):
             empty_ratios.append(stats.empty_ratio)
-            if stats.empty_ratio > 0.05:
+            if stats.empty_ratio > _EMPTY_WARN_THRESHOLD:
                 affected_columns.append(column_metadata.name)
 
     if not empty_ratios:
@@ -153,7 +145,7 @@ def _empty_strings(profile: DataProfile) -> QualityFactor:
             f"Média de {mean_empty:.1%} de valores vazios em "
             f"{len(empty_ratios)} colunas textuais."
         ),
-        severity=_severity(score),
+        severity=_score_severity(score),
         affected_columns=affected_columns,
     )
 
@@ -198,7 +190,7 @@ def _zero_length_fields(profile: DataProfile) -> QualityFactor:
             f"{len(affected_columns)} de {total_text} colunas textuais "
             f"possuem pelo menos um registro com comprimento zero."
         ),
-        severity=_severity(score),
+        severity=_score_severity(score),
         affected_columns=affected_columns,
     )
 

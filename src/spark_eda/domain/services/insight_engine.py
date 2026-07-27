@@ -7,23 +7,42 @@ descobertas relevantes sobre os dados.
 
 from __future__ import annotations
 
-import math
 from statistics import mean
 
 from spark_eda.domain.entities.column_profile import ColumnProfile
 from spark_eda.domain.entities.data_profile import DataProfile
 from spark_eda.domain.entities.insight import Insight
-from spark_eda.domain.entities.quality_score import QualityFactor, QualityScore
+from spark_eda.domain.entities.quality_score import QualityScore
 from spark_eda.domain.entities.statistic import CategoricalStats, NumericStats
 from spark_eda.domain.value_objects.insight_category import InsightCategory
 from spark_eda.domain.value_objects.severity import Severity
-
 
 _NULL_THRESHOLD: float = 0.30
 _SKEWNESS_THRESHOLD: float = 1.0
 _DUPLICATE_THRESHOLD: float = 0.05
 _OUTLIER_THRESHOLD: float = 0.10
 _ZERO_THRESHOLD: float = 0.05
+
+_NULL_HIGH_SEVERITY = 0.50
+_NULL_MEDIUM_SEVERITY = 0.40
+
+_SKEW_HIGH_SEVERITY = 2.0
+_SKEW_MEDIUM_SEVERITY = 1.5
+
+_HIGH_UNIQUE_RATIO = 0.95
+_NEAR_UNIQUE_RATIO = 0.99
+
+_NEAR_CONSTANT_CARDINALITY = 3
+_LARGE_ROW_COUNT = 100
+
+_DUP_HIGH_SEVERITY = 0.20
+_DUP_MEDIUM_SEVERITY = 0.10
+
+_OUTLIER_HIGH_SEVERITY = 0.25
+_OUTLIER_MEDIUM_SEVERITY = 0.15
+
+_SCORE_HIGH_SEVERITY = 0.3
+_SCORE_MEDIUM_SEVERITY = 0.6
 
 
 class InsightEngine:
@@ -52,9 +71,9 @@ class InsightEngine:
             null_ratio: float = column_metadata.null_count / total_column
             if null_ratio > _NULL_THRESHOLD:
                 severity: Severity
-                if null_ratio > 0.50:
+                if null_ratio > _NULL_HIGH_SEVERITY:
                     severity = Severity.CRITICAL
-                elif null_ratio > 0.40:
+                elif null_ratio > _NULL_MEDIUM_SEVERITY:
                     severity = Severity.HIGH
                 else:
                     severity = Severity.MEDIUM
@@ -94,9 +113,9 @@ class InsightEngine:
                 direction: str = "à direita" if stats.skewness > 0 else "à esquerda"
 
                 severity: Severity
-                if skewness_abs > 2.0:
+                if skewness_abs > _SKEW_HIGH_SEVERITY:
                     severity = Severity.HIGH
-                elif skewness_abs > 1.5:
+                elif skewness_abs > _SKEW_MEDIUM_SEVERITY:
                     severity = Severity.MEDIUM
                 else:
                     severity = Severity.LOW
@@ -132,12 +151,9 @@ class InsightEngine:
             if not isinstance(stats, CategoricalStats):
                 continue
 
-            if stats.unique_ratio > 0.95 and profile.row_count > 0:
+            if stats.unique_ratio > _HIGH_UNIQUE_RATIO and profile.row_count > 0:
                 severity: Severity
-                if stats.unique_ratio >= 0.99:
-                    severity = Severity.MEDIUM
-                else:
-                    severity = Severity.LOW
+                severity = Severity.MEDIUM if stats.unique_ratio >= _NEAR_UNIQUE_RATIO else Severity.LOW
 
                 insights.append(Insight(
                     category=InsightCategory.CARDINALITY,
@@ -183,7 +199,7 @@ class InsightEngine:
                     ),
                     metric_value=1.0,
                 ))
-            elif stats.cardinality <= 3 and profile.row_count > 100:
+            elif stats.cardinality <= _NEAR_CONSTANT_CARDINALITY and profile.row_count > _LARGE_ROW_COUNT:
                 insights.append(Insight(
                     category=InsightCategory.NEAR_CONSTANT,
                     severity=Severity.LOW,
@@ -222,9 +238,9 @@ class InsightEngine:
 
             if estimated_duplicate_ratio > _DUPLICATE_THRESHOLD:
                 severity: Severity
-                if estimated_duplicate_ratio > 0.20:
+                if estimated_duplicate_ratio > _DUP_HIGH_SEVERITY:
                     severity = Severity.HIGH
-                elif estimated_duplicate_ratio > 0.10:
+                elif estimated_duplicate_ratio > _DUP_MEDIUM_SEVERITY:
                     severity = Severity.MEDIUM
                 else:
                     severity = Severity.LOW
@@ -262,9 +278,9 @@ class InsightEngine:
 
             if outlier_info.ratio > _OUTLIER_THRESHOLD:
                 severity: Severity
-                if outlier_info.ratio > 0.25:
+                if outlier_info.ratio > _OUTLIER_HIGH_SEVERITY:
                     severity = Severity.HIGH
-                elif outlier_info.ratio > 0.15:
+                elif outlier_info.ratio > _OUTLIER_MEDIUM_SEVERITY:
                     severity = Severity.MEDIUM
                 else:
                     severity = Severity.LOW
@@ -327,7 +343,6 @@ class InsightEngine:
 
     @staticmethod
     def _insight_business_pattern(
-        profile: DataProfile,
         quality: QualityScore,
     ) -> list[Insight]:
         """Gera insights sobre violações de regras de negócio.
@@ -345,9 +360,9 @@ class InsightEngine:
             if factor.name == "Regras de negócio" and factor.score < 1.0:
                 for column in factor.affected_columns:
                     severity: Severity
-                    if factor.score < 0.3:
+                    if factor.score < _SCORE_HIGH_SEVERITY:
                         severity = Severity.HIGH
-                    elif factor.score < 0.6:
+                    elif factor.score < _SCORE_MEDIUM_SEVERITY:
                         severity = Severity.MEDIUM
                     else:
                         severity = Severity.LOW
@@ -396,7 +411,7 @@ class InsightEngine:
         insights.extend(self._insight_duplicates(profile))
         insights.extend(self._insight_outliers(profile))
         insights.extend(self._insight_zero_values(profile))
-        insights.extend(self._insight_business_pattern(profile, quality))
+        insights.extend(self._insight_business_pattern(quality))
 
         severity_order: dict[Severity, int] = {
             Severity.CRITICAL: 0,

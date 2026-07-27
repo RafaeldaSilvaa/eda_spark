@@ -22,4 +22,4 @@ COPY tests/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["pytest", "tests/", "--cov=spark_eda", "--cov-fail-under=77", "-v"]
+CMD ["pytest", "tests/", "--cov=spark_eda", "--cov-fail-under=95", "-v"]

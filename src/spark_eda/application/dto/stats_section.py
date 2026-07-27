@@ -133,26 +133,26 @@ class StatsSection:
 
         if self.numeric:
             header: str = (
-                f'<thead><tr>'
-                f'<th style="text-align:left;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
-                f'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Column</th>'
-                f'<th style="text-align:right;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
-                f'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Mean</th>'
-                f'<th style="text-align:right;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
-                f'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Std</th>'
-                f'<th style="text-align:right;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
-                f'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Min</th>'
-                f'<th style="text-align:right;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
-                f'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">P25</th>'
-                f'<th style="text-align:right;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
-                f'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">P50</th>'
-                f'<th style="text-align:right;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
-                f'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">P75</th>'
-                f'<th style="text-align:right;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
-                f'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Max</th>'
-                f'<th style="text-align:right;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
-                f'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Skew</th>'
-                f'</tr></thead>'
+                '<thead><tr>'
+                '<th style="text-align:left;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
+                'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Column</th>'
+                '<th style="text-align:right;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
+                'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Mean</th>'
+                '<th style="text-align:right;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
+                'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Std</th>'
+                '<th style="text-align:right;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
+                'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Min</th>'
+                '<th style="text-align:right;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
+                'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">P25</th>'
+                '<th style="text-align:right;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
+                'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">P50</th>'
+                '<th style="text-align:right;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
+                'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">P75</th>'
+                '<th style="text-align:right;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
+                'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Max</th>'
+                '<th style="text-align:right;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
+                'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Skew</th>'
+                '</tr></thead>'
             )
             rows: str = "".join(
                 f'<tr style="border-bottom:1px solid var(--border,#e2e8f0);">'
@@ -164,7 +164,8 @@ class StatsSection:
                 f'<td style="padding:6px 10px;text-align:right;color:var(--text,#1a1a2e);">{format_number(s.q50)}</td>'
                 f'<td style="padding:6px 10px;text-align:right;color:var(--text,#1a1a2e);">{format_number(s.q75)}</td>'
                 f'<td style="padding:6px 10px;text-align:right;color:var(--text,#1a1a2e);">{format_number(s.max)}</td>'
-                f'<td style="padding:6px 10px;text-align:right;color:var(--text,#1a1a2e);">{format_number(s.skewness)}</td>'
+                f'<td style="padding:6px 10px;text-align:right;color:var(--text,#1a1a2e);">'
+                f'{format_number(s.skewness)}</td>'
                 f"</tr>"
                 for s in self.numeric
             )
@@ -176,25 +177,26 @@ class StatsSection:
 
         if self.categorical:
             header = (
-                f'<thead><tr>'
-                f'<th style="text-align:left;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
-                f'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Column</th>'
-                f'<th style="text-align:right;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
-                f'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Cardinality</th>'
-                f'<th style="text-align:left;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
-                f'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Mode</th>'
-                f'<th style="text-align:right;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
-                f'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Uniqueness</th>'
-                f'<th style="text-align:left;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
-                f'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Top</th>'
-                f'</tr></thead>'
+                '<thead><tr>'
+                '<th style="text-align:left;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
+                'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Column</th>'
+                '<th style="text-align:right;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
+                'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Cardinality</th>'
+                '<th style="text-align:left;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
+                'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Mode</th>'
+                '<th style="text-align:right;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
+                'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Uniqueness</th>'
+                '<th style="text-align:left;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
+                'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Top</th>'
+                '</tr></thead>'
             )
             rows = "".join(
                 f'<tr style="border-bottom:1px solid var(--border,#e2e8f0);">'
                 f'<td style="padding:6px 10px;font-weight:500;color:var(--text,#1a1a2e);">{s.column_name}</td>'
                 f'<td style="padding:6px 10px;text-align:right;color:var(--text,#1a1a2e);">{s.cardinality}</td>'
                 f'<td style="padding:6px 10px;color:var(--text,#1a1a2e);">{s.mode or "\u2014"}</td>'
-                f'<td style="padding:6px 10px;text-align:right;color:var(--text,#1a1a2e);">{format_percentage(s.unique_ratio)}</td>'
+                f'<td style="padding:6px 10px;text-align:right;color:var(--text,#1a1a2e);">'
+                f'{format_percentage(s.unique_ratio)}</td>'
                 f'<td style="padding:6px 10px;color:var(--muted,#64748b);font-size:12px;">'
                 f'{" | ".join(f"{v}: {c}" for v, c in s.top_values[:3])}</td>'
                 f"</tr>"
@@ -208,18 +210,18 @@ class StatsSection:
 
         if self.temporal:
             header = (
-                f'<thead><tr>'
-                f'<th style="text-align:left;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
-                f'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Column</th>'
-                f'<th style="text-align:left;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
-                f'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Min</th>'
-                f'<th style="text-align:left;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
-                f'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Max</th>'
-                f'<th style="text-align:right;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
-                f'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Range</th>'
-                f'<th style="text-align:right;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
-                f'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Gaps</th>'
-                f'</tr></thead>'
+                '<thead><tr>'
+                '<th style="text-align:left;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
+                'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Column</th>'
+                '<th style="text-align:left;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
+                'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Min</th>'
+                '<th style="text-align:left;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
+                'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Max</th>'
+                '<th style="text-align:right;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
+                'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Range</th>'
+                '<th style="text-align:right;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
+                'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Gaps</th>'
+                '</tr></thead>'
             )
             rows = "".join(
                 f'<tr style="border-bottom:1px solid var(--border,#e2e8f0);">'
@@ -239,26 +241,28 @@ class StatsSection:
 
         if self.text:
             header = (
-                f'<thead><tr>'
-                f'<th style="text-align:left;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
-                f'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Column</th>'
-                f'<th style="text-align:right;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
-                f'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Min</th>'
-                f'<th style="text-align:right;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
-                f'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Max</th>'
-                f'<th style="text-align:right;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
-                f'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Avg</th>'
-                f'<th style="text-align:right;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
-                f'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Empty</th>'
-                f'</tr></thead>'
+                '<thead><tr>'
+                '<th style="text-align:left;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
+                'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Column</th>'
+                '<th style="text-align:right;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
+                'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Min</th>'
+                '<th style="text-align:right;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
+                'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Max</th>'
+                '<th style="text-align:right;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
+                'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Avg</th>'
+                '<th style="text-align:right;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
+                'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Empty</th>'
+                '</tr></thead>'
             )
             rows = "".join(
                 f'<tr style="border-bottom:1px solid var(--border,#e2e8f0);">'
                 f'<td style="padding:6px 10px;font-weight:500;color:var(--text,#1a1a2e);">{s.column_name}</td>'
                 f'<td style="padding:6px 10px;text-align:right;color:var(--text,#1a1a2e);">{s.min_length}</td>'
                 f'<td style="padding:6px 10px;text-align:right;color:var(--text,#1a1a2e);">{s.max_length}</td>'
-                f'<td style="padding:6px 10px;text-align:right;color:var(--text,#1a1a2e);">{format_number(s.avg_length)}</td>'
-                f'<td style="padding:6px 10px;text-align:right;color:var(--text,#1a1a2e);">{format_percentage(s.empty_ratio)}</td>'
+                f'<td style="padding:6px 10px;text-align:right;color:var(--text,#1a1a2e);">'
+                f'{format_number(s.avg_length)}</td>'
+                f'<td style="padding:6px 10px;text-align:right;color:var(--text,#1a1a2e);">'
+                f'{format_percentage(s.empty_ratio)}</td>'
                 f"</tr>"
                 for s in self.text
             )
@@ -270,23 +274,24 @@ class StatsSection:
 
         if self.boolean:
             header = (
-                f'<thead><tr>'
-                f'<th style="text-align:left;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
-                f'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Column</th>'
-                f'<th style="text-align:right;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
-                f'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">True</th>'
-                f'<th style="text-align:right;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
-                f'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">False</th>'
-                f'<th style="text-align:right;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
-                f'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">% True</th>'
-                f'</tr></thead>'
+                '<thead><tr>'
+                '<th style="text-align:left;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
+                'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Column</th>'
+                '<th style="text-align:right;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
+                'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">True</th>'
+                '<th style="text-align:right;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
+                'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">False</th>'
+                '<th style="text-align:right;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
+                'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">% True</th>'
+                '</tr></thead>'
             )
             rows = "".join(
                 f'<tr style="border-bottom:1px solid var(--border,#e2e8f0);">'
                 f'<td style="padding:6px 10px;font-weight:500;color:var(--text,#1a1a2e);">{s.column_name}</td>'
                 f'<td style="padding:6px 10px;text-align:right;color:var(--text,#1a1a2e);">{s.true_count}</td>'
                 f'<td style="padding:6px 10px;text-align:right;color:var(--text,#1a1a2e);">{s.false_count}</td>'
-                f'<td style="padding:6px 10px;text-align:right;color:var(--text,#1a1a2e);">{format_percentage(s.true_ratio)}</td>'
+                f'<td style="padding:6px 10px;text-align:right;color:var(--text,#1a1a2e);">'
+                f'{format_percentage(s.true_ratio)}</td>'
                 f"</tr>"
                 for s in self.boolean
             )
@@ -316,34 +321,34 @@ class StatsSection:
 
         if self.categorical:
             lines.append("  Categorical:")
-            for s in self.categorical:
+            for cat in self.categorical:
                 lines.append(
-                    f"    {s.column_name}: card={s.cardinality}, "
-                    f"mode={s.mode or '\u2014'}, uniq={format_percentage(s.unique_ratio)}"
+                    f"    {cat.column_name}: card={cat.cardinality}, "
+                    f"mode={cat.mode or '\u2014'}, uniq={format_percentage(cat.unique_ratio)}"
                 )
 
         if self.temporal:
             lines.append("  Temporal:")
-            for s in self.temporal:
+            for tmp in self.temporal:
                 lines.append(
-                    f"    {s.column_name}: [{s.min_date} .. {s.max_date}], "
-                    f"{s.range_days} days, {s.gap_count} gaps"
+                    f"    {tmp.column_name}: [{tmp.min_date} .. {tmp.max_date}], "
+                    f"{tmp.range_days} days, {tmp.gap_count} gaps"
                 )
 
         if self.text:
             lines.append("  Text:")
-            for s in self.text:
+            for txt in self.text:
                 lines.append(
-                    f"    {s.column_name}: len=[{s.min_length} .. {s.max_length}], "
-                    f"avg={format_number(s.avg_length)}, empty={format_percentage(s.empty_ratio)}"
+                    f"    {txt.column_name}: len=[{txt.min_length} .. {txt.max_length}], "
+                    f"avg={format_number(txt.avg_length)}, empty={format_percentage(txt.empty_ratio)}"
                 )
 
         if self.boolean:
             lines.append("  Boolean:")
-            for s in self.boolean:
+            for bln in self.boolean:
                 lines.append(
-                    f"    {s.column_name}: true={s.true_count}, false={s.false_count}, "
-                    f"ratio={format_percentage(s.true_ratio)}"
+                    f"    {bln.column_name}: true={bln.true_count}, false={bln.false_count}, "
+                    f"ratio={format_percentage(bln.true_ratio)}"
                 )
 
         return "\n".join(lines) if len(lines) > 1 else "Statistics\n" + "-" * 20 + "\n  (empty)"

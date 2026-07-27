@@ -6,6 +6,8 @@ do esquema, consistência entre colunas e conformidade de formato.
 
 from __future__ import annotations
 
+from statistics import mean
+
 from spark_eda.domain.entities.column_profile import ColumnProfile
 from spark_eda.domain.entities.data_profile import DataProfile
 from spark_eda.domain.entities.quality_score import QualityFactor
@@ -14,21 +16,13 @@ from spark_eda.domain.entities.statistic import (
     CategoricalStats,
     NumericStats,
     TemporalStats,
+    TextStats,
 )
-from spark_eda.domain.services.quality_factors import registrar
+from spark_eda.domain.services.quality_factors import _score_severity, registrar
 from spark_eda.domain.value_objects.data_type import DataType
 from spark_eda.domain.value_objects.severity import Severity
 
-
-def _severity(score: float) -> Severity:
-    """Mapeia uma pontuação em [0, 1] para um nível de severidade."""
-    if score < 0.3:
-        return Severity.CRITICAL
-    if score < 0.6:
-        return Severity.HIGH
-    if score < 0.8:
-        return Severity.MEDIUM
-    return Severity.LOW
+_FK_NULL_THRESHOLD = 0.1
 
 
 def _type_consistency(profile: DataProfile) -> QualityFactor:
@@ -42,12 +36,12 @@ def _type_consistency(profile: DataProfile) -> QualityFactor:
     inconsistent_columns: list[str] = []
     valid_columns: int = 0
 
-    expected_type_mapping: dict[DataType, type] = {
+    expected_type_mapping: dict[DataType, type | tuple[type, ...]] = {
         DataType.INTEGER: NumericStats,
         DataType.LONG: NumericStats,
         DataType.DOUBLE: NumericStats,
         DataType.DECIMAL: NumericStats,
-        DataType.STRING: CategoricalStats,
+        DataType.STRING: (CategoricalStats, TextStats),
         DataType.DATE: TemporalStats,
         DataType.TIMESTAMP: TemporalStats,
         DataType.BOOLEAN: BooleanStats,
@@ -88,7 +82,7 @@ def _type_consistency(profile: DataProfile) -> QualityFactor:
             f"apresentam incompatibilidade entre tipo declarado e "
             f"estatísticas observadas."
         ),
-        severity=_severity(score),
+        severity=_score_severity(score),
         affected_columns=inconsistent_columns,
     )
 
@@ -146,7 +140,7 @@ def _range_consistency(profile: DataProfile) -> QualityFactor:
             f"numéricas apresentam valores fora do intervalo esperado "
             f"(ex.: valores negativos em campos de quantidade)."
         ),
-        severity=_severity(score),
+        severity=_score_severity(score),
         affected_columns=inconsistent_columns,
     )
 
@@ -171,7 +165,7 @@ def _cross_column_consistency(profile: DataProfile) -> QualityFactor:
             ini_variant: str = f"{base}_ini"
             for candidate in column_names:
                 cn_lower: str = candidate.lower()
-                if cn_lower == start_variant or cn_lower == ini_variant:
+                if cn_lower in (start_variant, ini_variant):
                     temporal_pairs.append((column_metadata.name, candidate))
 
     for end_column, start_column in temporal_pairs:
@@ -181,10 +175,9 @@ def _cross_column_consistency(profile: DataProfile) -> QualityFactor:
         end_stats = end_profile.stats
         start_stats = start_profile.stats
 
-        if isinstance(end_stats, TemporalStats) and isinstance(start_stats, TemporalStats):
-            if start_stats.min_date > end_stats.min_date:
-                inconsistent_columns.add(start_column)
-                inconsistent_columns.add(end_column)
+        if isinstance(end_stats, TemporalStats) and isinstance(start_stats, TemporalStats) and start_stats.min_date > end_stats.min_date:  # noqa: E501
+            inconsistent_columns.add(start_column)
+            inconsistent_columns.add(end_column)
 
     pair_count: int = len(temporal_pairs)
 
@@ -211,7 +204,7 @@ def _cross_column_consistency(profile: DataProfile) -> QualityFactor:
             f"{pair_count} pares relacionados apresentam inconsistências "
             f"(ex.: data de fim anterior à data de início)."
         ),
-        severity=_severity(score),
+        severity=_score_severity(score),
         affected_columns=sorted(inconsistent_columns),
     )
 
@@ -250,7 +243,7 @@ def _schema_integrity(profile: DataProfile) -> QualityFactor:
             f"{len(violated_columns)} colunas violam a restrição de "
             f"nulabilidade (nullable=False mas possuem valores nulos)."
         ),
-        severity=_severity(score),
+        severity=_score_severity(score),
         affected_columns=violated_columns,
     )
 
@@ -269,9 +262,8 @@ def _referential_integrity(profile: DataProfile) -> QualityFactor:
         if normalized_name.endswith("_id") or normalized_name.endswith("_fk"):
             column_profile: ColumnProfile = profile.column_profiles[column_metadata.name]
             stats = column_profile.stats
-            if isinstance(stats, CategoricalStats):
-                if column_metadata.null_count > 0:
-                    sensitive_columns.append(column_metadata.name)
+            if isinstance(stats, CategoricalStats) and column_metadata.null_count > 0:
+                sensitive_columns.append(column_metadata.name)
 
     if len(sensitive_columns) == 0:
         return QualityFactor(
@@ -284,18 +276,34 @@ def _referential_integrity(profile: DataProfile) -> QualityFactor:
             affected_columns=[],
         )
 
-    score: float = 1.0
+    null_ratios: list[float] = []
+    for col_name in sensitive_columns:
+        col_profile: ColumnProfile | None = profile.column_profiles.get(col_name)
+        if col_profile is not None:
+            meta = col_profile.metadata
+            total: int = meta.non_null_count + meta.null_count
+            if total > 0:
+                null_ratios.append(meta.null_count / total)
+
+    score: float
+    reason: str
+    avg_null_ratio: float = mean(null_ratios) if null_ratios else 0.0
+    score = max(0.0, 1.0 - avg_null_ratio)
+    reason = (
+        f"Média de {avg_null_ratio:.1%} de nulos em {len(null_ratios)} "
+        f"coluna(s) com indícios de chave estrangeira."
+    ) if null_ratios else (
+        "Colunas FK encontradas, porém sem nulos — "
+        "sem evidências de violação de integridade referencial."
+    )
 
     return QualityFactor(
         name="Integridade referencial",
         score=score,
         internal_weight=0.10,
         contribution=score * 0.10,
-        reason=(
-            "Verificação heurística concluída sem evidências de violação "
-            "de integridade referencial."
-        ),
-        severity=_severity(score),
+        reason=reason,
+        severity=_score_severity(score),
         affected_columns=sensitive_columns,
     )
 
@@ -316,7 +324,7 @@ def _format_consistency(profile: DataProfile) -> QualityFactor:
             total_column: int = column_metadata.null_count + column_metadata.non_null_count
             if total_column > 0:
                 null_ratio: float = column_metadata.null_count / total_column
-                if null_ratio > 0.1:
+                if null_ratio > _FK_NULL_THRESHOLD:
                     inconsistent_columns.append(column_metadata.name)
 
     if columns_with_inferred_type == 0:
@@ -342,7 +350,7 @@ def _format_consistency(profile: DataProfile) -> QualityFactor:
             f"colunas com tipo inferido possuem alta taxa de nulos, "
             f"possível indicativo de dados em formato incorreto."
         ),
-        severity=_severity(score),
+        severity=_score_severity(score),
         affected_columns=inconsistent_columns,
     )
 

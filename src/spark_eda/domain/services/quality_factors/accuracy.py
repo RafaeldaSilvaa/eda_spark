@@ -7,26 +7,23 @@ de negócio.
 
 from __future__ import annotations
 
+from datetime import date
 from statistics import mean
 
 from spark_eda.domain.entities.column_profile import ColumnProfile
 from spark_eda.domain.entities.data_profile import DataProfile
 from spark_eda.domain.entities.quality_score import QualityFactor
 from spark_eda.domain.entities.statistic import NumericStats, TextStats
-from spark_eda.domain.services.quality_factors import registrar
-from spark_eda.domain.value_objects.data_type import DataType
+from spark_eda.domain.services.quality_factors import _score_severity, registrar
 from spark_eda.domain.value_objects.severity import Severity
 
-
-def _severity(score: float) -> Severity:
-    """Mapeia uma pontuação em [0, 1] para um nível de severidade."""
-    if score < 0.3:
-        return Severity.CRITICAL
-    if score < 0.6:
-        return Severity.HIGH
-    if score < 0.8:
-        return Severity.MEDIUM
-    return Severity.LOW
+_OUTLIER_WARN_THRESHOLD = 0.05
+_NULL_INCONSISTENCY_THRESHOLD = 0.2
+_YEAR_MIN_PLAUSIBLE = 1900.0
+_MONTH_MAX = 12.0
+_DAY_MAX = 31.0
+_PERCENTAGE_MAX = 100.0
+_AGE_MAX_PLAUSIBLE = 120.0
 
 
 def _outlier_ratio(profile: DataProfile) -> QualityFactor:
@@ -43,7 +40,7 @@ def _outlier_ratio(profile: DataProfile) -> QualityFactor:
         outlier_info = column_profile.outlier
         if outlier_info is not None:
             outlier_ratios.append(outlier_info.ratio)
-            if outlier_info.ratio > 0.05:
+            if outlier_info.ratio > _OUTLIER_WARN_THRESHOLD:
                 columns_with_outliers.append(column_metadata.name)
 
     if not outlier_ratios:
@@ -69,7 +66,7 @@ def _outlier_ratio(profile: DataProfile) -> QualityFactor:
             f"Taxa média de outliers de {mean_outlier:.2%} entre "
             f"{len(outlier_ratios)} colunas com detecção de outliers."
         ),
-        severity=_severity(score),
+        severity=_score_severity(score),
         affected_columns=columns_with_outliers,
     )
 
@@ -89,7 +86,7 @@ def _format_accuracy(profile: DataProfile) -> QualityFactor:
             total_column: int = column_metadata.null_count + column_metadata.non_null_count
             if total_column > 0:
                 null_ratio: float = column_metadata.null_count / total_column
-                if null_ratio > 0.2:
+                if null_ratio > _NULL_INCONSISTENCY_THRESHOLD:
                     inconsistent_columns.append(column_metadata.name)
 
     if columns_with_inferred_type == 0:
@@ -115,7 +112,7 @@ def _format_accuracy(profile: DataProfile) -> QualityFactor:
             f"colunas com tipo inferido possuem alta taxa de nulos, "
             f"possível indicativo de dados em formato incorreto."
         ),
-        severity=_severity(score),
+        severity=_score_severity(score),
         affected_columns=inconsistent_columns,
     )
 
@@ -125,7 +122,7 @@ def _suspicious_data(profile: DataProfile) -> QualityFactor:
 
     Identifica valores extremos que podem ser suspeitos usando o
     intervalo interquartil (IQR) de colunas numéricas. Outliers além
-    de 3× IQR são marcados como suspeitos.
+    de 3x IQR são marcados como suspeitos.
     """
     suspicious_columns: list[str] = []
 
@@ -139,13 +136,10 @@ def _suspicious_data(profile: DataProfile) -> QualityFactor:
             upper_extreme_limit: float = stats.q75 + 3.0 * iqr
             lower_extreme_limit: float = stats.q25 - 3.0 * iqr
 
-            if outlier_info.bounds_upper is not None:
-                if stats.max > upper_extreme_limit:
-                    suspicious_columns.append(column_metadata.name)
-            if outlier_info.bounds_lower is not None:
-                if stats.min < lower_extreme_limit:
-                    if column_metadata.name not in suspicious_columns:
-                        suspicious_columns.append(column_metadata.name)
+            if outlier_info.bounds_upper is not None and stats.max > upper_extreme_limit:
+                suspicious_columns.append(column_metadata.name)
+            if outlier_info.bounds_lower is not None and stats.min < lower_extreme_limit and column_metadata.name not in suspicious_columns:  # noqa: E501
+                suspicious_columns.append(column_metadata.name)
 
     if not suspicious_columns:
         return QualityFactor(
@@ -158,24 +152,7 @@ def _suspicious_data(profile: DataProfile) -> QualityFactor:
             affected_columns=[],
         )
 
-    total_numeric: int = sum(
-        1
-        for cm in profile.columns
-        if isinstance(profile.column_profiles[cm.name].stats, NumericStats)
-    )
-
-    if total_numeric == 0:
-        return QualityFactor(
-            name="Dados suspeitos",
-            score=1.0,
-            internal_weight=0.20,
-            contribution=0.20,
-            reason="Nenhuma coluna numérica disponível para análise.",
-            severity=Severity.LOW,
-            affected_columns=[],
-        )
-
-    score: float = 1.0 - (len(suspicious_columns) / total_numeric)
+    score: float = 1.0 - (len(suspicious_columns) / len(profile.columns))
 
     return QualityFactor(
         name="Dados suspeitos",
@@ -183,12 +160,11 @@ def _suspicious_data(profile: DataProfile) -> QualityFactor:
         internal_weight=0.20,
         contribution=score * 0.20,
         reason=(
-            f"{len(suspicious_columns)} de {total_numeric} colunas "
-            f"numéricas possuem valores extremos suspeitos (além de "
-            f"3× IQR)."
+            f"{len(suspicious_columns)} coluna(s) numérica(s) possuem "
+            f"valores extremos suspeitos (alem de 3x IQR)."
         ),
-        severity=_severity(score),
-        affected_columns=suspicious_columns,
+        severity=_score_severity(score),
+        affected_columns=list(suspicious_columns),
     )
 
 
@@ -204,9 +180,8 @@ def _corrupted_data(profile: DataProfile) -> QualityFactor:
         column_profile: ColumnProfile = profile.column_profiles[column_metadata.name]
         stats = column_profile.stats
 
-        if isinstance(stats, TextStats):
-            if stats.min_length < 0:
-                corrupted_columns.append(column_metadata.name)
+        if isinstance(stats, TextStats) and stats.min_length < 0:
+            corrupted_columns.append(column_metadata.name)
 
     if not corrupted_columns:
         return QualityFactor(
@@ -230,12 +205,12 @@ def _corrupted_data(profile: DataProfile) -> QualityFactor:
             f"{len(corrupted_columns)} colunas apresentam valores "
             f"impossíveis (ex.: comprimento mínimo negativo)."
         ),
-        severity=_severity(score),
+        severity=_score_severity(score),
         affected_columns=corrupted_columns,
     )
 
 
-def _business_rules(profile: DataProfile) -> QualityFactor:
+def _business_rules(profile: DataProfile) -> QualityFactor:  # noqa: PLR0912
     """Calcula o fator de violação de regras de negócio.
 
     Aplica regras de negócio comuns:
@@ -245,7 +220,7 @@ def _business_rules(profile: DataProfile) -> QualityFactor:
     * Colunas de percentual (``pct``, ``perc``, ``percentual``) devem ter valores entre 0 e 100.
     * Colunas de idade (``idade``, ``age``) devem ter valores entre 0 e 120.
     """
-    violated_columns: list[str] = []
+    violated_columns: set[str] = set()
     violation_details: list[str] = []
 
     for column_metadata in profile.columns:
@@ -257,44 +232,43 @@ def _business_rules(profile: DataProfile) -> QualityFactor:
         normalized_name: str = column_metadata.name.lower().replace("_", "").replace("-", "")
 
         if "ano" in normalized_name:
-            if stats.min < 1900.0 or stats.max > 2031.0:
-                violated_columns.append(column_metadata.name)
+            year_upper: int = date.today().year + 5
+            if stats.min < _YEAR_MIN_PLAUSIBLE or stats.max > year_upper:
+                violated_columns.add(column_metadata.name)
                 violation_details.append(
-                    f"{column_metadata.name}: ano fora do intervalo [1900, 2031] "
+                    f"{column_metadata.name}: ano fora do intervalo [1900, {year_upper}] "
                     f"(min={stats.min:.0f}, max={stats.max:.0f})"
                 )
 
-        if normalized_name in ("mes", "month") or normalized_name.startswith("mes") or normalized_name.startswith("month"):
-            if stats.min < 1.0 or stats.max > 12.0:
-                violated_columns.append(column_metadata.name)
-                violation_details.append(
-                    f"{column_metadata.name}: mês fora do intervalo [1, 12]"
-                )
+        if (normalized_name in ("mes", "month") or normalized_name.startswith("mes") or normalized_name.startswith("month")) and (stats.min < 1.0 or stats.max > _MONTH_MAX):  # noqa: E501
+            violated_columns.add(column_metadata.name)
+            violation_details.append(
+                f"{column_metadata.name}: mês fora do intervalo [1, {_MONTH_MAX:.0f}]"
+            )
 
-        if normalized_name in ("dia", "day") or normalized_name.startswith("dia") or normalized_name.startswith("day"):
-            if stats.min < 1.0 or stats.max > 31.0:
-                violated_columns.append(column_metadata.name)
-                violation_details.append(
-                    f"{column_metadata.name}: dia fora do intervalo [1, 31]"
-                )
+        if (normalized_name in ("dia", "day") or normalized_name.startswith("dia") or normalized_name.startswith("day")) and (stats.min < 1.0 or stats.max > _DAY_MAX):  # noqa: E501
+            violated_columns.add(column_metadata.name)
+            violation_details.append(
+                f"{column_metadata.name}: dia fora do intervalo [1, {_DAY_MAX:.0f}]"
+            )
 
         percentage_patterns: tuple[str, ...] = ("pct", "perc", "percentual", "porcentagem")
         for pattern in percentage_patterns:
             if pattern in normalized_name:
-                if stats.min < 0.0 or stats.max > 100.0:
-                    violated_columns.append(column_metadata.name)
+                if stats.min < 0.0 or stats.max > _PERCENTAGE_MAX:
+                    violated_columns.add(column_metadata.name)
                     violation_details.append(
-                        f"{column_metadata.name}: percentual fora de [0, 100]"
+                        f"{column_metadata.name}: percentual fora de [0, {_PERCENTAGE_MAX:.0f}]"
                     )
                 break
 
         age_patterns: tuple[str, ...] = ("idade", "age", "idadeanos", "anos")
         for pattern in age_patterns:
             if pattern in normalized_name:
-                if stats.min < 0.0 or stats.max > 120.0:
-                    violated_columns.append(column_metadata.name)
+                if stats.min < 0.0 or stats.max > _AGE_MAX_PLAUSIBLE:
+                    violated_columns.add(column_metadata.name)
                     violation_details.append(
-                        f"{column_metadata.name}: idade fora do intervalo [0, 120]"
+                        f"{column_metadata.name}: idade fora do intervalo [0, {_AGE_MAX_PLAUSIBLE:.0f}]"
                     )
                 break
 
@@ -318,8 +292,8 @@ def _business_rules(profile: DataProfile) -> QualityFactor:
         internal_weight=0.20,
         contribution=score * 0.20,
         reason=" | ".join(violation_details),
-        severity=_severity(score),
-        affected_columns=violated_columns,
+        severity=_score_severity(score),
+        affected_columns=list(violated_columns),
     )
 
 

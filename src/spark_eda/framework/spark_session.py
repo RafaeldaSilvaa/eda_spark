@@ -8,7 +8,7 @@ from pyspark.sql import SparkSession
 def get_or_create_spark_session(
     app_name: str = "spark_eda",
     shuffle_partitions: int | None = None,
-    adapter_partition_size: str = "64MB",
+    advisory_partition_size: str = "64MB",
 ) -> SparkSession:
     """Obtém ou cria uma SparkSession com configuração otimizada.
 
@@ -23,7 +23,7 @@ def get_or_create_spark_session(
         app_name: Nome da aplicação Spark (padrão: ``"spark_eda"``).
         shuffle_partitions: Número de shuffle partitions.
             Se ``None``, o Spark autoajusta via AQE.
-        adapter_partition_size: Tamanho alvo da partição após
+        advisory_partition_size: Tamanho alvo da partição após
             coalesce (padrão: ``"64MB"``).
 
     Returns:
@@ -36,7 +36,7 @@ def get_or_create_spark_session(
         .config("spark.sql.adaptive.skewJoin.enabled", "true")
         .config(
             "spark.sql.adaptive.advisoryPartitionSizeInBytes",
-            adapter_partition_size,
+            advisory_partition_size,
         )
     )
 

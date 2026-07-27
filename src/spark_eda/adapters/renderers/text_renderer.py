@@ -5,7 +5,7 @@ from __future__ import annotations
 import sys
 
 from spark_eda.application.dto.eda_report import EDAReport
-from spark_eda.application.dto.quality_section import QualityFactorReport, QualityReport
+from spark_eda.application.dto.quality_section import QualityReport
 from spark_eda.utils.formatting import format_number, format_percentage
 
 

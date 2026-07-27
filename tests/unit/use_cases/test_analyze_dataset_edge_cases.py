@@ -11,6 +11,8 @@ from unittest.mock import MagicMock, create_autospec
 
 import pytest
 
+from spark_eda.application.exceptions import AnalysisError, DataProviderError
+
 from spark_eda.application.use_cases.analyze_dataset import AnalyzeDatasetUseCase, AnalyzeRequest
 from spark_eda.application.ports.cache_provider import CacheProvider
 from spark_eda.application.ports.data_provider import DataProvider
@@ -53,7 +55,7 @@ class TestAnalyzeDatasetEdgeCases:
         request: AnalyzeRequest = AnalyzeRequest(columns=None, config=MagicMock())
         dataframe = MagicMock()
 
-        with pytest.raises(ValueError, match="inexistente"):
+        with pytest.raises(DataProviderError, match="inexistente"):
             use_case.execute(request, dataframe)
 
     def test_execute_raises_runtime_error_when_cache_get_fails(self) -> None:
@@ -120,7 +122,7 @@ class TestAnalyzeDatasetEdgeCases:
         request: AnalyzeRequest = AnalyzeRequest(columns=None, config=MagicMock())
         dataframe = MagicMock()
 
-        with pytest.raises(RuntimeError, match="Failed to calculate data quality"):
+        with pytest.raises(AnalysisError, match="Failed to calculate data quality"):
             use_case.execute(request, dataframe)
 
     def test_execute_raises_runtime_error_when_insight_engine_fails(
@@ -152,7 +154,7 @@ class TestAnalyzeDatasetEdgeCases:
         request: AnalyzeRequest = AnalyzeRequest(columns=None, config=MagicMock())
         dataframe = MagicMock()
 
-        with pytest.raises(RuntimeError, match="Failed to generate insights"):
+        with pytest.raises(AnalysisError, match="Failed to generate insights"):
             use_case.execute(request, dataframe)
 
     def test_execute_raises_runtime_error_when_recommendation_engine_fails(
@@ -185,7 +187,7 @@ class TestAnalyzeDatasetEdgeCases:
         request: AnalyzeRequest = AnalyzeRequest(columns=None, config=MagicMock())
         dataframe = MagicMock()
 
-        with pytest.raises(RuntimeError, match="Failed to generate recommendations"):
+        with pytest.raises(AnalysisError, match="Failed to generate recommendations"):
             use_case.execute(request, dataframe)
 
     def test_build_cache_key_with_all_columns(self) -> None:

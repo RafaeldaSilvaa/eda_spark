@@ -36,6 +36,14 @@ def _severity_marker(severity: str) -> str:
     }.get(severity, "?")
 
 
+def _column_tag(col: str | None) -> str:
+    return f'<span style="font-size:11px;color:var(--muted,#64748b);">| {col}</span>' if col else ""
+
+
+def _metric_tag(value: float | None) -> str:
+    return f" <strong>{format_number(value)}</strong>" if value is not None else ""
+
+
 @dataclass(frozen=True)
 class InsightDTO:
     """Insight gerado durante a análise exploratória.
@@ -87,10 +95,10 @@ class InsightsSection:
             f'<div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;">'
             f'<span style="font-size:11px;font-weight:600;color:{_severity_color(insight.severity)};'
             f'text-transform:uppercase;">{insight.category.replace("_", " ")}</span>'
-            f'{"<span style=\"font-size:11px;color:var(--muted,#64748b);\">| " + insight.column + "</span>" if insight.column else ""}'
+            f'{_column_tag(insight.column)}'
             f'</div>'
             f'<div style="font-size:13px;color:var(--text,#1a1a2e);line-height:1.4;">{insight.message}'
-            f'{" <strong>" + format_number(insight.metric_value) + "</strong>" if insight.metric_value is not None else ""}'
+            f'{_metric_tag(insight.metric_value)}'
             f"</div>"
             f"</div>"
             f"</div>"

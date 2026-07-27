@@ -670,7 +670,7 @@ class TestConsistencyEdge:
         dp = DataProfile("ref_int", (metadata,), 100, {"cliente_id": profile})
         factors = FACTOR_REGISTRY["consistency"](dp)
         ref_factor = next(f for f in factors if f.name == "Integridade referencial")
-        assert ref_factor.score == 1.0
+        assert ref_factor.score == 0.9
 
     def test_referential_integrity_id_non_categorical(self) -> None:
         """Coluna *_id com stats não-Categorical → ignorada (linha 272->267)."""

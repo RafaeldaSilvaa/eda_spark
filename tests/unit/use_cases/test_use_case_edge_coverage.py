@@ -13,6 +13,7 @@ from unittest.mock import MagicMock, create_autospec
 
 import pytest
 
+from spark_eda.application.exceptions import DataProviderError
 from spark_eda.application.ports.cache_provider import CacheProvider
 from spark_eda.application.ports.data_provider import DataProvider
 from spark_eda.application.use_cases.analyze_dataset import AnalyzeDatasetUseCase, AnalyzeRequest
@@ -70,7 +71,7 @@ class TestAnalyzeRemainingCoverage:
             quality_calculator=calc, insight_engine=ie, recommendation_engine=re,
         )
 
-        with pytest.raises(RuntimeError, match="Failed to compute dataset profile"):
+        with pytest.raises(DataProviderError, match="Failed to compute dataset profile"):
             use_case.execute(AnalyzeRequest(columns=None, config=MagicMock()), MagicMock())
 
 

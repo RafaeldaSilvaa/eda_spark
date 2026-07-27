@@ -11,9 +11,9 @@ import threading
 import time
 from collections import OrderedDict
 
+from spark_eda.application.ports.cache_provider import CacheProvider
 from spark_eda.domain.entities.dataset_analysis import DatasetAnalysis
 from spark_eda.domain.entities.quality_score import QualityScore
-from spark_eda.application.ports.cache_provider import CacheProvider
 
 _CacheValue = DatasetAnalysis | QualityScore
 
@@ -27,7 +27,7 @@ class _CacheEntry:
             entrada expira. Se 0, nunca expira.
     """
 
-    __slots__ = ("value", "expires_at")
+    __slots__ = ("expires_at", "value")
 
     def __init__(
         self,

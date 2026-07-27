@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from spark_eda.adapters.presenters.quality_presenter import QualityPresenter
 from spark_eda.application.dto.correlation_section import CorrelationEntry, CorrelationSection
 from spark_eda.application.dto.distribution_section import (
     DistributionSection,
@@ -14,11 +15,8 @@ from spark_eda.application.dto.distribution_section import (
 from spark_eda.application.dto.eda_report import EDAReport
 from spark_eda.application.dto.insights_section import InsightDTO, InsightsSection
 from spark_eda.application.dto.outlier_section import OutlierSection, OutlierSummary
-from spark_eda.domain.entities.outlier import OutlierInfo
 from spark_eda.application.dto.overview_section import OverviewSection
 from spark_eda.application.dto.quality_section import (
-    QualityDimensionReport,
-    QualityFactorReport,
     QualityReport,
 )
 from spark_eda.application.dto.recommendations_section import (
@@ -34,7 +32,7 @@ from spark_eda.application.dto.stats_section import (
     TemporalStatsDTO,
     TextStatsDTO,
 )
-from spark_eda.adapters.presenters.quality_presenter import QualityPresenter
+from spark_eda.application.ports.output_presenter import OutputPresenter
 from spark_eda.domain.entities.column_profile import ColumnProfile
 from spark_eda.domain.entities.data_profile import DataProfile
 from spark_eda.domain.entities.dataset_analysis import DatasetAnalysis
@@ -44,6 +42,7 @@ from spark_eda.domain.entities.distribution import (
     NumericDistribution,
     TemporalDistribution,
 )
+from spark_eda.domain.entities.outlier import OutlierInfo
 from spark_eda.domain.entities.statistic import (
     BooleanStats,
     CategoricalStats,
@@ -53,7 +52,6 @@ from spark_eda.domain.entities.statistic import (
     TextStats,
 )
 from spark_eda.domain.value_objects.data_type import DataType
-from spark_eda.application.ports.output_presenter import OutputPresenter
 
 
 class AnalysisPresenter(OutputPresenter):
@@ -120,7 +118,7 @@ class AnalysisPresenter(OutputPresenter):
         """
         return QualityPresenter().present_quality(quality)
 
-    def _build_overview(self, analysis: DatasetAnalysis) -> OverviewSection:
+    def _build_overview(self, analysis: DatasetAnalysis) -> OverviewSection:  # noqa: PLR0912
         """Constrói a seção de visão geral."""
         profile: DataProfile = analysis.profile
         row_count: int = profile.row_count
@@ -129,14 +127,17 @@ class AnalysisPresenter(OutputPresenter):
 
         # Derive duplicates from the uniqueness dimension, if available
         duplicate_count: int = 0
-        if "unicidade" in analysis.quality.dimensions:
-            for factor in analysis.quality.dimensions["unicidade"].factors:
-                if "duplicata" in factor.name.lower():
-                    duplicate_count = int(factor.affected_columns[0]) if factor.affected_columns else 0
+        for dimension in analysis.quality.dimensions.values():
+            for factor in dimension.factors:
+                if "duplicata" in factor.name.lower() or "duplicate" in factor.name.lower():
                     for word in factor.reason.split():
                         if word.isdigit():
                             duplicate_count = int(word)
                             break
+                    if duplicate_count == 0 and factor.affected_columns:
+                        potential = factor.affected_columns[0]
+                        if potential.isdigit():
+                            duplicate_count = int(potential)
 
         duplicate_ratio: float = duplicate_count / row_count if row_count > 0 else 0.0
 
@@ -147,9 +148,7 @@ class AnalysisPresenter(OutputPresenter):
         # Size estimate (approximate by type)
         size_estimate: int = 0
         for col in profile.columns:
-            if col.data_type in (DataType.INTEGER, DataType.LONG):
-                size_estimate += row_count * 8
-            elif col.data_type == DataType.DOUBLE:
+            if col.data_type in (DataType.INTEGER, DataType.LONG) or col.data_type == DataType.DOUBLE:
                 size_estimate += row_count * 8
             elif col.data_type == DataType.DECIMAL:
                 size_estimate += row_count * 12
@@ -319,9 +318,8 @@ class AnalysisPresenter(OutputPresenter):
                 matrix[c][c2] = 0.0
 
         for e in entries:
-            if e.column_a in matrix and e.column_b in matrix[e.column_a]:
-                matrix[e.column_a][e.column_b] = e.value
-                matrix[e.column_b][e.column_a] = e.value
+            matrix[e.column_a][e.column_b] = e.value
+            matrix[e.column_b][e.column_a] = e.value
             matrix[e.column_a][e.column_a] = 1.0
             matrix[e.column_b][e.column_b] = 1.0
 

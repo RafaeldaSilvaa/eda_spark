@@ -5,6 +5,7 @@ import logging
 from dataclasses import dataclass
 from typing import Any
 
+from spark_eda.application.exceptions import DataProviderError, QualityError
 from spark_eda.application.ports.cache_provider import CacheProvider
 from spark_eda.application.ports.data_provider import DataProvider
 from spark_eda.domain.entities.data_profile import DataProfile
@@ -123,7 +124,7 @@ class AssessQualityUseCase:
 
         Raises:
             ValueError: Se as colunas solicitadas não existirem.
-            RuntimeError: Se o profiling falhar.
+            DataProviderError: Se o profiling falhar por outro motivo.
         """
         try:
             return self._data_provider.compute_profile(
@@ -131,10 +132,8 @@ class AssessQualityUseCase:
                 request.columns,
                 request.config,
             )
-        except ValueError:
-            raise
         except Exception as exc:
-            raise RuntimeError(
+            raise DataProviderError(
                 f"Failed to compute dataset profile: {exc}",
             ) from exc
 
@@ -157,7 +156,8 @@ class AssessQualityUseCase:
 
         Raises:
             ValueError: Se o dataframe for inválido.
-            RuntimeError: Se o profiling ou o cálculo de qualidade falhar.
+            DataProviderError: Se o profiling falhar.
+            QualityError: Se o cálculo de qualidade falhar.
         """
         fingerprint: str = self._data_provider.compute_fingerprint(
             dataframe,
@@ -175,7 +175,7 @@ class AssessQualityUseCase:
         try:
             quality: QualityScore = self._quality_calculator.calculate(profile)
         except Exception as exc:
-            raise RuntimeError(
+            raise QualityError(
                 f"Failed to calculate data quality: {exc}",
             ) from exc
 

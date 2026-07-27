@@ -9,6 +9,7 @@ utilizando mocks para todas as dependências externas.
 from datetime import datetime, timezone
 from unittest.mock import MagicMock, create_autospec
 
+from spark_eda.application.exceptions import DataProviderError
 from spark_eda.application.use_cases.analyze_dataset import AnalyzeDatasetUseCase, AnalyzeRequest
 from spark_eda.application.ports.cache_provider import CacheProvider
 from spark_eda.application.ports.data_provider import DataProvider
@@ -174,5 +175,5 @@ class TestAnalyzeDatasetUseCase:
 
         import pytest
 
-        with pytest.raises(ValueError, match="inexistente"):
+        with pytest.raises(DataProviderError, match="inexistente"):
             use_case.execute(request, dataframe)

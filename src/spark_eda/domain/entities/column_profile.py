@@ -5,9 +5,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from spark_eda.domain.entities.column_metadata import ColumnMetadata
+from spark_eda.domain.entities.distribution import Distribution
 from spark_eda.domain.entities.outlier import OutlierInfo
 from spark_eda.domain.entities.statistic import Statistic
-from spark_eda.domain.entities.distribution import Distribution
 
 
 @dataclass(frozen=True)

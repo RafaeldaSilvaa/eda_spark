@@ -10,6 +10,7 @@ from unittest.mock import MagicMock, create_autospec
 
 import pytest
 
+from spark_eda.application.exceptions import DataProviderError, QualityError
 from spark_eda.application.use_cases.assess_quality import AssessQualityUseCase, QualityRequest
 from spark_eda.application.ports.cache_provider import CacheProvider
 from spark_eda.application.ports.data_provider import DataProvider
@@ -23,8 +24,8 @@ class TestAssessQualityEdgeCases:
     def test_execute_raises_runtime_error_when_data_provider_fails(
         self,
     ) -> None:
-        """Quando o data provider lança ValueError, a exceção é
-        re-lançada; outras exceções são envolvidas em RuntimeError.
+        """Quando o data provider lança exceção, o erro é envolvido em
+        DataProviderError.
         """
         data_provider: MagicMock = create_autospec(DataProvider)
         cache_provider: MagicMock = create_autospec(CacheProvider)
@@ -42,11 +43,11 @@ class TestAssessQualityEdgeCases:
         dataframe = MagicMock()
 
         data_provider.compute_profile.side_effect = ValueError("Coluna inválida")
-        with pytest.raises(ValueError, match="Coluna inválida"):
+        with pytest.raises(DataProviderError, match="Failed to compute dataset profile"):
             use_case.execute(request, dataframe)
 
         data_provider.compute_profile.side_effect = Exception("Erro inesperado")
-        with pytest.raises(RuntimeError, match="Failed to compute dataset profile"):
+        with pytest.raises(DataProviderError, match="Failed to compute dataset profile"):
             use_case.execute(request, dataframe)
 
     def test_execute_raises_runtime_error_when_quality_calculator_fails(
@@ -73,7 +74,7 @@ class TestAssessQualityEdgeCases:
         request: QualityRequest = QualityRequest(columns=None, config=MagicMock())
         dataframe = MagicMock()
 
-        with pytest.raises(RuntimeError, match="Failed to calculate data quality"):
+        with pytest.raises(QualityError, match="Failed to calculate data quality"):
             use_case.execute(request, dataframe)
 
     def test_execute_cache_miss_computes_and_caches(self) -> None:

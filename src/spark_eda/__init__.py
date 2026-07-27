@@ -18,6 +18,10 @@ from __future__ import annotations
 from pyspark.sql import DataFrame
 
 from spark_eda._version import __version__
+from spark_eda.adapters.controllers.analyze_controller import AnalyzeController
+from spark_eda.adapters.controllers.quality_controller import QualityController
+from spark_eda.application.dto.eda_report import EDAReport
+from spark_eda.application.dto.quality_section import QualityReport
 from spark_eda.framework.config import EDAConfig, QualityConfig
 from spark_eda.framework.exceptions import (
     AnalysisError,
@@ -28,14 +32,11 @@ from spark_eda.framework.exceptions import (
     SparkEDAError,
 )
 
-from spark_eda.adapters.controllers.analyze_controller import AnalyzeController
-from spark_eda.adapters.controllers.quality_controller import QualityController
-
 
 def analyze(
     dataframe: DataFrame,
     config: EDAConfig | None = None,
-) -> "EDAReport":
+) -> EDAReport:
     """Executa uma análise exploratória completa em um DataFrame PySpark.
 
     Args:
@@ -53,7 +54,7 @@ def analyze(
 def assess_quality(
     dataframe: DataFrame,
     config: QualityConfig | None = None,
-) -> "QualityReport":
+) -> QualityReport:
     """Avalia a qualidade dos dados de um DataFrame PySpark.
 
     Args:
@@ -69,15 +70,15 @@ def assess_quality(
 
 
 __all__ = [
-    "analyze",
-    "assess_quality",
-    "EDAConfig",
-    "QualityConfig",
-    "SparkEDAError",
     "AnalysisError",
-    "QualityError",
-    "DataProviderError",
     "CacheError",
     "ConfigError",
+    "DataProviderError",
+    "EDAConfig",
+    "QualityConfig",
+    "QualityError",
+    "SparkEDAError",
     "__version__",
+    "analyze",
+    "assess_quality",
 ]

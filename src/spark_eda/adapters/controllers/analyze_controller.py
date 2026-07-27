@@ -8,13 +8,12 @@ e retorna um :class:`EDAReport`.
 from __future__ import annotations
 
 import logging
-from typing import Any
 
 from pyspark.sql import DataFrame
 
+from spark_eda.adapters.presenters.analysis_presenter import AnalysisPresenter
 from spark_eda.adapters.providers.lru_cache_provider import LRUCacheProvider
 from spark_eda.adapters.providers.spark_data_provider import SparkDataProvider
-from spark_eda.adapters.presenters.analysis_presenter import AnalysisPresenter
 from spark_eda.application.dto.eda_report import EDAReport
 from spark_eda.application.use_cases.analyze_dataset import AnalyzeDatasetUseCase, AnalyzeRequest
 from spark_eda.domain.entities.dataset_analysis import DatasetAnalysis
@@ -88,7 +87,8 @@ class AnalyzeController:
 
         Raises:
             ValueError: Se o DataFrame for inválido.
-            RuntimeError: Se o processamento falhar.
+            SparkEDAError: Se o processamento falhar (subclasse específica
+                conforme a etapa: DataProviderError, AnalysisError).
         """
         if dataframe is None:
             raise ValueError("DataFrame cannot be None.")

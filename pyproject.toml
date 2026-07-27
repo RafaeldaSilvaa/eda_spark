@@ -5,13 +5,37 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "spark-eda"
 version = "0.1.0"
-description = "Exploratory Data Analysis toolkit built on PySpark"
+description = "Distributed Exploratory Data Analysis and Data Quality Assessment for PySpark"
 readme = "README.md"
 requires-python = ">=3.12"
+license = {file = "LICENSE"}
+authors = [
+    {name = "spark_eda contributors"},
+]
+keywords = ["spark", "pyspark", "eda", "data-quality", "exploratory-data-analysis", "big-data"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
 
 dependencies = [
     "pyspark>=4.0.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/usuario/spark-eda"
+Repository = "https://github.com/usuario/spark-eda"
+Documentation = "https://github.com/usuario/spark-eda#readme"
+Tracker = "https://github.com/usuario/spark-eda/issues"
 
 [project.optional-dependencies]
 dev = [
@@ -80,7 +104,7 @@ branch = true
 command_line = "-m pytest"
 
 [tool.coverage.report]
-fail_under = 77
+fail_under = 95
 exclude_lines = [
     "pragma: no cover",
     "def __repr__",

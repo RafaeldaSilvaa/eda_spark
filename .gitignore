@@ -1,0 +1,57 @@
+﻿# Python
+__pycache__/
+*.py[cod]
+*.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Test / Coverage
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage_html/
+htmlcov/
+.coverage.*
+*.xml
+bench_results/
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+notebooks/*.html
+notebooks/*.nbconvert.*
+
+# PySpark
+metastore_db/
+derby.log
+spark-warehouse/
+*.parquet/
+*.csv
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+.docker/
+
+# Build
+*.whl
+*.tar.gz

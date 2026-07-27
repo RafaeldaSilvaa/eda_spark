@@ -397,6 +397,7 @@ class TestSparkDataProviderCoverage:
         self, spark_session: SparkSession, provider: SparkDataProvider,
     ) -> None:
         """BinaryType → DataType.OTHER (linha 98) e cobre linhas 666, 901, 1024-1029."""
+        from types import SimpleNamespace
         from spark_eda.domain.value_objects.data_type import DataType
 
         schema: StructType = StructType([
@@ -420,6 +421,8 @@ class TestSparkDataProviderCoverage:
         self, spark_session: SparkSession, provider: SparkDataProvider,
     ) -> None:
         """Z-score em coluna constante → std=0.0, retorna None (linha 477)."""
+        from types import SimpleNamespace
+
         schema: StructType = StructType([
             StructField("x", DoubleType()),
         ])
@@ -440,6 +443,8 @@ class TestSparkDataProviderCoverage:
         self, spark_session: SparkSession, provider: SparkDataProvider,
     ) -> None:
         """MAD em coluna constante → mad_val=0.0, retorna None (linha 543)."""
+        from types import SimpleNamespace
+
         schema: StructType = StructType([
             StructField("x", DoubleType()),
         ])
@@ -460,6 +465,8 @@ class TestSparkDataProviderCoverage:
         self, spark_session: SparkSession, provider: SparkDataProvider,
     ) -> None:
         """MAD em coluna toda nula → median_list vazio, retorna None (linha 528)."""
+        from types import SimpleNamespace
+
         schema: StructType = StructType([
             StructField("x", DoubleType()),
         ])
@@ -523,10 +530,31 @@ class TestSparkDataProviderCoverage:
         with pytest.raises(ValueError, match="do not exist in the schema"):
             provider.compute_profile(df, columns=["inexistente"], config=default_config)
 
+    def test_profile_with_valid_subset_of_columns(
+        self, spark_session: SparkSession, provider: SparkDataProvider,
+        default_config: Any,
+    ) -> None:
+        """Colunas válidas filtradas → perfil contém só elas (linha 835)."""
+        schema: StructType = StructType([
+            StructField("a", IntegerType()),
+            StructField("b", StringType()),
+        ])
+        df: DataFrame = spark_session.createDataFrame(
+            [(1, "x"), (2, "y")], schema=schema,
+        )
+        profile: DataProfile = provider.compute_profile(
+            df, columns=["a"], config=default_config,
+        )
+        assert profile.row_count == 2
+        assert len(profile.columns) == 1
+        assert profile.columns[0].name == "a"
+
     def test_sampling_triggered_by_low_threshold(
         self, spark_session: SparkSession, provider: SparkDataProvider,
     ) -> None:
         """sampling_threshold baixo → working_df é amostrado (linhas 842-844)."""
+        from types import SimpleNamespace
+
         schema: StructType = StructType([
             StructField("x", IntegerType()),
         ])
@@ -539,7 +567,7 @@ class TestSparkDataProviderCoverage:
         profile: DataProfile = provider.compute_profile(
             df, columns=None, config=config,
         )
-        assert profile.row_count < 100  # sampled
+        assert profile.row_count == 100  # original count preserved
         assert "x" in profile.column_profiles
 
     def test_correlation_constant_columns(

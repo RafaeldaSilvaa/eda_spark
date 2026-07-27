@@ -53,7 +53,8 @@ class OverviewSection:
         lines: list[str] = [
             f"  {'Rows':20s} {format_number(self.row_count):>15s}",
             f"  {'Columns':20s} {format_number(self.column_count):>15s}",
-            f"  {'Duplicates':20s} {format_number(self.duplicate_count):>10s} ({format_percentage(self.duplicate_ratio)})",
+            f"  {'Duplicates':20s} {format_number(self.duplicate_count):>10s}"
+            f" ({format_percentage(self.duplicate_ratio)})",
             f"  {'Missing':20s} {format_percentage(self.missing_ratio):>15s}",
             f"  {'Est. Size':20s} {format_bytes(self.size_estimate):>15s}",
         ]

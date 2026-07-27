@@ -38,26 +38,28 @@ class SchemaSection:
     def _repr_html_(self) -> str:
         """Renderiza o esquema como uma tabela HTML com estilos inline."""
         header: str = (
-            f'<thead><tr>'
-            f'<th style="text-align:left;padding:8px 12px;border-bottom:2px solid var(--border,#e2e8f0);'
-            f'color:var(--muted,#64748b);font-size:12px;text-transform:uppercase;">Column</th>'
-            f'<th style="text-align:left;padding:8px 12px;border-bottom:2px solid var(--border,#e2e8f0);'
-            f'color:var(--muted,#64748b);font-size:12px;text-transform:uppercase;">Type</th>'
-            f'<th style="text-align:center;padding:8px 12px;border-bottom:2px solid var(--border,#e2e8f0);'
-            f'color:var(--muted,#64748b);font-size:12px;text-transform:uppercase;">Nullable</th>'
-            f'<th style="text-align:left;padding:8px 12px;border-bottom:2px solid var(--border,#e2e8f0);'
-            f'color:var(--muted,#64748b);font-size:12px;text-transform:uppercase;">Inferred</th>'
-            f'<th style="text-align:right;padding:8px 12px;border-bottom:2px solid var(--border,#e2e8f0);'
-            f'color:var(--muted,#64748b);font-size:12px;text-transform:uppercase;">Nulls</th>'
-            f'</tr></thead>'
+            '<thead><tr>'
+            '<th style="text-align:left;padding:8px 12px;border-bottom:2px solid var(--border,#e2e8f0);'
+            'color:var(--muted,#64748b);font-size:12px;text-transform:uppercase;">Column</th>'
+            '<th style="text-align:left;padding:8px 12px;border-bottom:2px solid var(--border,#e2e8f0);'
+            'color:var(--muted,#64748b);font-size:12px;text-transform:uppercase;">Type</th>'
+            '<th style="text-align:center;padding:8px 12px;border-bottom:2px solid var(--border,#e2e8f0);'
+            'color:var(--muted,#64748b);font-size:12px;text-transform:uppercase;">Nullable</th>'
+            '<th style="text-align:left;padding:8px 12px;border-bottom:2px solid var(--border,#e2e8f0);'
+            'color:var(--muted,#64748b);font-size:12px;text-transform:uppercase;">Inferred</th>'
+            '<th style="text-align:right;padding:8px 12px;border-bottom:2px solid var(--border,#e2e8f0);'
+            'color:var(--muted,#64748b);font-size:12px;text-transform:uppercase;">Nulls</th>'
+            '</tr></thead>'
         )
         rows: str = "".join(
             f'<tr style="border-bottom:1px solid var(--border,#e2e8f0);">'
             f'<td style="padding:8px 12px;font-weight:500;color:var(--text,#1a1a2e);">{col.name}</td>'
             f'<td style="padding:8px 12px;color:var(--primary,#2563eb);">{col.type}</td>'
-            f'<td style="padding:8px 12px;text-align:center;color:var(--text,#1a1a2e);">{"Yes" if col.nullable else "No"}</td>'
+            f'<td style="padding:8px 12px;text-align:center;color:var(--text,#1a1a2e);">'
+            f'{"Yes" if col.nullable else "No"}</td>'
             f'<td style="padding:8px 12px;color:var(--text,#1a1a2e);">{col.inferred_type or "\u2014"}</td>'
-            f'<td style="padding:8px 12px;text-align:right;color:var(--text,#1a1a2e);">{format_number(col.null_count)}</td>'
+            f'<td style="padding:8px 12px;text-align:right;color:var(--text,#1a1a2e);">'
+            f'{format_number(col.null_count)}</td>'
             f"</tr>"
             for col in self.columns
         )
@@ -96,7 +98,7 @@ class SchemaSection:
             lines.append(
                 f"| {col.name.ljust(col_widths['name'])} "
                 f"| {col.type.ljust(col_widths['type'])} "
-                f"| {'Yes' if col.nullable else 'No'.ljust(col_widths['nullable'])} "
+                f"| {('Yes' if col.nullable else 'No').ljust(col_widths['nullable'])} "
                 f"| {(col.inferred_type or '\u2014').ljust(col_widths['inferred'])} "
                 f"| {str(col.null_count).rjust(col_widths['null'])} |"
             )

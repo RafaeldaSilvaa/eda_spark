@@ -17,7 +17,7 @@ services:
       - ./tests:/app/tests
       - ./pyproject.toml:/app/pyproject.toml
       - ./README.md:/app/README.md
-    command: ["pytest", "tests/", "--cov=spark_eda", "--cov-fail-under=77", "-v"]
+    command: ["pytest", "tests/", "--cov=spark_eda", "--cov-fail-under=95", "-v"]
 
   shell:
     build:
@@ -36,6 +36,28 @@ services:
     stdin_open: true
     tty: true
     entrypoint: ["/bin/bash"]
+
+  jupyter:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.jupyter
+    image: spark-eda:jupyter
+    container_name: spark-eda-jupyter
+    environment:
+      <<: *spark-env
+      SPARK_LOCAL_IP: 127.0.0.1
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./src:/home/jovyan/work/src
+      - ./notebooks:/home/jovyan/work/notebooks
+      - ./data:/home/jovyan/work/data
+      - ./pyproject.toml:/home/jovyan/work/pyproject.toml
+      - ./README.md:/home/jovyan/work/README.md
+      - ./LICENSE:/home/jovyan/work/LICENSE
+      - ./tests:/home/jovyan/work/tests
+    stdin_open: true
+    tty: true
 
   benchmark:
     build:

@@ -7,6 +7,8 @@ ordenados por urgência decrescente.
 
 from __future__ import annotations
 
+from collections.abc import Callable
+
 from spark_eda.domain.entities.insight import Insight
 from spark_eda.domain.entities.quality_score import QualityScore
 from spark_eda.domain.entities.recommendation import Recommendation
@@ -314,7 +316,7 @@ class RecommendationEngine:
     def generate(
         self,
         insights: list[Insight],
-        quality: QualityScore,
+        _quality: QualityScore,
     ) -> list[Recommendation]:
         """Gera recomendações de ação a partir dos insights da análise.
 
@@ -333,7 +335,7 @@ class RecommendationEngine:
         """
         recommendations: list[Recommendation] = []
 
-        conversion_map: dict[InsightCategory, callable] = {
+        conversion_map: dict[InsightCategory, Callable[..., list[Recommendation]]] = {
             InsightCategory.NULLS: RecommendationEngine._recommend_nulls,
             InsightCategory.OUTLIERS: RecommendationEngine._recommend_outliers,
             InsightCategory.SKEWNESS: RecommendationEngine._recommend_skewness,

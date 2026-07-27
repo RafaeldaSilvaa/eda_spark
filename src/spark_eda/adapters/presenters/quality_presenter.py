@@ -9,8 +9,8 @@ from spark_eda.application.dto.quality_section import (
     QualityFactorReport,
     QualityReport,
 )
-from spark_eda.domain.entities.quality_score import QualityScore
 from spark_eda.application.ports.output_presenter import OutputPresenter
+from spark_eda.domain.entities.quality_score import QualityScore
 
 
 class QualityPresenter(OutputPresenter):

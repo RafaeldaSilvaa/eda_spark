@@ -1,0 +1,41 @@
+FROM python:3.12-slim-bookworm
+
+LABEL org.opencontainers.image.title="spark-eda Jupyter"
+LABEL org.opencontainers.image.description="Jupyter Notebook with PySpark 4.x and spark_eda pre-installed"
+LABEL org.opencontainers.image.version="0.1.0"
+
+# ─── Silence apt-get prompts ──────────────────────────────────────────
+ENV DEBIAN_FRONTEND=noninteractive
+
+# ─── Install Java 17 (required by PySpark) ────────────────────────────
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    openjdk-17-jre-headless \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# ─── Java / Spark environment variables ───────────────────────────────
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+ENV PYSPARK_PYTHON=python3
+ENV PYSPARK_DRIVER_PYTHON=python3
+ENV SPARK_LOCAL_IP=127.0.0.1
+
+# ─── Working directory ────────────────────────────────────────────────
+WORKDIR /home/jovyan/work
+
+# ─── Install spark_eda from local source ──────────────────────────────
+COPY pyproject.toml README.md LICENSE ./
+COPY src/ ./src/
+
+RUN pip install --no-cache-dir -e ".[dev,test]" \
+    && pip install --no-cache-dir jupyter jupyterlab notebook ipywidgets
+
+# ─── Startup script (standalone file avoids quoting issues) ───────────
+COPY scripts/start-jupyter.sh /start.sh
+RUN chmod +x /start.sh
+
+# ─── Copy notebooks directory ─────────────────────────────────────────
+COPY notebooks/ ./notebooks/
+
+EXPOSE 8888
+
+ENTRYPOINT ["/start.sh"]

@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-from datetime import datetime
 from dataclasses import dataclass
+from datetime import datetime
 
-from spark_eda.domain.entities.data_profile import DataProfile
-from spark_eda.domain.entities.quality_score import QualityScore
 from spark_eda.domain.entities.correlation import Correlation
+from spark_eda.domain.entities.data_profile import DataProfile
 from spark_eda.domain.entities.insight import Insight
+from spark_eda.domain.entities.quality_score import QualityScore
 from spark_eda.domain.entities.recommendation import Recommendation
 
 

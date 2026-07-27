@@ -12,19 +12,15 @@ from spark_eda.domain.entities.column_profile import ColumnProfile
 from spark_eda.domain.entities.data_profile import DataProfile
 from spark_eda.domain.entities.quality_score import QualityFactor
 from spark_eda.domain.entities.statistic import CategoricalStats
-from spark_eda.domain.services.quality_factors import registrar
+from spark_eda.domain.services.quality_factors import _score_severity, registrar
 from spark_eda.domain.value_objects.severity import Severity
 
-
-def _severity(score: float) -> Severity:
-    """Mapeia uma pontuação em [0, 1] para um nível de severidade."""
-    if score < 0.3:
-        return Severity.CRITICAL
-    if score < 0.6:
-        return Severity.HIGH
-    if score < 0.8:
-        return Severity.MEDIUM
-    return Severity.LOW
+_UNIQUE_LOW_THRESHOLD = 0.5
+_UNIQUE_HIGH_THRESHOLD = 0.99
+_NEAR_DUPLICATE_THRESHOLD = 0.95
+_LARGE_ROW_THRESHOLD = 100
+_CARDINALITY_LOW = 0.01
+_CARDINALITY_HIGH = 0.99
 
 
 def _is_primary_key_candidate(column_name: str) -> bool:
@@ -54,7 +50,7 @@ def _duplicate_ratio(profile: DataProfile) -> QualityFactor:
         stats = column_profile.stats
         if isinstance(stats, CategoricalStats):
             unique_ratios.append(stats.unique_ratio)
-            if stats.unique_ratio < 0.5:
+            if stats.unique_ratio < _UNIQUE_LOW_THRESHOLD:
                 affected_columns.append(column_metadata.name)
 
     if not unique_ratios:
@@ -81,7 +77,7 @@ def _duplicate_ratio(profile: DataProfile) -> QualityFactor:
             f"{len(unique_ratios)} colunas categóricas. Valores próximos "
             f"de 1.0 indicam baixa duplicação."
         ),
-        severity=_severity(score),
+        severity=_score_severity(score),
         affected_columns=affected_columns,
     )
 
@@ -102,7 +98,7 @@ def _pk_uniqueness(profile: DataProfile) -> QualityFactor:
             pks_found += 1
             column_profile: ColumnProfile = profile.column_profiles[column_metadata.name]
             stats = column_profile.stats
-            if isinstance(stats, CategoricalStats) and stats.unique_ratio >= 0.99:
+            if isinstance(stats, CategoricalStats) and stats.unique_ratio >= _UNIQUE_HIGH_THRESHOLD:
                 pks_unique += 1
             else:
                 affected_columns.append(column_metadata.name)
@@ -129,7 +125,7 @@ def _pk_uniqueness(profile: DataProfile) -> QualityFactor:
             f"{pks_unique} de {pks_found} colunas candidatas a "
             f"chave primária possuem unique ratio ≥ 99%."
         ),
-        severity=_severity(score),
+        severity=_score_severity(score),
         affected_columns=affected_columns,
     )
 
@@ -149,7 +145,7 @@ def _near_duplicates(profile: DataProfile) -> QualityFactor:
         stats = column_profile.stats
         if isinstance(stats, CategoricalStats):
             total_categorical += 1
-            if 0.95 <= stats.unique_ratio < 1.0:
+            if _NEAR_DUPLICATE_THRESHOLD <= stats.unique_ratio < 1.0:
                 near_duplicate_columns.append(column_metadata.name)
 
     if total_categorical == 0:
@@ -176,7 +172,7 @@ def _near_duplicates(profile: DataProfile) -> QualityFactor:
             f"colunas categóricas possuem unique ratio entre 0.95 e 1.0, "
             f"sugerindo potenciais quase-duplicatas."
         ),
-        severity=_severity(score),
+        severity=_score_severity(score),
         affected_columns=near_duplicate_columns,
     )
 
@@ -222,7 +218,7 @@ def _constant_columns(profile: DataProfile) -> QualityFactor:
             f"{len(constant_columns_list)} de {total_with_cardinality} "
             f"colunas possuem cardinalidade 1 (constantes)."
         ),
-        severity=_severity(score),
+        severity=_score_severity(score),
         affected_columns=constant_columns_list,
     )
 
@@ -242,7 +238,7 @@ def _near_constant_columns(profile: DataProfile) -> QualityFactor:
         stats = column_profile.stats
         if isinstance(stats, CategoricalStats) and stats.cardinality >= 1:
             total_with_cardinality += 1
-            if stats.cardinality in (2, 3) and profile.row_count > 100:
+            if stats.cardinality in (2, 3) and profile.row_count > _LARGE_ROW_THRESHOLD:
                 near_constant_list.append(column_metadata.name)
 
     if total_with_cardinality == 0:
@@ -269,7 +265,7 @@ def _near_constant_columns(profile: DataProfile) -> QualityFactor:
             f"colunas possuem cardinalidade 2 ou 3 em um dataset com "
             f"{profile.row_count} linhas."
         ),
-        severity=_severity(score),
+        severity=_score_severity(score),
         affected_columns=near_constant_list,
     )
 
@@ -290,7 +286,7 @@ def _cardinality_factor(profile: DataProfile) -> QualityFactor:
         if isinstance(stats, CategoricalStats) and profile.row_count > 0:
             ratio: float = stats.cardinality / profile.row_count
             cardinality_ratios.append(ratio)
-            if ratio < 0.01 or ratio > 0.99:
+            if ratio < _CARDINALITY_LOW or ratio > _CARDINALITY_HIGH:
                 affected_columns.append(column_metadata.name)
 
     if not cardinality_ratios:
@@ -306,13 +302,7 @@ def _cardinality_factor(profile: DataProfile) -> QualityFactor:
 
     mean_ratio: float = mean(cardinality_ratios)
 
-    if mean_ratio <= 0.01:
-        score = mean_ratio * 100
-    elif mean_ratio >= 0.99:
-        score = (1.0 - mean_ratio) * 100
-    else:
-        score = 1.0 - abs(0.5 - mean_ratio) * 2
-
+    score = 1.0 - abs(0.5 - mean_ratio) * 2
     score = max(0.0, min(1.0, score))
 
     return QualityFactor(
@@ -324,7 +314,7 @@ def _cardinality_factor(profile: DataProfile) -> QualityFactor:
             f"Razão cardinalidade/linhas média de {mean_ratio:.4f} "
             f"entre {len(cardinality_ratios)} colunas. Ideal próximo de 0.5."
         ),
-        severity=_severity(score),
+        severity=_score_severity(score),
         affected_columns=affected_columns,
     )
 

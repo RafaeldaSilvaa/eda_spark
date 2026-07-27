@@ -1,5 +1,5 @@
 .PHONY: test-all test-unit test-integration test-coverage \
-        docker-test docker-shell docker-benchmark docker-build \
+        docker-test docker-shell docker-jupyter docker-benchmark docker-build \
         build shell clean
 
 # ─── Variables ────────────────────────────────────────────────────────
@@ -48,6 +48,21 @@ docker-benchmark:
 
 docker-build:
 	$(COMPOSE) build
+
+# ─── Docker Jupyter ────────────────────────────────────────────────────
+docker-jupyter:
+	@echo "=== Starting Jupyter Notebook ==="
+	$(COMPOSE) up -d jupyter
+	@echo ""
+	@echo "Jupyter Notebook disponível em: http://localhost:8888"
+	@echo "Token: nenhum (acesso livre)"
+	@echo "Para parar: make docker-jupyter-stop"
+
+docker-jupyter-stop:
+	$(COMPOSE) stop jupyter
+
+docker-jupyter-logs:
+	$(COMPOSE) logs -f jupyter
 
 # ─── Shell ────────────────────────────────────────────────────────────
 shell:

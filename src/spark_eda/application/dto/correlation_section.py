@@ -5,6 +5,12 @@ from dataclasses import dataclass
 
 from spark_eda.utils.formatting import format_number
 
+_CORR_NEGLIGIBLE: float = 0.1
+_CORR_WEAK: float = 0.3
+_CORR_LIGHT: float = 0.5
+_CORR_MODERATE: float = 0.6
+_CORR_STRONG: float = 0.7
+
 
 @dataclass(frozen=True)
 class CorrelationEntry:
@@ -26,9 +32,9 @@ class CorrelationEntry:
 def _correlation_color(value: float) -> str:
     """Retorna uma cor CSS baseada na intensidade e direção da correlação."""
     abs_val: float = abs(value)
-    if abs_val < 0.3:
+    if abs_val < _CORR_WEAK:
         return "#64748b"
-    if abs_val < 0.6:
+    if abs_val < _CORR_MODERATE:
         return "#2563eb" if value > 0 else "#dc2626"
     return "#1d4ed8" if value > 0 else "#b91c1c"
 
@@ -36,13 +42,13 @@ def _correlation_color(value: float) -> str:
 def _correlation_symbol(value: float) -> str:
     """Retorna um símbolo de intensidade para a correlação."""
     abs_val: float = abs(value)
-    if abs_val < 0.1:
+    if abs_val < _CORR_NEGLIGIBLE:
         return " "
-    if abs_val < 0.3:
+    if abs_val < _CORR_WEAK:
         return "."
-    if abs_val < 0.5:
+    if abs_val < _CORR_LIGHT:
         return "o"
-    if abs_val < 0.7:
+    if abs_val < _CORR_STRONG:
         return "O"
     return "@"
 
@@ -86,7 +92,8 @@ class CorrelationSection:
             cells: str = "".join(
                 f'<td style="padding:6px 4px;text-align:center;font-size:12px;'
                 f'font-weight:500;color:{_correlation_color(self.matrix.get(c1, {}).get(c2, 0.0))};'
-                f'background:color-mix(in srgb, {_correlation_color(self.matrix.get(c1, {}).get(c2, 0.0))} 10%, transparent);'
+                 f'background:color-mix(in srgb, '
+                 f'{_correlation_color(self.matrix.get(c1, {}).get(c2, 0.0))} 10%, transparent);'
                 f'border-bottom:1px solid var(--border,#e2e8f0);">'
                 f'{format_number(self.matrix.get(c1, {}).get(c2, 0.0), 2)}</td>'
                 for c2 in cols
