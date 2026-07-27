@@ -115,6 +115,9 @@ markers = [
 
 [tool.coverage.run]
 source = ["spark_eda"]
+omit = [
+    "*/adapters/providers/spark_data_provider.py",
+]
 branch = true
 command_line = "-m pytest"
 

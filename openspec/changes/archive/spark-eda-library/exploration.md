@@ -781,8 +781,7 @@ Every transformation is written to maximize Catalyst optimization opportunities:
 # GOOD: Filter pushdown + column pruning happen naturally
 df = spark.read.parquet("data/")
 result = (
-    df
-    .select("col_a", "col_b", "col_c")  # column pruning
+    df.select("col_a", "col_b", "col_c")  # column pruning
     .filter(F.col("col_a").isNotNull())  # filter pushdown
     .agg(...)
 )
@@ -1743,8 +1742,7 @@ class TestSparkDataProvider:
     def setup_class(cls):
         """Inicializa SparkSession uma vez (Docker)."""
         cls.spark = (
-            SparkSession.builder
-            .master("local[1]")
+            SparkSession.builder.master("local[1]")
             .appName("test")
             .config("spark.sql.shuffle.partitions", "1")
             .getOrCreate()
