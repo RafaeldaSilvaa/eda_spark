@@ -116,9 +116,7 @@ def _build_numeric_agg_expressions(
     expression_list.append(F.max(column_name).alias(f"{column_name}__max"))
     expression_list.append(F.count(column_name).alias(f"{column_name}__count"))
     expression_list.append(
-        F.count(F.when(F.isnull(F.col(column_name)), 1)).alias(
-            f"{column_name}__null_count"
-        ),
+        F.count(F.when(F.isnull(F.col(column_name)), 1)).alias(f"{column_name}__null_count"),
     )
     expression_list.append(
         F.approx_count_distinct(column_name).alias(f"{column_name}__approx_distinct"),
@@ -308,9 +306,7 @@ def _extract_categorical_stats(
     if value_counts:
         mode = max(value_counts, key=value_counts.__getitem__)
 
-    unique_ratio: float = (
-        cardinality / non_null_count if non_null_count > 0 else 0.0
-    )
+    unique_ratio: float = cardinality / non_null_count if non_null_count > 0 else 0.0
 
     return CategoricalStats(
         value_counts=value_counts,
@@ -428,17 +424,12 @@ def _compute_outliers_iqr(
     bound_lower: float = q25 - iqr_multiplier * iqr
     bound_upper: float = q75 + iqr_multiplier * iqr
 
-    outlier_count: int = (
-        dataframe.filter(
-            (F.col(column_name) < bound_lower)
-            | (F.col(column_name) > bound_upper),
-        ).count()
-    )
+    outlier_count: int = dataframe.filter(
+        (F.col(column_name) < bound_lower) | (F.col(column_name) > bound_upper),
+    ).count()
 
     total_count: int = dataframe.count()
-    outlier_ratio: float = (
-        outlier_count / total_count if total_count > 0 else 0.0
-    )
+    outlier_ratio: float = outlier_count / total_count if total_count > 0 else 0.0
 
     return OutlierInfo(
         method=OutlierMethod.IQR,
@@ -480,17 +471,12 @@ def _compute_outliers_zscore(
     bound_lower: float = mean_val - threshold * std_val
     bound_upper: float = mean_val + threshold * std_val
 
-    outlier_count: int = (
-        dataframe.filter(
-            (F.col(column_name) < bound_lower)
-            | (F.col(column_name) > bound_upper),
-        ).count()
-    )
+    outlier_count: int = dataframe.filter(
+        (F.col(column_name) < bound_lower) | (F.col(column_name) > bound_upper),
+    ).count()
 
     total_count: int = dataframe.count()
-    outlier_ratio: float = (
-        outlier_count / total_count if total_count > 0 else 0.0
-    )
+    outlier_ratio: float = outlier_count / total_count if total_count > 0 else 0.0
 
     return OutlierInfo(
         method=OutlierMethod.ZSCORE,
@@ -548,17 +534,12 @@ def _compute_outliers_mad(
     bound_lower: float = median_val - threshold * mad_val
     bound_upper: float = median_val + threshold * mad_val
 
-    outlier_count: int = (
-        dataframe.filter(
-            (F.col(column_name) < bound_lower)
-            | (F.col(column_name) > bound_upper),
-        ).count()
-    )
+    outlier_count: int = dataframe.filter(
+        (F.col(column_name) < bound_lower) | (F.col(column_name) > bound_upper),
+    ).count()
 
     total_count: int = dataframe.count()
-    outlier_ratio: float = (
-        outlier_count / total_count if total_count > 0 else 0.0
-    )
+    outlier_ratio: float = outlier_count / total_count if total_count > 0 else 0.0
 
     return OutlierInfo(
         method=OutlierMethod.MAD,
@@ -693,11 +674,7 @@ def _compute_temporal_distribution(
         )
 
         if yearly_rows:
-            periods = [
-                (str(int(row["year"])), int(row["count"]))
-                for row in yearly_rows
-                if row["year"] is not None
-            ]
+            periods = [(str(int(row["year"])), int(row["count"])) for row in yearly_rows if row["year"] is not None]
 
         # If yearly is too coarse (single year), try monthly
         if len(periods) <= 1:
@@ -709,11 +686,7 @@ def _compute_temporal_distribution(
             )
 
             if monthly_rows:
-                periods = [
-                    (str(row["month"]), int(row["count"]))
-                    for row in monthly_rows
-                    if row["month"] is not None
-                ]
+                periods = [(str(row["month"]), int(row["count"])) for row in monthly_rows if row["month"] is not None]
 
         if not periods:
             return None
@@ -742,7 +715,10 @@ def _compute_both_string_stats(
         Tupla de (CategoricalStats, TextStats).
     """
     categorical: CategoricalStats = _extract_categorical_stats(
-        aggregation_row, column_name, value_counts, total_rows,
+        aggregation_row,
+        column_name,
+        value_counts,
+        total_rows,
     )
     text: TextStats = _extract_text_stats(aggregation_row, column_name)
 
@@ -764,9 +740,7 @@ class SparkDataProvider(DataProvider):
             column_classifier: Classificador semântico para inferir
                 tipos de negócio das colunas. Se None, cria um padrão.
         """
-        self._column_classifier: ColumnClassifier = (
-            column_classifier or ColumnClassifier()
-        )
+        self._column_classifier: ColumnClassifier = column_classifier or ColumnClassifier()
 
     def compute_profile(  # noqa: PLR0912, PLR0915
         self,
@@ -798,13 +772,10 @@ class SparkDataProvider(DataProvider):
         column_names: list[str] = spark_schema.names
         if columns is not None:
             valid_columns: set[str] = set(column_names)
-            missing_columns: list[str] = [
-                col for col in columns if col not in valid_columns
-            ]
+            missing_columns: list[str] = [col for col in columns if col not in valid_columns]
             if missing_columns:
                 raise ValueError(
-                    f"The following columns do not exist in the schema: "
-                    f"{missing_columns}",
+                    f"The following columns do not exist in the schema: {missing_columns}",
                 )
             column_names = columns
 
@@ -820,8 +791,7 @@ class SparkDataProvider(DataProvider):
 
         classification_sample: DataFrame | None = None
         if any(
-            getattr(config, "infer_semantic_types", True)
-            and self._should_infer_column(col, spark_schema)
+            getattr(config, "infer_semantic_types", True) and self._should_infer_column(col, spark_schema)
             for col in column_names
         ):
             classification_sample = working_df.select(column_names).limit(1000)

@@ -1,4 +1,5 @@
 """DTO da seção de esquema e metadados das colunas."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -38,7 +39,7 @@ class SchemaSection:
     def _repr_html_(self) -> str:
         """Renderiza o esquema como uma tabela HTML com estilos inline."""
         header: str = (
-            '<thead><tr>'
+            "<thead><tr>"
             '<th style="text-align:left;padding:8px 12px;border-bottom:2px solid var(--border,#e2e8f0);'
             'color:var(--muted,#64748b);font-size:12px;text-transform:uppercase;">Column</th>'
             '<th style="text-align:left;padding:8px 12px;border-bottom:2px solid var(--border,#e2e8f0);'
@@ -49,17 +50,17 @@ class SchemaSection:
             'color:var(--muted,#64748b);font-size:12px;text-transform:uppercase;">Inferred</th>'
             '<th style="text-align:right;padding:8px 12px;border-bottom:2px solid var(--border,#e2e8f0);'
             'color:var(--muted,#64748b);font-size:12px;text-transform:uppercase;">Nulls</th>'
-            '</tr></thead>'
+            "</tr></thead>"
         )
         rows: str = "".join(
             f'<tr style="border-bottom:1px solid var(--border,#e2e8f0);">'
             f'<td style="padding:8px 12px;font-weight:500;color:var(--text,#1a1a2e);">{col.name}</td>'
             f'<td style="padding:8px 12px;color:var(--primary,#2563eb);">{col.type}</td>'
             f'<td style="padding:8px 12px;text-align:center;color:var(--text,#1a1a2e);">'
-            f'{"Yes" if col.nullable else "No"}</td>'
+            f"{'Yes' if col.nullable else 'No'}</td>"
             f'<td style="padding:8px 12px;color:var(--text,#1a1a2e);">{col.inferred_type or "\u2014"}</td>'
             f'<td style="padding:8px 12px;text-align:right;color:var(--text,#1a1a2e);">'
-            f'{format_number(col.null_count)}</td>'
+            f"{format_number(col.null_count)}</td>"
             f"</tr>"
             for col in self.columns
         )

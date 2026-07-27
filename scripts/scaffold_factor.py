@@ -9,10 +9,8 @@ Cria:
     - Registra no FACTOR_REGISTRY via decorador @registrar
 """
 
-import os
 import sys
 from pathlib import Path
-
 
 _PROJECT_ROOT: Path = Path(__file__).resolve().parent.parent
 
@@ -162,8 +160,7 @@ def _validar_nome_dimensao(nome: str) -> str:
         raise ValueError("O nome da dimensão não pode ser vazio.")
     if not nome_normalizado.isidentifier():
         raise ValueError(
-            f"'{nome}' não é um identificador Python válido. "
-            f"Use apenas letras, números e underscores.",
+            f"'{nome}' não é um identificador Python válido. Use apenas letras, números e underscores.",
         )
     return nome_normalizado
 

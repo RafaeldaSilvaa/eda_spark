@@ -12,10 +12,9 @@ from unittest.mock import MagicMock, create_autospec
 import pytest
 
 from spark_eda.application.exceptions import AnalysisError, DataProviderError
-
-from spark_eda.application.use_cases.analyze_dataset import AnalyzeDatasetUseCase, AnalyzeRequest
 from spark_eda.application.ports.cache_provider import CacheProvider
 from spark_eda.application.ports.data_provider import DataProvider
+from spark_eda.application.use_cases.analyze_dataset import AnalyzeDatasetUseCase, AnalyzeRequest
 from spark_eda.domain.entities.data_profile import DataProfile
 from spark_eda.domain.entities.quality_score import QualityScore
 from spark_eda.domain.services.insight_engine import InsightEngine

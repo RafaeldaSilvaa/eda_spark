@@ -10,7 +10,7 @@ from spark_eda.domain.entities.column_metadata import ColumnMetadata
 from spark_eda.domain.entities.column_profile import ColumnProfile
 from spark_eda.domain.entities.data_profile import DataProfile
 from spark_eda.domain.entities.insight import Insight
-from spark_eda.domain.entities.quality_score import QualityFactor, QualityDimension, QualityScore
+from spark_eda.domain.entities.quality_score import QualityScore
 from spark_eda.domain.entities.statistic import (
     CategoricalStats,
     NumericStats,
@@ -136,9 +136,7 @@ class TestInsightEngine:
         engine: InsightEngine = InsightEngine()
         insights: list[Insight] = engine.generate(data_profile, _build_empty_quality_score())
 
-        constant_insights: list[Insight] = [
-            i for i in insights if i.category == InsightCategory.CONSTANT
-        ]
+        constant_insights: list[Insight] = [i for i in insights if i.category == InsightCategory.CONSTANT]
         assert len(constant_insights) == 1
         assert constant_insights[0].column == "pais"
 
@@ -186,9 +184,7 @@ class TestInsightEngine:
         engine: InsightEngine = InsightEngine()
         insights: list[Insight] = engine.generate(data_profile, _build_empty_quality_score())
 
-        dup_insights: list[Insight] = [
-            i for i in insights if i.category == InsightCategory.DUPLICATES
-        ]
+        dup_insights: list[Insight] = [i for i in insights if i.category == InsightCategory.DUPLICATES]
         assert len(dup_insights) == 1
         assert dup_insights[0].column is None
 

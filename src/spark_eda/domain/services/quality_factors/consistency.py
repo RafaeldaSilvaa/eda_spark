@@ -107,8 +107,7 @@ def _range_consistency(profile: DataProfile) -> QualityFactor:
         normalized_name: str = column_metadata.name.lower().replace("_", "").replace("-", "")
 
         is_absolute_quantity: bool = any(
-            pattern in normalized_name
-            for pattern in ("qtd", "count", "qtde", "quantidade", "numero", "nr", "num")
+            pattern in normalized_name for pattern in ("qtd", "count", "qtde", "quantidade", "numero", "nr", "num")
         )
 
         if is_absolute_quantity and stats.min < 0.0:
@@ -175,7 +174,11 @@ def _cross_column_consistency(profile: DataProfile) -> QualityFactor:
         end_stats = end_profile.stats
         start_stats = start_profile.stats
 
-        if isinstance(end_stats, TemporalStats) and isinstance(start_stats, TemporalStats) and start_stats.min_date > end_stats.min_date:  # noqa: E501
+        if (
+            isinstance(end_stats, TemporalStats)
+            and isinstance(start_stats, TemporalStats)
+            and start_stats.min_date > end_stats.min_date
+        ):
             inconsistent_columns.add(start_column)
             inconsistent_columns.add(end_column)
 
@@ -290,11 +293,9 @@ def _referential_integrity(profile: DataProfile) -> QualityFactor:
     avg_null_ratio: float = mean(null_ratios) if null_ratios else 0.0
     score = max(0.0, 1.0 - avg_null_ratio)
     reason = (
-        f"Média de {avg_null_ratio:.1%} de nulos em {len(null_ratios)} "
-        f"coluna(s) com indícios de chave estrangeira."
-    ) if null_ratios else (
-        "Colunas FK encontradas, porém sem nulos — "
-        "sem evidências de violação de integridade referencial."
+        (f"Média de {avg_null_ratio:.1%} de nulos em {len(null_ratios)} coluna(s) com indícios de chave estrangeira.")
+        if null_ratios
+        else ("Colunas FK encontradas, porém sem nulos — sem evidências de violação de integridade referencial.")
     )
 
     return QualityFactor(

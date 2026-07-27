@@ -138,9 +138,7 @@ class TestLRUCacheProvider:
             except Exception as e:
                 errors.append(e)
 
-        threads: list[threading.Thread] = [
-            threading.Thread(target=worker, args=(i,)) for i in range(10)
-        ]
+        threads: list[threading.Thread] = [threading.Thread(target=worker, args=(i,)) for i in range(10)]
 
         # Act
         for t in threads:

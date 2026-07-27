@@ -1,4 +1,5 @@
 """Caso de uso para análise exploratória de dados completa."""
+
 from __future__ import annotations
 
 import logging
@@ -190,12 +191,12 @@ class AnalyzeDatasetUseCase:
         correlations: list[Correlation] = []
         try:
             numeric_columns: list[str] = [
-                col.name for col in profile.columns
-                if col.data_type.value in ("integer", "long", "double", "decimal")
+                col.name for col in profile.columns if col.data_type.value in ("integer", "long", "double", "decimal")
             ]
             if numeric_columns:
                 correlations = self._data_provider.compute_correlations(
-                    dataframe, numeric_columns,
+                    dataframe,
+                    numeric_columns,
                 )
         except Exception as exc:
             logger.warning("Correlation computation failed (continuing): %s", exc)

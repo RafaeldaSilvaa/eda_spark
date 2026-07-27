@@ -1,4 +1,5 @@
 """DTO da seção de visão geral do dataset."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -44,9 +45,7 @@ class OverviewSection:
             f"</div>"
             for label, value in cards
         )
-        return (
-            f'<div style="display:flex;flex-wrap:wrap;gap:12px;padding:16px 0;">{items_html}</div>'
-        )
+        return f'<div style="display:flex;flex-wrap:wrap;gap:12px;padding:16px 0;">{items_html}</div>'
 
     def __str__(self) -> str:
         """Renderiza a visão geral como texto formatado para terminal."""

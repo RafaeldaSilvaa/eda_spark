@@ -16,6 +16,7 @@ def _severity_color(severity: str) -> str:
         "low": "#22c55e",
     }.get(severity, "#64748b")
 
+
 _INLINE_CSS: str = """
 :root {
     --bg: #ffffff;
@@ -100,17 +101,11 @@ class HTMLRenderer:
             HTMLRenderer._wrap_section("Schema", eda_report.schema._repr_html_()),
             HTMLRenderer._wrap_section("Quality", HTMLRenderer.render_quality_report(eda_report.quality)),
             HTMLRenderer._wrap_section("Statistics", eda_report.stats._repr_html_()),
-            HTMLRenderer._wrap_section(
-                "Distributions", eda_report.distributions._repr_html_()
-            ),
-            HTMLRenderer._wrap_section(
-                "Correlations", eda_report.correlations._repr_html_()
-            ),
+            HTMLRenderer._wrap_section("Distributions", eda_report.distributions._repr_html_()),
+            HTMLRenderer._wrap_section("Correlations", eda_report.correlations._repr_html_()),
             HTMLRenderer._wrap_section("Outliers", eda_report.outliers._repr_html_()),
             HTMLRenderer._wrap_section("Insights", eda_report.insights._repr_html_()),
-            HTMLRenderer._wrap_section(
-                "Recommendations", eda_report.recommendations._repr_html_()
-            ),
+            HTMLRenderer._wrap_section("Recommendations", eda_report.recommendations._repr_html_()),
         ]
         sections_html: str = "".join(sections)
         return HTMLRenderer._document(sections_html)
@@ -125,9 +120,7 @@ class HTMLRenderer:
         Returns:
             String HTML completa.
         """
-        content: str = HTMLRenderer._wrap_section(
-            "Data Quality", HTMLRenderer.render_quality_report(quality_report)
-        )
+        content: str = HTMLRenderer._wrap_section("Data Quality", HTMLRenderer.render_quality_report(quality_report))
         return HTMLRenderer._document(content)
 
     @staticmethod
@@ -143,8 +136,10 @@ class HTMLRenderer:
         gauge_value: float = max(0.0, min(100.0, quality.overall))
         gauge_deg: float = (gauge_value / 100.0) * 180.0
         gauge_color: str = (
-            "#dc2626" if gauge_value < _GAUGE_LOW_THRESHOLD
-            else "#d97706" if gauge_value < _GAUGE_MEDIUM_THRESHOLD
+            "#dc2626"
+            if gauge_value < _GAUGE_LOW_THRESHOLD
+            else "#d97706"
+            if gauge_value < _GAUGE_MEDIUM_THRESHOLD
             else "#16a34a"
         )
         gauge_svg: str = (
@@ -156,8 +151,8 @@ class HTMLRenderer:
             f'<text x="80" y="55" text-anchor="middle" font-size="28" font-weight="700" '
             f'fill="var(--text,#1a1a2e)">{format_number(gauge_value, 1)}</text>'
             f'<text x="80" y="75" text-anchor="middle" font-size="10" fill="var(--muted,#64748b)">'
-            f'QUALITY</text>'
-            f'</svg>'
+            f"QUALITY</text>"
+            f"</svg>"
         )
 
         dims_html: str = "".join(
@@ -165,12 +160,12 @@ class HTMLRenderer:
             f'<div style="display:flex;justify-content:space-between;margin-bottom:4px;'
             f'font-size:13px;color:var(--text,#1a1a2e);">'
             f'<span style="font-weight:500;">{dim.name.title()}</span>'
-            f'<span>{format_number(dim.score, 1)}</span>'
+            f"<span>{format_number(dim.score, 1)}</span>"
             f"</div>"
             f'<div style="height:6px;background:var(--border,#e2e8f0);border-radius:3px;overflow:hidden;">'
-             f'<div style="height:100%;width:{dim.score}%;'
-             f'background:{gauge_color if dim.score < _GAUGE_MEDIUM_THRESHOLD else "#16a34a"};'
-             f'border-radius:3px;transition:width 0.3s;"></div>'
+            f'<div style="height:100%;width:{dim.score}%;'
+            f"background:{gauge_color if dim.score < _GAUGE_MEDIUM_THRESHOLD else '#16a34a'};"
+            f'border-radius:3px;transition:width 0.3s;"></div>'
             f"</div>"
             f"</div>"
             for dim in quality.dimensions
@@ -180,26 +175,25 @@ class HTMLRenderer:
         if quality.top_penalizers:
             items: str = "".join(
                 f'<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;'
-                f'background:var(--card-bg,#f8fafc);border-radius:6px;'
+                f"background:var(--card-bg,#f8fafc);border-radius:6px;"
                 f'border:1px solid var(--border,#e2e8f0);margin-bottom:6px;">'
                 f'<span style="width:8px;height:8px;border-radius:50%;'
                 f'background:{_severity_color(f.severity)};flex-shrink:0;"></span>'
                 f'<span style="font-size:13px;color:var(--text,#1a1a2e);flex:1;">{f.reason}</span>'
                 f'<span style="font-size:12px;font-weight:600;color:{_severity_color(f.severity)};">'
-                f'{format_percentage(1.0 - f.score)}</span>'
+                f"{format_percentage(1.0 - f.score)}</span>"
                 f"</div>"
                 for f in quality.top_penalizers
             )
             penalizers_html = (
-                f'<h4 style="margin:16px 0 8px;font-size:14px;color:var(--text,#1a1a2e);">'
-                f'Top Penalizers</h4>{items}'
+                f'<h4 style="margin:16px 0 8px;font-size:14px;color:var(--text,#1a1a2e);">Top Penalizers</h4>{items}'
             )
 
         return (
             f'<div style="padding:8px 0;">'
-            f'{gauge_svg}'
+            f"{gauge_svg}"
             f'<div style="margin-top:16px;">{dims_html}</div>'
-            f'{penalizers_html}'
+            f"{penalizers_html}"
             f"</div>"
         )
 
@@ -228,11 +222,7 @@ class HTMLRenderer:
         Returns:
             HTML completo da seção.
         """
-        return (
-            f'<div class="section">'
-            f'<div class="section-title">{title}</div>'
-            f"{content_html}</div>"
-        )
+        return f'<div class="section"><div class="section-title">{title}</div>{content_html}</div>'
 
     @staticmethod
     def _document(body_html: str) -> str:
@@ -256,7 +246,7 @@ class HTMLRenderer:
             "<body>"
             "<h1>Exploratory Data Analysis Report</h1>"
             f'<p style="color:var(--muted);margin-bottom:20px;">'
-            f'Generated by <strong>spark_eda</strong></p>'
+            f"Generated by <strong>spark_eda</strong></p>"
             f"{body_html}"
             f'<div class="footer">spark_eda &mdash; Exploratory Data Analysis with PySpark</div>'
             "</body></html>"

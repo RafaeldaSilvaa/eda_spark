@@ -13,6 +13,7 @@ Basic usage:
     >>> quality = spark_eda.assess_quality(dataframe)
     >>> print(quality.top_penalizers)
 """
+
 from __future__ import annotations
 
 from pyspark.sql import DataFrame

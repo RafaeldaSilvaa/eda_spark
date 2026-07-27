@@ -103,10 +103,7 @@ def _temporal_completeness(profile: DataProfile) -> QualityFactor:
         score=score,
         internal_weight=0.25,
         contribution=score * 0.25,
-        reason=(
-            f"Média de {mean_value:.1%} de valores preenchidos em "
-            f"{len(non_null_proportions)} colunas temporais."
-        ),
+        reason=(f"Média de {mean_value:.1%} de valores preenchidos em {len(non_null_proportions)} colunas temporais."),
         severity=_score_severity(score),
         affected_columns=affected_columns,
     )
@@ -201,10 +198,7 @@ def _temporal_gaps(profile: DataProfile) -> QualityFactor:
         score=score,
         internal_weight=0.20,
         contribution=score * 0.20,
-        reason=(
-            f"Total de {total_gaps} lacunas temporais identificadas "
-            f"em {len(columns_with_gap)} colunas."
-        ),
+        reason=(f"Total de {total_gaps} lacunas temporais identificadas em {len(columns_with_gap)} colunas."),
         severity=_score_severity(score),
         affected_columns=columns_with_gap,
     )

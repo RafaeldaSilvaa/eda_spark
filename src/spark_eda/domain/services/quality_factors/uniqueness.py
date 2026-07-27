@@ -27,8 +27,15 @@ def _is_primary_key_candidate(column_name: str) -> bool:
     """Retorna ``True`` se o nome da coluna sugere que é uma chave primária."""
     normalized_name: str = column_name.lower().replace("_", "").replace("-", "")
     pk_patterns: tuple[str, ...] = (
-        "id", "codigo", "cod", "chave", "pk", "primarykey",
-        "uuid", "guid", "hash",
+        "id",
+        "codigo",
+        "cod",
+        "chave",
+        "pk",
+        "primarykey",
+        "uuid",
+        "guid",
+        "hash",
     )
     for pattern in pk_patterns:
         if normalized_name == pattern or normalized_name.endswith(pattern) or normalized_name.startswith(pattern):
@@ -121,10 +128,7 @@ def _pk_uniqueness(profile: DataProfile) -> QualityFactor:
         score=score,
         internal_weight=0.20,
         contribution=score * 0.20,
-        reason=(
-            f"{pks_unique} de {pks_found} colunas candidatas a "
-            f"chave primária possuem unique ratio ≥ 99%."
-        ),
+        reason=(f"{pks_unique} de {pks_found} colunas candidatas a chave primária possuem unique ratio ≥ 99%."),
         severity=_score_severity(score),
         affected_columns=affected_columns,
     )
@@ -215,8 +219,7 @@ def _constant_columns(profile: DataProfile) -> QualityFactor:
         internal_weight=0.20,
         contribution=score * 0.20,
         reason=(
-            f"{len(constant_columns_list)} de {total_with_cardinality} "
-            f"colunas possuem cardinalidade 1 (constantes)."
+            f"{len(constant_columns_list)} de {total_with_cardinality} colunas possuem cardinalidade 1 (constantes)."
         ),
         severity=_score_severity(score),
         affected_columns=constant_columns_list,

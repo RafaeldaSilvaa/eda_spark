@@ -8,9 +8,9 @@ utilizando mocks para todas as dependências externas.
 
 from unittest.mock import MagicMock, create_autospec
 
-from spark_eda.application.use_cases.assess_quality import AssessQualityUseCase, QualityRequest
 from spark_eda.application.ports.cache_provider import CacheProvider
 from spark_eda.application.ports.data_provider import DataProvider
+from spark_eda.application.use_cases.assess_quality import AssessQualityUseCase, QualityRequest
 from spark_eda.domain.entities.quality_score import QualityScore
 from spark_eda.domain.services.quality_calculator import QualityCalculator
 

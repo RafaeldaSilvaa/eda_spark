@@ -1,4 +1,5 @@
 """DTO da seção de correlação."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -75,40 +76,40 @@ class CorrelationSection:
 
         header_cells: str = "".join(
             f'<th style="padding:6px 4px;font-size:11px;text-align:center;'
-            f'border-bottom:2px solid var(--border,#e2e8f0);'
-            f'color:var(--muted,#64748b);writing-mode:vertical-lr;height:80px;'
+            f"border-bottom:2px solid var(--border,#e2e8f0);"
+            f"color:var(--muted,#64748b);writing-mode:vertical-lr;height:80px;"
             f'font-weight:400;">{c}</th>'
             for c in cols
         )
         header: str = (
-            f'<thead><tr>'
+            f"<thead><tr>"
             f'<th style="padding:6px 4px;font-size:11px;text-align:left;'
             f'border-bottom:2px solid var(--border,#e2e8f0);color:var(--muted,#64748b);font-weight:400;">'
-            f'</th>{header_cells}</tr></thead>'
+            f"</th>{header_cells}</tr></thead>"
         )
 
         rows_html: str = ""
         for c1 in cols:
             cells: str = "".join(
                 f'<td style="padding:6px 4px;text-align:center;font-size:12px;'
-                f'font-weight:500;color:{_correlation_color(self.matrix.get(c1, {}).get(c2, 0.0))};'
-                 f'background:color-mix(in srgb, '
-                 f'{_correlation_color(self.matrix.get(c1, {}).get(c2, 0.0))} 10%, transparent);'
+                f"font-weight:500;color:{_correlation_color(self.matrix.get(c1, {}).get(c2, 0.0))};"
+                f"background:color-mix(in srgb, "
+                f"{_correlation_color(self.matrix.get(c1, {}).get(c2, 0.0))} 10%, transparent);"
                 f'border-bottom:1px solid var(--border,#e2e8f0);">'
-                f'{format_number(self.matrix.get(c1, {}).get(c2, 0.0), 2)}</td>'
+                f"{format_number(self.matrix.get(c1, {}).get(c2, 0.0), 2)}</td>"
                 for c2 in cols
             )
             rows_html += (
                 f'<tr><td style="padding:6px 4px;font-size:12px;font-weight:500;'
-                f'color:var(--text,#1a1a2e);border-bottom:1px solid var(--border,#e2e8f0);'
+                f"color:var(--text,#1a1a2e);border-bottom:1px solid var(--border,#e2e8f0);"
                 f'white-space:nowrap;">{c1}</td>{cells}</tr>'
             )
 
         return (
             f'<div style="margin-bottom:12px;font-size:12px;color:var(--muted,#64748b);">'
-            f'Method: {self.method}</div>'
+            f"Method: {self.method}</div>"
             f'<div style="overflow-x:auto;"><table style="border-collapse:collapse;font-size:13px;">'
-            f'{header}<tbody>{rows_html}</tbody></table></div>'
+            f"{header}<tbody>{rows_html}</tbody></table></div>"
         )
 
     def __str__(self) -> str:

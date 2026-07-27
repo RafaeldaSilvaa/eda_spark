@@ -80,15 +80,11 @@ def _row_completeness(profile: DataProfile) -> QualityFactor:
             affected_columns=[],
         )
 
-    columns_with_nulls: int = sum(
-        1 for cm in profile.columns if cm.null_count > 0
-    )
+    columns_with_nulls: int = sum(1 for cm in profile.columns if cm.null_count > 0)
     fraction_columns_with_nulls: float = columns_with_nulls / len(profile.columns)
     score: float = 1.0 - fraction_columns_with_nulls
 
-    affected_columns: list[str] = [
-        cm.name for cm in profile.columns if cm.null_count > 0
-    ]
+    affected_columns: list[str] = [cm.name for cm in profile.columns if cm.null_count > 0]
 
     return QualityFactor(
         name="Completude de linhas",
@@ -141,10 +137,7 @@ def _empty_strings(profile: DataProfile) -> QualityFactor:
         score=score,
         internal_weight=0.20,
         contribution=score * 0.20,
-        reason=(
-            f"Média de {mean_empty:.1%} de valores vazios em "
-            f"{len(empty_ratios)} colunas textuais."
-        ),
+        reason=(f"Média de {mean_empty:.1%} de valores vazios em {len(empty_ratios)} colunas textuais."),
         severity=_score_severity(score),
         affected_columns=affected_columns,
     )

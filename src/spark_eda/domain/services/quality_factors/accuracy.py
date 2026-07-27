@@ -138,7 +138,11 @@ def _suspicious_data(profile: DataProfile) -> QualityFactor:
 
             if outlier_info.bounds_upper is not None and stats.max > upper_extreme_limit:
                 suspicious_columns.append(column_metadata.name)
-            if outlier_info.bounds_lower is not None and stats.min < lower_extreme_limit and column_metadata.name not in suspicious_columns:  # noqa: E501
+            if (
+                outlier_info.bounds_lower is not None
+                and stats.min < lower_extreme_limit
+                and column_metadata.name not in suspicious_columns
+            ):
                 suspicious_columns.append(column_metadata.name)
 
     if not suspicious_columns:
@@ -160,8 +164,7 @@ def _suspicious_data(profile: DataProfile) -> QualityFactor:
         internal_weight=0.20,
         contribution=score * 0.20,
         reason=(
-            f"{len(suspicious_columns)} coluna(s) numérica(s) possuem "
-            f"valores extremos suspeitos (alem de 3x IQR)."
+            f"{len(suspicious_columns)} coluna(s) numérica(s) possuem valores extremos suspeitos (alem de 3x IQR)."
         ),
         severity=_score_severity(score),
         affected_columns=list(suspicious_columns),
@@ -201,10 +204,7 @@ def _corrupted_data(profile: DataProfile) -> QualityFactor:
         score=score,
         internal_weight=0.15,
         contribution=score * 0.15,
-        reason=(
-            f"{len(corrupted_columns)} colunas apresentam valores "
-            f"impossíveis (ex.: comprimento mínimo negativo)."
-        ),
+        reason=(f"{len(corrupted_columns)} colunas apresentam valores impossíveis (ex.: comprimento mínimo negativo)."),
         severity=_score_severity(score),
         affected_columns=corrupted_columns,
     )
@@ -240,26 +240,26 @@ def _business_rules(profile: DataProfile) -> QualityFactor:  # noqa: PLR0912
                     f"(min={stats.min:.0f}, max={stats.max:.0f})"
                 )
 
-        if (normalized_name in ("mes", "month") or normalized_name.startswith("mes") or normalized_name.startswith("month")) and (stats.min < 1.0 or stats.max > _MONTH_MAX):  # noqa: E501
+        if (
+            normalized_name in ("mes", "month")
+            or normalized_name.startswith("mes")
+            or normalized_name.startswith("month")
+        ) and (stats.min < 1.0 or stats.max > _MONTH_MAX):
             violated_columns.add(column_metadata.name)
-            violation_details.append(
-                f"{column_metadata.name}: mês fora do intervalo [1, {_MONTH_MAX:.0f}]"
-            )
+            violation_details.append(f"{column_metadata.name}: mês fora do intervalo [1, {_MONTH_MAX:.0f}]")
 
-        if (normalized_name in ("dia", "day") or normalized_name.startswith("dia") or normalized_name.startswith("day")) and (stats.min < 1.0 or stats.max > _DAY_MAX):  # noqa: E501
+        if (
+            normalized_name in ("dia", "day") or normalized_name.startswith("dia") or normalized_name.startswith("day")
+        ) and (stats.min < 1.0 or stats.max > _DAY_MAX):
             violated_columns.add(column_metadata.name)
-            violation_details.append(
-                f"{column_metadata.name}: dia fora do intervalo [1, {_DAY_MAX:.0f}]"
-            )
+            violation_details.append(f"{column_metadata.name}: dia fora do intervalo [1, {_DAY_MAX:.0f}]")
 
         percentage_patterns: tuple[str, ...] = ("pct", "perc", "percentual", "porcentagem")
         for pattern in percentage_patterns:
             if pattern in normalized_name:
                 if stats.min < 0.0 or stats.max > _PERCENTAGE_MAX:
                     violated_columns.add(column_metadata.name)
-                    violation_details.append(
-                        f"{column_metadata.name}: percentual fora de [0, {_PERCENTAGE_MAX:.0f}]"
-                    )
+                    violation_details.append(f"{column_metadata.name}: percentual fora de [0, {_PERCENTAGE_MAX:.0f}]")
                 break
 
         age_patterns: tuple[str, ...] = ("idade", "age", "idadeanos", "anos")

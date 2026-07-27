@@ -1,4 +1,5 @@
 """Caso de uso para avaliação de qualidade dos dados."""
+
 from __future__ import annotations
 
 import logging

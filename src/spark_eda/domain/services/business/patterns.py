@@ -13,9 +13,7 @@ CNPJ: re.Pattern[str] = re.compile(r"^\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2}$")
 EMAIL: re.Pattern[str] = re.compile(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
 """Endereço de email conforme RFC 5322 simplificado."""
 
-UUID: re.Pattern[str] = re.compile(
-    r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
-)
+UUID: re.Pattern[str] = re.compile(r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
 """UUID na forma canônica ``XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX``."""
 
 URL: re.Pattern[str] = re.compile(r"^https?://[^\s/$.?#].[^\s]*$")

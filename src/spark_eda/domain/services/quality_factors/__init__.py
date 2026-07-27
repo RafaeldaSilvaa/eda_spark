@@ -56,6 +56,7 @@ def registrar(
     Returns:
         O próprio decorador que insere a função no registro.
     """
+
     def _decorator(
         func: Callable[..., list[QualityFactor]],
     ) -> Callable[..., list[QualityFactor]]:

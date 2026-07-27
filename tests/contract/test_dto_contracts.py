@@ -196,10 +196,23 @@ class TestStatsSectionContract:
 
     def test_create_stats_section_with_data(self) -> None:
         num: NumericStatsDTO = NumericStatsDTO(
-            "v1", 10.0, 2.0, 1.0, 5.0, 10.0, 15.0, 20.0, 0.0, 0.0,
+            "v1",
+            10.0,
+            2.0,
+            1.0,
+            5.0,
+            10.0,
+            15.0,
+            20.0,
+            0.0,
+            0.0,
         )
         cat: CategoricalStatsDTO = CategoricalStatsDTO(
-            "cat1", 3, "x", 0.3, [("x", 10), ("y", 5)],
+            "cat1",
+            3,
+            "x",
+            0.3,
+            [("x", 10), ("y", 5)],
         )
         section: StatsSection = StatsSection(
             numeric=[num],
@@ -213,7 +226,16 @@ class TestStatsSectionContract:
 
     def test_numeric_stats_is_frozen(self) -> None:
         dto: NumericStatsDTO = NumericStatsDTO(
-            "c", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+            "c",
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
         )
         with pytest.raises(FrozenInstanceError):
             dto.column_name = "x"
@@ -455,7 +477,11 @@ class TestQualitySectionContract:
             ],
         )
         pen: QualityFactorReport = QualityFactorReport(
-            "Nulos", 0.5, "Muitos nulos", "high", ["x"],
+            "Nulos",
+            0.5,
+            "Muitos nulos",
+            "high",
+            ["x"],
         )
         report: QualityReport = QualityReport(
             overall=80.0,

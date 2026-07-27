@@ -42,13 +42,11 @@ class TestSparkSession:
         builder.appName.assert_called_once_with("spark_eda")
         builder.config.assert_any_call("spark.sql.adaptive.enabled", "true")
         builder.config.assert_any_call(
-            "spark.sql.adaptive.advisoryPartitionSizeInBytes", "64MB",
+            "spark.sql.adaptive.advisoryPartitionSizeInBytes",
+            "64MB",
         )
         # shuffle.partitions NÃO deve ser configurado
-        calls: list[tuple] = [
-            c for c in builder.config.call_args_list
-            if c[0][0] == "spark.sql.shuffle.partitions"
-        ]
+        calls: list[tuple] = [c for c in builder.config.call_args_list if c[0][0] == "spark.sql.shuffle.partitions"]
         assert len(calls) == 0
 
     def test_get_or_create_with_custom_app_name(self) -> None:
@@ -98,7 +96,8 @@ class TestSparkSession:
 
         # Assert
         builder.config.assert_any_call(
-            "spark.sql.adaptive.advisoryPartitionSizeInBytes", "128MB",
+            "spark.sql.adaptive.advisoryPartitionSizeInBytes",
+            "128MB",
         )
 
     def test_get_or_create_configures_adaptive_features(self) -> None:
@@ -117,8 +116,10 @@ class TestSparkSession:
         # Assert
         builder.config.assert_any_call("spark.sql.adaptive.enabled", "true")
         builder.config.assert_any_call(
-            "spark.sql.adaptive.coalescePartitions.enabled", "true",
+            "spark.sql.adaptive.coalescePartitions.enabled",
+            "true",
         )
         builder.config.assert_any_call(
-            "spark.sql.adaptive.skewJoin.enabled", "true",
+            "spark.sql.adaptive.skewJoin.enabled",
+            "true",
         )

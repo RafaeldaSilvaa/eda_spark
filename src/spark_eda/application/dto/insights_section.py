@@ -1,4 +1,5 @@
 """DTO da seção de insights."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -86,25 +87,25 @@ class InsightsSection:
 
         items: str = "".join(
             f'<div style="display:flex;gap:10px;padding:10px 14px;margin-bottom:6px;'
-            f'background:var(--card-bg,#f8fafc);border-radius:8px;'
-            f'border-left:3px solid {_severity_color(insight.severity)};'
-            f'border-top:1px solid var(--border,#e2e8f0);border-right:1px solid var(--border,#e2e8f0);'
+            f"background:var(--card-bg,#f8fafc);border-radius:8px;"
+            f"border-left:3px solid {_severity_color(insight.severity)};"
+            f"border-top:1px solid var(--border,#e2e8f0);border-right:1px solid var(--border,#e2e8f0);"
             f'border-bottom:1px solid var(--border,#e2e8f0);">'
             f'<span style="font-size:14px;line-height:1.4;flex-shrink:0;">{_severity_icon(insight.severity)}</span>'
             f'<div style="flex:1;">'
             f'<div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;">'
             f'<span style="font-size:11px;font-weight:600;color:{_severity_color(insight.severity)};'
             f'text-transform:uppercase;">{insight.category.replace("_", " ")}</span>'
-            f'{_column_tag(insight.column)}'
-            f'</div>'
+            f"{_column_tag(insight.column)}"
+            f"</div>"
             f'<div style="font-size:13px;color:var(--text,#1a1a2e);line-height:1.4;">{insight.message}'
-            f'{_metric_tag(insight.metric_value)}'
+            f"{_metric_tag(insight.metric_value)}"
             f"</div>"
             f"</div>"
             f"</div>"
             for insight in sorted_insights
         )
-        return f'<div>{items}</div>'
+        return f"<div>{items}</div>"
 
     def __str__(self) -> str:
         """Renderiza insights como texto para terminal."""

@@ -22,9 +22,19 @@ class TestDataType:
 
     def test_all_members_present(self) -> None:
         expected: set[str] = {
-            "STRING", "INTEGER", "LONG", "DOUBLE", "BOOLEAN",
-            "DATE", "TIMESTAMP", "DECIMAL", "BINARY", "ARRAY",
-            "MAP", "STRUCT", "OTHER",
+            "STRING",
+            "INTEGER",
+            "LONG",
+            "DOUBLE",
+            "BOOLEAN",
+            "DATE",
+            "TIMESTAMP",
+            "DECIMAL",
+            "BINARY",
+            "ARRAY",
+            "MAP",
+            "STRUCT",
+            "OTHER",
         }
         actual: set[str] = {m.name for m in DataType}
         assert actual == expected
@@ -43,9 +53,18 @@ class TestInferredType:
 
     def test_all_members_present(self) -> None:
         expected: set[str] = {
-            "CPF", "CNPJ", "EMAIL", "UUID", "URL",
-            "IPV4", "CEP", "PHONE_BR", "CREDIT_CARD",
-            "AUTO_INCREMENT", "TECHNICAL_KEY", "NONE",
+            "CPF",
+            "CNPJ",
+            "EMAIL",
+            "UUID",
+            "URL",
+            "IPV4",
+            "CEP",
+            "PHONE_BR",
+            "CREDIT_CARD",
+            "AUTO_INCREMENT",
+            "TECHNICAL_KEY",
+            "NONE",
         }
         actual: set[str] = {m.name for m in InferredType}
         assert actual == expected
@@ -62,9 +81,16 @@ class TestInsightCategory:
 
     def test_all_members_present(self) -> None:
         expected: set[str] = {
-            "NULLS", "OUTLIERS", "SKEWNESS", "CARDINALITY",
-            "CONSTANT", "NEAR_CONSTANT", "DUPLICATES",
-            "BUSINESS_PATTERN", "ZERO_VALUES", "HIGH_CORRELATION",
+            "NULLS",
+            "OUTLIERS",
+            "SKEWNESS",
+            "CARDINALITY",
+            "CONSTANT",
+            "NEAR_CONSTANT",
+            "DUPLICATES",
+            "BUSINESS_PATTERN",
+            "ZERO_VALUES",
+            "HIGH_CORRELATION",
         }
         actual: set[str] = {m.name for m in InsightCategory}
         assert actual == expected
@@ -98,8 +124,12 @@ class TestRecommendationCategory:
 
     def test_all_members_present(self) -> None:
         expected: set[str] = {
-            "NULL_TREATMENT", "OUTLIER_TREATMENT", "TYPE_FIX",
-            "PERFORMANCE", "SCHEMA", "BUSINESS_RULE",
+            "NULL_TREATMENT",
+            "OUTLIER_TREATMENT",
+            "TYPE_FIX",
+            "PERFORMANCE",
+            "SCHEMA",
+            "BUSINESS_RULE",
         }
         actual: set[str] = {m.name for m in RecommendationCategory}
         assert actual == expected

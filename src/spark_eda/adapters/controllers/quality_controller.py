@@ -101,8 +101,7 @@ class QualityController:
         report: QualityReport = self._presenter.present_quality(quality)
 
         logger.info(
-            "Quality assessment completed: overall score %.2f "
-            "with %d dimensions evaluated.",
+            "Quality assessment completed: overall score %.2f with %d dimensions evaluated.",
             quality.overall,
             len(quality.dimensions),
         )

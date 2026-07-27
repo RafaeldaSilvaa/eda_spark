@@ -278,18 +278,13 @@ class AnalysisPresenter(OutputPresenter):
             dist: Distribution = col_profile.distribution
             if isinstance(dist, NumericDistribution):
                 histograms[col.name] = [
-                    HistogramBin(lower=lower, upper=upper, count=count)
-                    for lower, upper, count in dist.bins
+                    HistogramBin(lower=lower, upper=upper, count=count) for lower, upper, count in dist.bins
                 ]
             elif isinstance(dist, CategoricalDistribution):
-                frequencies[col.name] = [
-                    FrequencyEntry(label=cat, count=count)
-                    for cat, count in dist.categories
-                ]
+                frequencies[col.name] = [FrequencyEntry(label=cat, count=count) for cat, count in dist.categories]
             elif isinstance(dist, TemporalDistribution):
                 temporal_charts[col.name] = [
-                    TemporalPoint(period=period, count=count)
-                    for period, count in dist.periods
+                    TemporalPoint(period=period, count=count) for period, count in dist.periods
                 ]
 
         return DistributionSection(

@@ -6,13 +6,13 @@ Testa a orquestração do fluxo de análise exploratória completa,
 utilizando mocks para todas as dependências externas.
 """
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from unittest.mock import MagicMock, create_autospec
 
 from spark_eda.application.exceptions import DataProviderError
-from spark_eda.application.use_cases.analyze_dataset import AnalyzeDatasetUseCase, AnalyzeRequest
 from spark_eda.application.ports.cache_provider import CacheProvider
 from spark_eda.application.ports.data_provider import DataProvider
+from spark_eda.application.use_cases.analyze_dataset import AnalyzeDatasetUseCase, AnalyzeRequest
 from spark_eda.domain.entities.dataset_analysis import DatasetAnalysis
 from spark_eda.domain.entities.quality_score import QualityScore
 from spark_eda.domain.services.insight_engine import InsightEngine
@@ -84,7 +84,7 @@ class TestAnalyzeDatasetUseCase:
             correlations=[],
             insights=[],
             recommendations=[],
-            timestamps=datetime.now(timezone.utc),
+            timestamps=datetime.now(UTC),
         )
         data_provider: MagicMock = create_autospec(DataProvider)
         cache_provider: MagicMock = create_autospec(CacheProvider)

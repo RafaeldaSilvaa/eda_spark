@@ -22,7 +22,6 @@ from spark_eda.domain.entities.data_profile import DataProfile
 from spark_eda.domain.entities.dataset_analysis import DatasetAnalysis
 from spark_eda.domain.entities.distribution import (
     CategoricalDistribution,
-    Distribution,
     NumericDistribution,
     TemporalDistribution,
 )
@@ -62,8 +61,15 @@ class TestAnalysisPresenter:
             non_null_count=100,
         )
         stats: NumericStats = NumericStats(
-            mean=35.0, std=10.0, min=18.0, q25=25.0, q50=33.0,
-            q75=42.0, max=65.0, skewness=0.0, kurtosis=-1.0,
+            mean=35.0,
+            std=10.0,
+            min=18.0,
+            q25=25.0,
+            q50=33.0,
+            q75=42.0,
+            max=65.0,
+            skewness=0.0,
+            kurtosis=-1.0,
         )
         profile: ColumnProfile = ColumnProfile(
             metadata=metadata,
@@ -118,8 +124,15 @@ class TestAnalysisPresenter:
             non_null_count=95,
         )
         stats: NumericStats = NumericStats(
-            mean=50.0, std=15.0, min=0.0, q25=25.0, q50=50.0,
-            q75=75.0, max=100.0, skewness=0.5, kurtosis=2.0,
+            mean=50.0,
+            std=15.0,
+            min=0.0,
+            q25=25.0,
+            q50=50.0,
+            q75=75.0,
+            max=100.0,
+            skewness=0.5,
+            kurtosis=2.0,
         )
         profile: ColumnProfile = ColumnProfile(
             metadata=metadata,
@@ -265,8 +278,12 @@ class TestAnalysisPresenter:
             top_penalizers=[factor],
         )
         metadata: ColumnMetadata = ColumnMetadata(
-            name="id", data_type=DataType.INTEGER, nullable=False,
-            inferred_type=None, null_count=0, non_null_count=100,
+            name="id",
+            data_type=DataType.INTEGER,
+            nullable=False,
+            inferred_type=None,
+            null_count=0,
+            non_null_count=100,
         )
         data_profile: DataProfile = DataProfile(
             id="dup_test",
@@ -317,8 +334,12 @@ class TestAnalysisPresenter:
             top_penalizers=[factor],
         )
         metadata: ColumnMetadata = ColumnMetadata(
-            name="id", data_type=DataType.INTEGER, nullable=False,
-            inferred_type=None, null_count=0, non_null_count=100,
+            name="id",
+            data_type=DataType.INTEGER,
+            nullable=False,
+            inferred_type=None,
+            null_count=0,
+            non_null_count=100,
         )
         data_profile: DataProfile = DataProfile(
             id="dup_fallback",
@@ -348,11 +369,46 @@ class TestAnalysisPresenter:
         """
         # Arrange
         cols: list[ColumnMetadata] = [
-            ColumnMetadata(name="c_dec", data_type=DataType.DECIMAL, nullable=False, inferred_type=None, null_count=0, non_null_count=10),
-            ColumnMetadata(name="c_bool", data_type=DataType.BOOLEAN, nullable=False, inferred_type=None, null_count=0, non_null_count=10),
-            ColumnMetadata(name="c_date", data_type=DataType.DATE, nullable=False, inferred_type=None, null_count=0, non_null_count=10),
-            ColumnMetadata(name="c_ts", data_type=DataType.TIMESTAMP, nullable=False, inferred_type=None, null_count=0, non_null_count=10),
-            ColumnMetadata(name="c_other", data_type=DataType.OTHER, nullable=False, inferred_type=None, null_count=0, non_null_count=10),
+            ColumnMetadata(
+                name="c_dec",
+                data_type=DataType.DECIMAL,
+                nullable=False,
+                inferred_type=None,
+                null_count=0,
+                non_null_count=10,
+            ),
+            ColumnMetadata(
+                name="c_bool",
+                data_type=DataType.BOOLEAN,
+                nullable=False,
+                inferred_type=None,
+                null_count=0,
+                non_null_count=10,
+            ),
+            ColumnMetadata(
+                name="c_date",
+                data_type=DataType.DATE,
+                nullable=False,
+                inferred_type=None,
+                null_count=0,
+                non_null_count=10,
+            ),
+            ColumnMetadata(
+                name="c_ts",
+                data_type=DataType.TIMESTAMP,
+                nullable=False,
+                inferred_type=None,
+                null_count=0,
+                non_null_count=10,
+            ),
+            ColumnMetadata(
+                name="c_other",
+                data_type=DataType.OTHER,
+                nullable=False,
+                inferred_type=None,
+                null_count=0,
+                non_null_count=10,
+            ),
         ]
         data_profile: DataProfile = DataProfile(
             id="size_test",
@@ -383,16 +439,25 @@ class TestAnalysisPresenter:
         """
         # Arrange
         metadata: ColumnMetadata = ColumnMetadata(
-            name="skip_me", data_type=DataType.STRING, nullable=True,
-            inferred_type=None, null_count=0, non_null_count=10,
+            name="skip_me",
+            data_type=DataType.STRING,
+            nullable=True,
+            inferred_type=None,
+            null_count=0,
+            non_null_count=10,
         )
         data_profile: DataProfile = DataProfile(
             id="skip_test",
             columns=(metadata,),
             row_count=10,
-            column_profiles={"skip_me": ColumnProfile(
-                metadata=metadata, stats=None, distribution=None, outlier=None,
-            )},
+            column_profiles={
+                "skip_me": ColumnProfile(
+                    metadata=metadata,
+                    stats=None,
+                    distribution=None,
+                    outlier=None,
+                )
+            },
         )
         quality: QualityScore = QualityScore(overall=100.0, dimensions={}, top_penalizers=[])
         analysis: DatasetAnalysis = DatasetAnalysis(
@@ -427,19 +492,33 @@ class TestAnalysisPresenter:
             affected_columns=[],
         )
         dim: QualityDimension = QualityDimension(
-            name="unicidade", score=90.0, weight=0.2, contribution=18.0, factors=[factor],
+            name="unicidade",
+            score=90.0,
+            weight=0.2,
+            contribution=18.0,
+            factors=[factor],
         )
         quality: QualityScore = QualityScore(overall=90.0, dimensions={"unicidade": dim}, top_penalizers=[factor])
         metadata: ColumnMetadata = ColumnMetadata(
-            name="id", data_type=DataType.INTEGER, nullable=False,
-            inferred_type=None, null_count=0, non_null_count=100,
+            name="id",
+            data_type=DataType.INTEGER,
+            nullable=False,
+            inferred_type=None,
+            null_count=0,
+            non_null_count=100,
         )
         data_profile: DataProfile = DataProfile(
-            id="non_dup", columns=(metadata,), row_count=100, column_profiles={},
+            id="non_dup",
+            columns=(metadata,),
+            row_count=100,
+            column_profiles={},
         )
         analysis: DatasetAnalysis = DatasetAnalysis(
-            profile=data_profile, quality=quality,
-            correlations=[], insights=[], recommendations=[],
+            profile=data_profile,
+            quality=quality,
+            correlations=[],
+            insights=[],
+            recommendations=[],
             timestamps=datetime(2024, 6, 1),
         )
         presenter: AnalysisPresenter = AnalysisPresenter()
@@ -449,22 +528,33 @@ class TestAnalysisPresenter:
     def test_build_stats_with_unknown_stat_type_passes(self) -> None:
         """_build_stats com tipo Statistic desconhecido não quebra (linha 250 else)."""
         metadata: ColumnMetadata = ColumnMetadata(
-            name="unknown", data_type=DataType.OTHER, nullable=True,
-            inferred_type=None, null_count=0, non_null_count=10,
+            name="unknown",
+            data_type=DataType.OTHER,
+            nullable=True,
+            inferred_type=None,
+            null_count=0,
+            non_null_count=10,
         )
         data_profile: DataProfile = DataProfile(
-            id="unk_stat", columns=(metadata,), row_count=10,
+            id="unk_stat",
+            columns=(metadata,),
+            row_count=10,
             column_profiles={
                 "unknown": ColumnProfile(
-                    metadata=metadata, stats="not_a_real_stat_object",
-                    distribution=None, outlier=None,
+                    metadata=metadata,
+                    stats="not_a_real_stat_object",
+                    distribution=None,
+                    outlier=None,
                 ),
             },
         )
         quality: QualityScore = QualityScore(overall=100.0, dimensions={}, top_penalizers=[])
         analysis: DatasetAnalysis = DatasetAnalysis(
-            profile=data_profile, quality=quality,
-            correlations=[], insights=[], recommendations=[],
+            profile=data_profile,
+            quality=quality,
+            correlations=[],
+            insights=[],
+            recommendations=[],
             timestamps=datetime(2024, 6, 1),
         )
         presenter: AnalysisPresenter = AnalysisPresenter()
@@ -478,22 +568,33 @@ class TestAnalysisPresenter:
     def test_build_distributions_with_unknown_dist_type_passes(self) -> None:
         """_build_distributions com tipo Distribution desconhecido não quebra (linha 290 else)."""
         metadata: ColumnMetadata = ColumnMetadata(
-            name="unknown", data_type=DataType.OTHER, nullable=True,
-            inferred_type=None, null_count=0, non_null_count=10,
+            name="unknown",
+            data_type=DataType.OTHER,
+            nullable=True,
+            inferred_type=None,
+            null_count=0,
+            non_null_count=10,
         )
         data_profile: DataProfile = DataProfile(
-            id="unk_dist", columns=(metadata,), row_count=10,
+            id="unk_dist",
+            columns=(metadata,),
+            row_count=10,
             column_profiles={
                 "unknown": ColumnProfile(
-                    metadata=metadata, stats=None,
-                    distribution="not_a_real_dist_object", outlier=None,
+                    metadata=metadata,
+                    stats=None,
+                    distribution="not_a_real_dist_object",
+                    outlier=None,
                 ),
             },
         )
         quality: QualityScore = QualityScore(overall=100.0, dimensions={}, top_penalizers=[])
         analysis: DatasetAnalysis = DatasetAnalysis(
-            profile=data_profile, quality=quality,
-            correlations=[], insights=[], recommendations=[],
+            profile=data_profile,
+            quality=quality,
+            correlations=[],
+            insights=[],
+            recommendations=[],
             timestamps=datetime(2024, 6, 1),
         )
         presenter: AnalysisPresenter = AnalysisPresenter()
@@ -508,41 +609,91 @@ class TestAnalysisPresenter:
         """
         # Arrange
         meta_num: ColumnMetadata = ColumnMetadata(
-            name="num", data_type=DataType.INTEGER, nullable=False,
-            inferred_type=None, null_count=0, non_null_count=10,
+            name="num",
+            data_type=DataType.INTEGER,
+            nullable=False,
+            inferred_type=None,
+            null_count=0,
+            non_null_count=10,
         )
         meta_cat: ColumnMetadata = ColumnMetadata(
-            name="cat", data_type=DataType.STRING, nullable=True,
-            inferred_type=None, null_count=0, non_null_count=10,
+            name="cat",
+            data_type=DataType.STRING,
+            nullable=True,
+            inferred_type=None,
+            null_count=0,
+            non_null_count=10,
         )
         meta_tmp: ColumnMetadata = ColumnMetadata(
-            name="tmp", data_type=DataType.DATE, nullable=True,
-            inferred_type=None, null_count=0, non_null_count=10,
+            name="tmp",
+            data_type=DataType.DATE,
+            nullable=True,
+            inferred_type=None,
+            null_count=0,
+            non_null_count=10,
         )
         meta_txt: ColumnMetadata = ColumnMetadata(
-            name="txt", data_type=DataType.STRING, nullable=True,
-            inferred_type=None, null_count=0, non_null_count=10,
+            name="txt",
+            data_type=DataType.STRING,
+            nullable=True,
+            inferred_type=None,
+            null_count=0,
+            non_null_count=10,
         )
         meta_bool: ColumnMetadata = ColumnMetadata(
-            name="bool", data_type=DataType.BOOLEAN, nullable=False,
-            inferred_type=None, null_count=0, non_null_count=10,
+            name="bool",
+            data_type=DataType.BOOLEAN,
+            nullable=False,
+            inferred_type=None,
+            null_count=0,
+            non_null_count=10,
         )
         data_profile: DataProfile = DataProfile(
             id="all_stats",
             columns=(meta_num, meta_cat, meta_tmp, meta_txt, meta_bool),
             row_count=10,
             column_profiles={
-                "num": ColumnProfile(metadata=meta_num, stats=NumericStats(mean=5.0, std=2.0, min=1.0, q25=3.0, q50=5.0, q75=7.0, max=9.0, skewness=0.0, kurtosis=-1.0), distribution=None, outlier=None),
-                "cat": ColumnProfile(metadata=meta_cat, stats=CategoricalStats(value_counts={"a": 5, "b": 5}, mode="a", cardinality=2, unique_ratio=0.2), distribution=None, outlier=None),
-                "tmp": ColumnProfile(metadata=meta_tmp, stats=TemporalStats(min_date="2024-01-01", max_date="2024-12-31", range_days=365, gap_count=0), distribution=None, outlier=None),
-                "txt": ColumnProfile(metadata=meta_txt, stats=TextStats(min_length=2, max_length=10, avg_length=5.5, empty_ratio=0.0), distribution=None, outlier=None),
-                "bool": ColumnProfile(metadata=meta_bool, stats=BooleanStats(true_count=6, false_count=4, true_ratio=0.6), distribution=None, outlier=None),
+                "num": ColumnProfile(
+                    metadata=meta_num,
+                    stats=NumericStats(
+                        mean=5.0, std=2.0, min=1.0, q25=3.0, q50=5.0, q75=7.0, max=9.0, skewness=0.0, kurtosis=-1.0
+                    ),
+                    distribution=None,
+                    outlier=None,
+                ),
+                "cat": ColumnProfile(
+                    metadata=meta_cat,
+                    stats=CategoricalStats(value_counts={"a": 5, "b": 5}, mode="a", cardinality=2, unique_ratio=0.2),
+                    distribution=None,
+                    outlier=None,
+                ),
+                "tmp": ColumnProfile(
+                    metadata=meta_tmp,
+                    stats=TemporalStats(min_date="2024-01-01", max_date="2024-12-31", range_days=365, gap_count=0),
+                    distribution=None,
+                    outlier=None,
+                ),
+                "txt": ColumnProfile(
+                    metadata=meta_txt,
+                    stats=TextStats(min_length=2, max_length=10, avg_length=5.5, empty_ratio=0.0),
+                    distribution=None,
+                    outlier=None,
+                ),
+                "bool": ColumnProfile(
+                    metadata=meta_bool,
+                    stats=BooleanStats(true_count=6, false_count=4, true_ratio=0.6),
+                    distribution=None,
+                    outlier=None,
+                ),
             },
         )
         quality: QualityScore = QualityScore(overall=100.0, dimensions={}, top_penalizers=[])
         analysis: DatasetAnalysis = DatasetAnalysis(
-            profile=data_profile, quality=quality,
-            correlations=[], insights=[], recommendations=[],
+            profile=data_profile,
+            quality=quality,
+            correlations=[],
+            insights=[],
+            recommendations=[],
             timestamps=datetime(2024, 6, 1),
         )
         presenter: AnalysisPresenter = AnalysisPresenter()
@@ -573,37 +724,61 @@ class TestAnalysisPresenter:
         """
         # Arrange
         meta_num: ColumnMetadata = ColumnMetadata(
-            name="num", data_type=DataType.INTEGER, nullable=False,
-            inferred_type=None, null_count=0, non_null_count=10,
+            name="num",
+            data_type=DataType.INTEGER,
+            nullable=False,
+            inferred_type=None,
+            null_count=0,
+            non_null_count=10,
         )
         meta_cat: ColumnMetadata = ColumnMetadata(
-            name="cat", data_type=DataType.STRING, nullable=True,
-            inferred_type=None, null_count=0, non_null_count=10,
+            name="cat",
+            data_type=DataType.STRING,
+            nullable=True,
+            inferred_type=None,
+            null_count=0,
+            non_null_count=10,
         )
         meta_tmp: ColumnMetadata = ColumnMetadata(
-            name="tmp", data_type=DataType.DATE, nullable=True,
-            inferred_type=None, null_count=0, non_null_count=10,
+            name="tmp",
+            data_type=DataType.DATE,
+            nullable=True,
+            inferred_type=None,
+            null_count=0,
+            non_null_count=10,
         )
         data_profile: DataProfile = DataProfile(
             id="dist_test",
             columns=(meta_num, meta_cat, meta_tmp),
             row_count=10,
             column_profiles={
-                "num": ColumnProfile(metadata=meta_num, stats=None,
+                "num": ColumnProfile(
+                    metadata=meta_num,
+                    stats=None,
                     distribution=NumericDistribution(bins=[(0.0, 5.0, 3), (5.0, 10.0, 7)]),
-                    outlier=None),
-                "cat": ColumnProfile(metadata=meta_cat, stats=None,
+                    outlier=None,
+                ),
+                "cat": ColumnProfile(
+                    metadata=meta_cat,
+                    stats=None,
                     distribution=CategoricalDistribution(categories=[("a", 6), ("b", 4)], others_count=0),
-                    outlier=None),
-                "tmp": ColumnProfile(metadata=meta_tmp, stats=None,
+                    outlier=None,
+                ),
+                "tmp": ColumnProfile(
+                    metadata=meta_tmp,
+                    stats=None,
                     distribution=TemporalDistribution(periods=[("2024-Q1", 4), ("2024-Q2", 6)]),
-                    outlier=None),
+                    outlier=None,
+                ),
             },
         )
         quality: QualityScore = QualityScore(overall=100.0, dimensions={}, top_penalizers=[])
         analysis: DatasetAnalysis = DatasetAnalysis(
-            profile=data_profile, quality=quality,
-            correlations=[], insights=[], recommendations=[],
+            profile=data_profile,
+            quality=quality,
+            correlations=[],
+            insights=[],
+            recommendations=[],
             timestamps=datetime(2024, 6, 1),
         )
         presenter: AnalysisPresenter = AnalysisPresenter()
@@ -625,20 +800,32 @@ class TestAnalysisPresenter:
         """
         # Arrange
         metadata: ColumnMetadata = ColumnMetadata(
-            name="a", data_type=DataType.INTEGER, nullable=False,
-            inferred_type=None, null_count=0, non_null_count=10,
+            name="a",
+            data_type=DataType.INTEGER,
+            nullable=False,
+            inferred_type=None,
+            null_count=0,
+            non_null_count=10,
         )
         data_profile: DataProfile = DataProfile(
-            id="corr_test", columns=(metadata,), row_count=10,
+            id="corr_test",
+            columns=(metadata,),
+            row_count=10,
             column_profiles={"a": ColumnProfile(metadata=metadata, stats=None, distribution=None, outlier=None)},
         )
         quality: QualityScore = QualityScore(overall=100.0, dimensions={}, top_penalizers=[])
         corr: Correlation = Correlation(
-            column_a="a", column_b="a", method=CorrelationMethod.PEARSON, value=1.0,
+            column_a="a",
+            column_b="a",
+            method=CorrelationMethod.PEARSON,
+            value=1.0,
         )
         analysis: DatasetAnalysis = DatasetAnalysis(
-            profile=data_profile, quality=quality,
-            correlations=[corr], insights=[], recommendations=[],
+            profile=data_profile,
+            quality=quality,
+            correlations=[corr],
+            insights=[],
+            recommendations=[],
             timestamps=datetime(2024, 6, 1),
         )
         presenter: AnalysisPresenter = AnalysisPresenter()
@@ -657,15 +844,25 @@ class TestAnalysisPresenter:
         """
         # Arrange
         meta_a: ColumnMetadata = ColumnMetadata(
-            name="a", data_type=DataType.INTEGER, nullable=False,
-            inferred_type=None, null_count=0, non_null_count=10,
+            name="a",
+            data_type=DataType.INTEGER,
+            nullable=False,
+            inferred_type=None,
+            null_count=0,
+            non_null_count=10,
         )
         meta_b: ColumnMetadata = ColumnMetadata(
-            name="b", data_type=DataType.INTEGER, nullable=False,
-            inferred_type=None, null_count=0, non_null_count=10,
+            name="b",
+            data_type=DataType.INTEGER,
+            nullable=False,
+            inferred_type=None,
+            null_count=0,
+            non_null_count=10,
         )
         data_profile: DataProfile = DataProfile(
-            id="corr2", columns=(meta_a, meta_b), row_count=10,
+            id="corr2",
+            columns=(meta_a, meta_b),
+            row_count=10,
             column_profiles={
                 "a": ColumnProfile(metadata=meta_a, stats=None, distribution=None, outlier=None),
                 "b": ColumnProfile(metadata=meta_b, stats=None, distribution=None, outlier=None),
@@ -673,11 +870,17 @@ class TestAnalysisPresenter:
         )
         quality: QualityScore = QualityScore(overall=100.0, dimensions={}, top_penalizers=[])
         corr: Correlation = Correlation(
-            column_a="a", column_b="b", method=CorrelationMethod.PEARSON, value=0.85,
+            column_a="a",
+            column_b="b",
+            method=CorrelationMethod.PEARSON,
+            value=0.85,
         )
         analysis: DatasetAnalysis = DatasetAnalysis(
-            profile=data_profile, quality=quality,
-            correlations=[corr], insights=[], recommendations=[],
+            profile=data_profile,
+            quality=quality,
+            correlations=[corr],
+            insights=[],
+            recommendations=[],
             timestamps=datetime(2024, 6, 1),
         )
         presenter: AnalysisPresenter = AnalysisPresenter()
@@ -695,25 +898,39 @@ class TestAnalysisPresenter:
         """_build_outliers deve incluir colunas com OutlierInfo."""
         # Arrange
         metadata: ColumnMetadata = ColumnMetadata(
-            name="x", data_type=DataType.INTEGER, nullable=False,
-            inferred_type=None, null_count=0, non_null_count=10,
+            name="x",
+            data_type=DataType.INTEGER,
+            nullable=False,
+            inferred_type=None,
+            null_count=0,
+            non_null_count=10,
         )
         data_profile: DataProfile = DataProfile(
-            id="out_test", columns=(metadata,), row_count=10,
+            id="out_test",
+            columns=(metadata,),
+            row_count=10,
             column_profiles={
                 "x": ColumnProfile(
-                    metadata=metadata, stats=None, distribution=None,
+                    metadata=metadata,
+                    stats=None,
+                    distribution=None,
                     outlier=OutlierInfo(
-                        method=OutlierMethod.IQR, count=1, ratio=0.1,
-                        bounds_lower=-5.0, bounds_upper=15.0,
+                        method=OutlierMethod.IQR,
+                        count=1,
+                        ratio=0.1,
+                        bounds_lower=-5.0,
+                        bounds_upper=15.0,
                     ),
                 ),
             },
         )
         quality: QualityScore = QualityScore(overall=100.0, dimensions={}, top_penalizers=[])
         analysis: DatasetAnalysis = DatasetAnalysis(
-            profile=data_profile, quality=quality,
-            correlations=[], insights=[], recommendations=[],
+            profile=data_profile,
+            quality=quality,
+            correlations=[],
+            insights=[],
+            recommendations=[],
             timestamps=datetime(2024, 6, 1),
         )
         presenter: AnalysisPresenter = AnalysisPresenter()

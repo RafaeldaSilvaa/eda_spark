@@ -45,8 +45,11 @@ class TestAnalyzeRemainingCoverage:
         re.generate.return_value = []
 
         use_case: AnalyzeDatasetUseCase = AnalyzeDatasetUseCase(
-            data_provider=data_provider, cache_provider=cache_provider,
-            quality_calculator=calc, insight_engine=ie, recommendation_engine=re,
+            data_provider=data_provider,
+            cache_provider=cache_provider,
+            quality_calculator=calc,
+            insight_engine=ie,
+            recommendation_engine=re,
         )
 
         result = use_case.execute(AnalyzeRequest(columns=None, config=MagicMock()), MagicMock())
@@ -67,8 +70,11 @@ class TestAnalyzeRemainingCoverage:
         data_provider.compute_profile.side_effect = RuntimeError("Spark falhou")
 
         use_case: AnalyzeDatasetUseCase = AnalyzeDatasetUseCase(
-            data_provider=data_provider, cache_provider=cache_provider,
-            quality_calculator=calc, insight_engine=ie, recommendation_engine=re,
+            data_provider=data_provider,
+            cache_provider=cache_provider,
+            quality_calculator=calc,
+            insight_engine=ie,
+            recommendation_engine=re,
         )
 
         with pytest.raises(DataProviderError, match="Failed to compute dataset profile"):
@@ -90,7 +96,8 @@ class TestAssessQualityRemainingCoverage:
         calc.calculate.return_value = MagicMock(spec=QualityScore)
 
         use_case: AssessQualityUseCase = AssessQualityUseCase(
-            data_provider=data_provider, cache_provider=cache_provider,
+            data_provider=data_provider,
+            cache_provider=cache_provider,
             quality_calculator=calc,
         )
 
@@ -111,7 +118,8 @@ class TestAssessQualityRemainingCoverage:
         cache_provider.set.side_effect = RuntimeError("Cache offline")
 
         use_case: AssessQualityUseCase = AssessQualityUseCase(
-            data_provider=data_provider, cache_provider=cache_provider,
+            data_provider=data_provider,
+            cache_provider=cache_provider,
             quality_calculator=calc,
         )
 

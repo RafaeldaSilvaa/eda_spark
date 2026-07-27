@@ -6,8 +6,8 @@ Cobre o branch onde a lista de fatores de uma dimensão está vazia,
 resultando em score 100.0 e contribution = weight * 100.
 """
 
-from spark_eda.domain.entities.quality_score import QualityFactor, QualityDimension
-from spark_eda.domain.services.quality_calculator import QualityCalculator, DIMENSION_WEIGHTS
+from spark_eda.domain.entities.quality_score import QualityDimension
+from spark_eda.domain.services.quality_calculator import DIMENSION_WEIGHTS, QualityCalculator
 
 
 class TestQualityCalculatorEdge:

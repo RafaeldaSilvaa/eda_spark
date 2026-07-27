@@ -5,7 +5,7 @@ from __future__ import annotations
 Cobre as linhas 38 e 78: retorno False no primeiro dígito verificador.
 """
 
-from spark_eda.domain.services.business.validators import CPFValidator, CNPJValidator
+from spark_eda.domain.services.business.validators import CNPJValidator, CPFValidator
 
 
 class TestCPFValidatorEdge:

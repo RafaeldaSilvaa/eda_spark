@@ -66,6 +66,11 @@ target-version = "py314"
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "N", "UP", "B", "SIM", "ARG", "PTH", "PL", "RUF"]
 
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["E402", "PLR2004", "PLC0415"]
+"notebooks/**" = ["E402", "E501", "PLR2004", "N812", "I001"]
+"scripts/**" = ["PLR2004"]
+
 [tool.ruff.format]
 quote-style = "double"
 

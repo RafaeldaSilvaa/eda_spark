@@ -1,4 +1,5 @@
 """DTO da seção de estatísticas descritivas agrupadas por tipo de coluna."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -133,7 +134,7 @@ class StatsSection:
 
         if self.numeric:
             header: str = (
-                '<thead><tr>'
+                "<thead><tr>"
                 '<th style="text-align:left;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
                 'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Column</th>'
                 '<th style="text-align:right;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
@@ -152,7 +153,7 @@ class StatsSection:
                 'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Max</th>'
                 '<th style="text-align:right;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
                 'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Skew</th>'
-                '</tr></thead>'
+                "</tr></thead>"
             )
             rows: str = "".join(
                 f'<tr style="border-bottom:1px solid var(--border,#e2e8f0);">'
@@ -165,19 +166,19 @@ class StatsSection:
                 f'<td style="padding:6px 10px;text-align:right;color:var(--text,#1a1a2e);">{format_number(s.q75)}</td>'
                 f'<td style="padding:6px 10px;text-align:right;color:var(--text,#1a1a2e);">{format_number(s.max)}</td>'
                 f'<td style="padding:6px 10px;text-align:right;color:var(--text,#1a1a2e);">'
-                f'{format_number(s.skewness)}</td>'
+                f"{format_number(s.skewness)}</td>"
                 f"</tr>"
                 for s in self.numeric
             )
             html_parts.append(
                 f'<h4 style="margin:16px 0 8px;font-size:14px;color:var(--text,#1a1a2e);">Numeric</h4>'
                 f'<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:13px;">'
-                f'{header}<tbody>{rows}</tbody></table></div>'
+                f"{header}<tbody>{rows}</tbody></table></div>"
             )
 
         if self.categorical:
             header = (
-                '<thead><tr>'
+                "<thead><tr>"
                 '<th style="text-align:left;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
                 'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Column</th>'
                 '<th style="text-align:right;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
@@ -188,7 +189,7 @@ class StatsSection:
                 'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Uniqueness</th>'
                 '<th style="text-align:left;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
                 'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Top</th>'
-                '</tr></thead>'
+                "</tr></thead>"
             )
             rows = "".join(
                 f'<tr style="border-bottom:1px solid var(--border,#e2e8f0);">'
@@ -196,21 +197,21 @@ class StatsSection:
                 f'<td style="padding:6px 10px;text-align:right;color:var(--text,#1a1a2e);">{s.cardinality}</td>'
                 f'<td style="padding:6px 10px;color:var(--text,#1a1a2e);">{s.mode or "\u2014"}</td>'
                 f'<td style="padding:6px 10px;text-align:right;color:var(--text,#1a1a2e);">'
-                f'{format_percentage(s.unique_ratio)}</td>'
+                f"{format_percentage(s.unique_ratio)}</td>"
                 f'<td style="padding:6px 10px;color:var(--muted,#64748b);font-size:12px;">'
-                f'{" | ".join(f"{v}: {c}" for v, c in s.top_values[:3])}</td>'
+                f"{' | '.join(f'{v}: {c}' for v, c in s.top_values[:3])}</td>"
                 f"</tr>"
                 for s in self.categorical
             )
             html_parts.append(
                 f'<h4 style="margin:16px 0 8px;font-size:14px;color:var(--text,#1a1a2e);">Categorical</h4>'
                 f'<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:13px;">'
-                f'{header}<tbody>{rows}</tbody></table></div>'
+                f"{header}<tbody>{rows}</tbody></table></div>"
             )
 
         if self.temporal:
             header = (
-                '<thead><tr>'
+                "<thead><tr>"
                 '<th style="text-align:left;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
                 'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Column</th>'
                 '<th style="text-align:left;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
@@ -221,7 +222,7 @@ class StatsSection:
                 'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Range</th>'
                 '<th style="text-align:right;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
                 'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Gaps</th>'
-                '</tr></thead>'
+                "</tr></thead>"
             )
             rows = "".join(
                 f'<tr style="border-bottom:1px solid var(--border,#e2e8f0);">'
@@ -236,12 +237,12 @@ class StatsSection:
             html_parts.append(
                 f'<h4 style="margin:16px 0 8px;font-size:14px;color:var(--text,#1a1a2e);">Temporal</h4>'
                 f'<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:13px;">'
-                f'{header}<tbody>{rows}</tbody></table></div>'
+                f"{header}<tbody>{rows}</tbody></table></div>"
             )
 
         if self.text:
             header = (
-                '<thead><tr>'
+                "<thead><tr>"
                 '<th style="text-align:left;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
                 'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Column</th>'
                 '<th style="text-align:right;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
@@ -252,7 +253,7 @@ class StatsSection:
                 'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Avg</th>'
                 '<th style="text-align:right;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
                 'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Empty</th>'
-                '</tr></thead>'
+                "</tr></thead>"
             )
             rows = "".join(
                 f'<tr style="border-bottom:1px solid var(--border,#e2e8f0);">'
@@ -260,21 +261,21 @@ class StatsSection:
                 f'<td style="padding:6px 10px;text-align:right;color:var(--text,#1a1a2e);">{s.min_length}</td>'
                 f'<td style="padding:6px 10px;text-align:right;color:var(--text,#1a1a2e);">{s.max_length}</td>'
                 f'<td style="padding:6px 10px;text-align:right;color:var(--text,#1a1a2e);">'
-                f'{format_number(s.avg_length)}</td>'
+                f"{format_number(s.avg_length)}</td>"
                 f'<td style="padding:6px 10px;text-align:right;color:var(--text,#1a1a2e);">'
-                f'{format_percentage(s.empty_ratio)}</td>'
+                f"{format_percentage(s.empty_ratio)}</td>"
                 f"</tr>"
                 for s in self.text
             )
             html_parts.append(
                 f'<h4 style="margin:16px 0 8px;font-size:14px;color:var(--text,#1a1a2e);">Text</h4>'
                 f'<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:13px;">'
-                f'{header}<tbody>{rows}</tbody></table></div>'
+                f"{header}<tbody>{rows}</tbody></table></div>"
             )
 
         if self.boolean:
             header = (
-                '<thead><tr>'
+                "<thead><tr>"
                 '<th style="text-align:left;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
                 'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Column</th>'
                 '<th style="text-align:right;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
@@ -283,7 +284,7 @@ class StatsSection:
                 'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">False</th>'
                 '<th style="text-align:right;padding:6px 10px;border-bottom:2px solid var(--border,#e2e8f0);'
                 'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">% True</th>'
-                '</tr></thead>'
+                "</tr></thead>"
             )
             rows = "".join(
                 f'<tr style="border-bottom:1px solid var(--border,#e2e8f0);">'
@@ -291,19 +292,18 @@ class StatsSection:
                 f'<td style="padding:6px 10px;text-align:right;color:var(--text,#1a1a2e);">{s.true_count}</td>'
                 f'<td style="padding:6px 10px;text-align:right;color:var(--text,#1a1a2e);">{s.false_count}</td>'
                 f'<td style="padding:6px 10px;text-align:right;color:var(--text,#1a1a2e);">'
-                f'{format_percentage(s.true_ratio)}</td>'
+                f"{format_percentage(s.true_ratio)}</td>"
                 f"</tr>"
                 for s in self.boolean
             )
             html_parts.append(
                 f'<h4 style="margin:16px 0 8px;font-size:14px;color:var(--text,#1a1a2e);">Boolean</h4>'
                 f'<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:13px;">'
-                f'{header}<tbody>{rows}</tbody></table></div>'
+                f"{header}<tbody>{rows}</tbody></table></div>"
             )
 
         return "".join(html_parts) or (
-            '<div style="padding:12px;color:var(--muted,#64748b);font-size:13px;">'
-            "No statistics available.</div>"
+            '<div style="padding:12px;color:var(--muted,#64748b);font-size:13px;">No statistics available.</div>'
         )
 
     def __str__(self) -> str:

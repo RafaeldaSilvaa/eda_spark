@@ -13,11 +13,10 @@ from spark_eda.domain.entities.column_profile import ColumnProfile
 from spark_eda.domain.entities.data_profile import DataProfile
 from spark_eda.domain.entities.insight import Insight
 from spark_eda.domain.entities.outlier import OutlierInfo
-from spark_eda.domain.entities.quality_score import QualityFactor, QualityDimension, QualityScore
+from spark_eda.domain.entities.quality_score import QualityDimension, QualityFactor, QualityScore
 from spark_eda.domain.entities.statistic import (
     CategoricalStats,
     NumericStats,
-    TemporalStats,
 )
 from spark_eda.domain.services.insight_engine import InsightEngine
 from spark_eda.domain.value_objects.data_type import DataType
@@ -185,8 +184,15 @@ class TestInsightEngineEdge:
             non_null_count=100,
         )
         stats: NumericStats = NumericStats(
-            mean=50.0, std=20.0, min=1.0, q25=35.0, q50=45.0,
-            q75=60.0, max=150.0, skewness=1.2, kurtosis=3.0,
+            mean=50.0,
+            std=20.0,
+            min=1.0,
+            q25=35.0,
+            q50=45.0,
+            q75=60.0,
+            max=150.0,
+            skewness=1.2,
+            kurtosis=3.0,
         )
         profile = ColumnProfile(metadata=metadata, stats=stats, distribution=None, outlier=None)
         data_profile = DataProfile(
@@ -212,8 +218,15 @@ class TestInsightEngineEdge:
             non_null_count=100,
         )
         stats: NumericStats = NumericStats(
-            mean=5000.0, std=3000.0, min=0.0, q25=2000.0, q50=4000.0,
-            q75=7000.0, max=50000.0, skewness=2.5, kurtosis=10.0,
+            mean=5000.0,
+            std=3000.0,
+            min=0.0,
+            q25=2000.0,
+            q50=4000.0,
+            q75=7000.0,
+            max=50000.0,
+            skewness=2.5,
+            kurtosis=10.0,
         )
         profile = ColumnProfile(metadata=metadata, stats=stats, distribution=None, outlier=None)
         data_profile = DataProfile(
@@ -239,8 +252,15 @@ class TestInsightEngineEdge:
             non_null_count=100,
         )
         stats = NumericStats(
-            mean=50.0, std=20.0, min=1.0, q25=35.0, q50=45.0,
-            q75=60.0, max=150.0, skewness=1.8, kurtosis=4.0,
+            mean=50.0,
+            std=20.0,
+            min=1.0,
+            q25=35.0,
+            q50=45.0,
+            q75=60.0,
+            max=150.0,
+            skewness=1.8,
+            kurtosis=4.0,
         )
         profile = ColumnProfile(metadata=metadata, stats=stats, distribution=None, outlier=None)
         data_profile = DataProfile(
@@ -417,12 +437,22 @@ class TestInsightEngineEdge:
             non_null_count=100,
         )
         stats = NumericStats(
-            mean=50.0, std=15.0, min=0.0, q25=40.0, q50=50.0,
-            q75=60.0, max=200.0, skewness=0.5, kurtosis=2.0,
+            mean=50.0,
+            std=15.0,
+            min=0.0,
+            q25=40.0,
+            q50=50.0,
+            q75=60.0,
+            max=200.0,
+            skewness=0.5,
+            kurtosis=2.0,
         )
         outlier = OutlierInfo(
-            method=OutlierMethod.IQR, count=15, ratio=0.15,
-            bounds_lower=10.0, bounds_upper=90.0,
+            method=OutlierMethod.IQR,
+            count=15,
+            ratio=0.15,
+            bounds_lower=10.0,
+            bounds_upper=90.0,
         )
         profile = ColumnProfile(metadata=metadata, stats=stats, distribution=None, outlier=outlier)
         data_profile = DataProfile(
@@ -450,12 +480,22 @@ class TestInsightEngineEdge:
             non_null_count=100,
         )
         stats = NumericStats(
-            mean=100.0, std=30.0, min=10.0, q25=80.0, q50=95.0,
-            q75=120.0, max=500.0, skewness=0.8, kurtosis=3.0,
+            mean=100.0,
+            std=30.0,
+            min=10.0,
+            q25=80.0,
+            q50=95.0,
+            q75=120.0,
+            max=500.0,
+            skewness=0.8,
+            kurtosis=3.0,
         )
         outlier = OutlierInfo(
-            method=OutlierMethod.ZSCORE, count=12, ratio=0.12,
-            bounds_lower=None, bounds_upper=None,
+            method=OutlierMethod.ZSCORE,
+            count=12,
+            ratio=0.12,
+            bounds_lower=None,
+            bounds_upper=None,
         )
         profile = ColumnProfile(metadata=metadata, stats=stats, distribution=None, outlier=outlier)
         data_profile = DataProfile(
@@ -481,12 +521,22 @@ class TestInsightEngineEdge:
             non_null_count=100,
         )
         stats = NumericStats(
-            mean=50.0, std=15.0, min=0.0, q25=40.0, q50=50.0,
-            q75=60.0, max=500.0, skewness=0.5, kurtosis=2.0,
+            mean=50.0,
+            std=15.0,
+            min=0.0,
+            q25=40.0,
+            q50=50.0,
+            q75=60.0,
+            max=500.0,
+            skewness=0.5,
+            kurtosis=2.0,
         )
         outlier = OutlierInfo(
-            method=OutlierMethod.IQR, count=30, ratio=0.30,
-            bounds_lower=5.0, bounds_upper=95.0,
+            method=OutlierMethod.IQR,
+            count=30,
+            ratio=0.30,
+            bounds_lower=5.0,
+            bounds_upper=95.0,
         )
         profile = ColumnProfile(metadata=metadata, stats=stats, distribution=None, outlier=outlier)
         data_profile = DataProfile(
@@ -512,12 +562,22 @@ class TestInsightEngineEdge:
             non_null_count=100,
         )
         stats = NumericStats(
-            mean=50.0, std=15.0, min=0.0, q25=40.0, q50=50.0,
-            q75=60.0, max=300.0, skewness=0.5, kurtosis=2.0,
+            mean=50.0,
+            std=15.0,
+            min=0.0,
+            q25=40.0,
+            q50=50.0,
+            q75=60.0,
+            max=300.0,
+            skewness=0.5,
+            kurtosis=2.0,
         )
         outlier = OutlierInfo(
-            method=OutlierMethod.IQR, count=20, ratio=0.20,
-            bounds_lower=5.0, bounds_upper=95.0,
+            method=OutlierMethod.IQR,
+            count=20,
+            ratio=0.20,
+            bounds_lower=5.0,
+            bounds_upper=95.0,
         )
         profile = ColumnProfile(metadata=metadata, stats=stats, distribution=None, outlier=outlier)
         data_profile = DataProfile(
@@ -543,12 +603,22 @@ class TestInsightEngineEdge:
             non_null_count=100,
         )
         stats = NumericStats(
-            mean=50.0, std=15.0, min=10.0, q25=40.0, q50=50.0,
-            q75=60.0, max=90.0, skewness=0.1, kurtosis=2.0,
+            mean=50.0,
+            std=15.0,
+            min=10.0,
+            q25=40.0,
+            q50=50.0,
+            q75=60.0,
+            max=90.0,
+            skewness=0.1,
+            kurtosis=2.0,
         )
         outlier = OutlierInfo(
-            method=OutlierMethod.IQR, count=5, ratio=0.05,
-            bounds_lower=10.0, bounds_upper=90.0,
+            method=OutlierMethod.IQR,
+            count=5,
+            ratio=0.05,
+            bounds_lower=10.0,
+            bounds_upper=90.0,
         )
         profile = ColumnProfile(metadata=metadata, stats=stats, distribution=None, outlier=outlier)
         data_profile = DataProfile(
@@ -573,12 +643,22 @@ class TestInsightEngineEdge:
             non_null_count=100,
         )
         stats = NumericStats(
-            mean=50.0, std=15.0, min=0.0, q25=40.0, q50=50.0,
-            q75=60.0, max=200.0, skewness=0.5, kurtosis=2.0,
+            mean=50.0,
+            std=15.0,
+            min=0.0,
+            q25=40.0,
+            q50=50.0,
+            q75=60.0,
+            max=200.0,
+            skewness=0.5,
+            kurtosis=2.0,
         )
         outlier = OutlierInfo(
-            method=OutlierMethod.IQR, count=12, ratio=0.12,
-            bounds_lower=5.0, bounds_upper=95.0,
+            method=OutlierMethod.IQR,
+            count=12,
+            ratio=0.12,
+            bounds_lower=5.0,
+            bounds_upper=95.0,
         )
         profile = ColumnProfile(metadata=metadata, stats=stats, distribution=None, outlier=outlier)
         data_profile = DataProfile(
@@ -604,8 +684,15 @@ class TestInsightEngineEdge:
             non_null_count=100,
         )
         stats = NumericStats(
-            mean=5.0, std=2.0, min=0.0, q25=3.0, q50=5.0,
-            q75=7.0, max=10.0, skewness=0.0, kurtosis=-1.0,
+            mean=5.0,
+            std=2.0,
+            min=0.0,
+            q25=3.0,
+            q50=5.0,
+            q75=7.0,
+            max=10.0,
+            skewness=0.0,
+            kurtosis=-1.0,
         )
         profile = ColumnProfile(metadata=metadata, stats=stats, distribution=None, outlier=None)
         data_profile = DataProfile(
@@ -630,8 +717,15 @@ class TestInsightEngineEdge:
             non_null_count=100,
         )
         stats = NumericStats(
-            mean=2000.0, std=1.0, min=1800.0, q25=1990.0, q50=2000.0,
-            q75=2010.0, max=2020.0, skewness=0.0, kurtosis=-1.0,
+            mean=2000.0,
+            std=1.0,
+            min=1800.0,
+            q25=1990.0,
+            q50=2000.0,
+            q75=2010.0,
+            max=2020.0,
+            skewness=0.0,
+            kurtosis=-1.0,
         )
         profile = ColumnProfile(metadata=metadata, stats=stats, distribution=None, outlier=None)
         data_profile = DataProfile(
@@ -641,7 +735,8 @@ class TestInsightEngineEdge:
             column_profiles={"ano_ref": profile},
         )
         quality = _build_quality_score_with_accuracy_factor(
-            score=0.2, reason="Ano fora do intervalo",
+            score=0.2,
+            reason="Ano fora do intervalo",
             affected_columns=["ano_ref"],
         )
         engine = InsightEngine()
@@ -655,7 +750,8 @@ class TestInsightEngineEdge:
     def test_business_pattern_medium_severity(self) -> None:
         """factor.score entre 0.3 e 0.6 → MEDIUM (linha 350-351)."""
         quality = _build_quality_score_with_accuracy_factor(
-            score=0.5, reason="Valor inconsistente",
+            score=0.5,
+            reason="Valor inconsistente",
             affected_columns=["coluna_x"],
         )
         metadata = ColumnMetadata(
@@ -667,8 +763,15 @@ class TestInsightEngineEdge:
             non_null_count=100,
         )
         stats = NumericStats(
-            mean=10.0, std=2.0, min=1.0, q25=8.0, q50=10.0,
-            q75=12.0, max=20.0, skewness=0.0, kurtosis=-1.0,
+            mean=10.0,
+            std=2.0,
+            min=1.0,
+            q25=8.0,
+            q50=10.0,
+            q75=12.0,
+            max=20.0,
+            skewness=0.0,
+            kurtosis=-1.0,
         )
         profile = ColumnProfile(metadata=metadata, stats=stats, distribution=None, outlier=None)
         data_profile = DataProfile(
@@ -687,7 +790,8 @@ class TestInsightEngineEdge:
     def test_business_pattern_low_severity(self) -> None:
         """factor.score >= 0.6 → LOW (linha 353)."""
         quality = _build_quality_score_with_accuracy_factor(
-            score=0.8, reason="Pequena divergência",
+            score=0.8,
+            reason="Pequena divergência",
             affected_columns=["coluna_y"],
         )
         metadata = ColumnMetadata(
@@ -699,8 +803,15 @@ class TestInsightEngineEdge:
             non_null_count=100,
         )
         stats = NumericStats(
-            mean=10.0, std=2.0, min=1.0, q25=8.0, q50=10.0,
-            q75=12.0, max=20.0, skewness=0.0, kurtosis=-1.0,
+            mean=10.0,
+            std=2.0,
+            min=1.0,
+            q25=8.0,
+            q50=10.0,
+            q75=12.0,
+            max=20.0,
+            skewness=0.0,
+            kurtosis=-1.0,
         )
         profile = ColumnProfile(metadata=metadata, stats=stats, distribution=None, outlier=None)
         data_profile = DataProfile(
@@ -719,17 +830,28 @@ class TestInsightEngineEdge:
     def test_business_pattern_factor_score_1_skipped(self) -> None:
         """factor.score == 1.0 → insight NÃO é gerado (linha 345->344)."""
         quality = _build_quality_score_with_accuracy_factor(
-            score=1.0, reason="Tudo ok",
+            score=1.0,
+            reason="Tudo ok",
             affected_columns=["col_x"],
         )
         metadata = ColumnMetadata(
-            name="col_x", data_type=DataType.INTEGER,
-            nullable=True, inferred_type=None,
-            null_count=0, non_null_count=100,
+            name="col_x",
+            data_type=DataType.INTEGER,
+            nullable=True,
+            inferred_type=None,
+            null_count=0,
+            non_null_count=100,
         )
         stats = NumericStats(
-            mean=10.0, std=2.0, min=1.0, q25=8.0, q50=10.0,
-            q75=12.0, max=20.0, skewness=0.0, kurtosis=-1.0,
+            mean=10.0,
+            std=2.0,
+            min=1.0,
+            q25=8.0,
+            q50=10.0,
+            q75=12.0,
+            max=20.0,
+            skewness=0.0,
+            kurtosis=-1.0,
         )
         profile = ColumnProfile(metadata=metadata, stats=stats, distribution=None, outlier=None)
         data_profile = DataProfile(

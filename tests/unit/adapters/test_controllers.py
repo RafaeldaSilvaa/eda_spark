@@ -93,6 +93,7 @@ class TestAnalyzeController:
         controller._presenter.present_analysis = mock.MagicMock(return_value=mock_report)
         controller._use_case.execute = mock.MagicMock(return_value=mock.MagicMock())
         from spark_eda.framework.config import EDAConfig
+
         config: EDAConfig = EDAConfig(max_categories=10)
 
         # Act

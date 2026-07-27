@@ -150,9 +150,7 @@ class QualityCalculator:
 
         penalizers_with_impact.sort(key=lambda item: item[0], reverse=True)
 
-        top_penalizers: list[QualityFactor] = [
-            factor for _, _, factor in penalizers_with_impact[:5]
-        ]
+        top_penalizers: list[QualityFactor] = [factor for _, _, factor in penalizers_with_impact[:5]]
 
         return QualityScore(
             overall=overall,

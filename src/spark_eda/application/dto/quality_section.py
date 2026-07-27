@@ -1,4 +1,5 @@
 """DTO da seção de qualidade dos dados."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass

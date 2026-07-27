@@ -11,7 +11,6 @@ Cria:
 import sys
 from pathlib import Path
 
-
 _PROJECT_ROOT: Path = Path(__file__).resolve().parent.parent
 
 _ADAPTERS_DIR: Path = _PROJECT_ROOT / "src" / "spark_eda" / "adapters"
@@ -91,8 +90,7 @@ def _validar_nome_estrategia(nome: str) -> str:
         raise ValueError("O nome da estratégia não pode ser vazio.")
     if not nome_normalizado.isidentifier():
         raise ValueError(
-            f"'{nome}' não é um identificador Python válido. "
-            f"Use apenas letras, números e underscores.",
+            f"'{nome}' não é um identificador Python válido. Use apenas letras, números e underscores.",
         )
     return nome_normalizado
 

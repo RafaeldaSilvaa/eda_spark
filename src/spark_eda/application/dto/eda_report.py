@@ -1,4 +1,5 @@
 """DTO principal do relatório completo de análise exploratória."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass

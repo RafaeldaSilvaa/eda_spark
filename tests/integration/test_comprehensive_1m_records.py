@@ -18,11 +18,10 @@ from __future__ import annotations
 
 import pytest
 from pyspark.sql import DataFrame, SparkSession
-from pyspark.sql import functions as F
+from pyspark.sql import functions as F  # noqa: N812
 from pyspark.sql.types import (
     DoubleType,
     LongType,
-    StringType,
     StructField,
     StructType,
 )
@@ -67,8 +66,16 @@ CIDADES_BRASIL: list[tuple[str, str, str]] = [
 ]
 
 CATEGORIAS: list[str] = [
-    "Eletrônicos", "Roupas", "Alimentos", "Livros", "Esportes",
-    "Beleza", "Casa", "Automotivo", "Brinquedos", "Saúde",
+    "Eletrônicos",
+    "Roupas",
+    "Alimentos",
+    "Livros",
+    "Esportes",
+    "Beleza",
+    "Casa",
+    "Automotivo",
+    "Brinquedos",
+    "Saúde",
 ]
 
 NUM_CIDADES: int = len(CIDADES_BRASIL)
@@ -118,14 +125,11 @@ def million_row_dataframe(spark_session: SparkSession) -> DataFrame:
     # --- Montar DataFrame com expressões Spark 100% distribuídas ---
     final_df = base.select(
         F.col("id"),
-
         # nome: 5% nulos, distribuição por mod
         F.concat(
             F.lit("Pessoa_"),
-            F.when(F.rand() < 0.05, None)
-            .otherwise(F.expr("printf('%06d', CAST(rand() * 500000 AS INT))"))
+            F.when(F.rand() < 0.05, None).otherwise(F.expr("printf('%06d', CAST(rand() * 500000 AS INT))")),
         ).alias("nome"),
-
         # email: 3% nulos
         F.when(F.rand() < 0.03, None)
         .otherwise(
@@ -134,11 +138,10 @@ def million_row_dataframe(spark_session: SparkSession) -> DataFrame:
                 F.expr("printf('%04d', CAST(rand() * 900000 AS INT))"),
                 F.lit("@exemplo.com.br"),
             )
-        ).alias("email"),
-
+        )
+        .alias("email"),
         cidade_expr.alias("cidade"),
         estado_expr.alias("estado"),
-
         # idade: distribuição normal truncada [18, 80], 2% nulos
         F.when(F.rand() < 0.02, None)
         .otherwise(
@@ -146,8 +149,8 @@ def million_row_dataframe(spark_session: SparkSession) -> DataFrame:
                 F.lit(18),
                 F.least(F.lit(80), (F.randn() * 12 + 38).cast("int")),
             )
-        ).alias("idade"),
-
+        )
+        .alias("idade"),
         # salario: log-normal [1200, 35000], 6% nulos
         F.when(F.rand() < 0.06, None)
         .otherwise(
@@ -161,30 +164,26 @@ def million_row_dataframe(spark_session: SparkSession) -> DataFrame:
                 ),
                 2,
             )
-        ).alias("salario"),
-
+        )
+        .alias("salario"),
         # score: uniforme [0, 1000]
         F.round(F.rand() * 1000, 2).alias("score"),
-
         cat_expr.alias("categoria"),
-
         # data_cadastro: datas aleatórias entre 2019-01-01 e 2024-12-31
         F.date_add(
             F.lit("2019-01-01"),
             (F.rand() * 2191).cast("int"),  # 2191 = ~6 anos em dias
         ).alias("data_cadastro"),
-
         # ultimo_acesso: timestamps entre 2020-01-01 e ~2025, 8% nulos
         F.when(F.rand() < 0.08, None)
         .otherwise(
             F.timestamp_seconds(
                 F.lit(1577836800) + (F.rand() * 157766400).cast("int"),
             )
-        ).alias("ultimo_acesso"),
-
+        )
+        .alias("ultimo_acesso"),
         # ativo: 80% True, 20% False
         (F.rand() < 0.8).alias("ativo"),
-
         # dependentes: 0-5 (semi-poisson), 1% nulos
         F.when(F.rand() < 0.01, None)
         .otherwise(
@@ -192,43 +191,42 @@ def million_row_dataframe(spark_session: SparkSession) -> DataFrame:
                 F.lit(5),
                 F.greatest(F.lit(0), (F.abs(F.randn()) * 1.5).cast("int")),
             )
-        ).alias("dependentes"),
-
+        )
+        .alias("dependentes"),
         # tempo_casa_dias: uniforme [0, 2191]
         (F.rand() * 2191).cast("int").alias("tempo_casa_dias"),
-
         # documento: 11 dígitos (simula CPF), 2% nulos
         F.when(F.rand() < 0.02, None)
         .otherwise(
             F.expr("printf('%011d', CAST(rand() * 99999999999 AS LONG))"),
-        ).alias("documento"),
-
+        )
+        .alias("documento"),
         # cep: formatado xxxxx-xxx
         F.concat(
             F.expr("printf('%05d', CAST(rand() * 99999 AS INT))"),
             F.lit("-"),
             F.expr("printf('%03d', CAST(rand() * 999 AS INT))"),
         ).alias("cep"),
-
         # observacao: hash truncado (10-110 chars), 1% vazio
         F.when(F.rand() < 0.01, F.lit(""))
         .otherwise(
             F.expr(
-                "substr(sha2(cast(rand() as string), 256), 1, "
-                "CAST(rand() * 100 + 10 AS INT))",
+                "substr(sha2(cast(rand() as string), 256), 1, CAST(rand() * 100 + 10 AS INT))",
             )
-        ).alias("observacao"),
-
+        )
+        .alias("observacao"),
         regiao_expr.alias("regiao"),
     )
 
     # --- Injetar ~100 outliers extremos de salário ---
     outliers = spark.createDataFrame(
         [(500000 + i, 999999.99) for i in range(100)],
-        schema=StructType([
-            StructField("id_out", LongType()),
-            StructField("salario_out", DoubleType()),
-        ]),
+        schema=StructType(
+            [
+                StructField("id_out", LongType()),
+                StructField("salario_out", DoubleType()),
+            ]
+        ),
     )
 
     final_df = final_df.join(
@@ -265,8 +263,7 @@ def million_row_dataframe(spark_session: SparkSession) -> DataFrame:
     # --- Coluna quase-constante (99.9% mesmo valor) ---
     final_df = final_df.withColumn(
         "coluna_quase_constante",
-        F.when(F.rand() < 0.001, F.expr("printf('%04d', CAST(rand() * 1000 AS INT))"))
-        .otherwise(F.lit("predominante")),
+        F.when(F.rand() < 0.001, F.expr("printf('%04d', CAST(rand() * 1000 AS INT))")).otherwise(F.lit("predominante")),
     )
 
     # --- Coluna totalmente nula (edge case) ---
@@ -288,7 +285,8 @@ class TestCompleteAnalysis1M:
     """Testa a análise completa em dataset de 1 milhão de registros."""
 
     def test_analyze_returns_complete_report(
-        self, million_row_dataframe: DataFrame,
+        self,
+        million_row_dataframe: DataFrame,
     ) -> None:
         """analyze() deve retornar EDAReport com todas as seções."""
         report: EDAReport = analyze(million_row_dataframe)
@@ -305,7 +303,8 @@ class TestCompleteAnalysis1M:
         assert isinstance(report.recommendations, RecommendationsSection)
 
     def test_overview_counts(
-        self, million_row_dataframe: DataFrame,
+        self,
+        million_row_dataframe: DataFrame,
     ) -> None:
         """Visão geral deve refletir corretamente o dataset."""
         report = analyze(million_row_dataframe)
@@ -318,25 +317,42 @@ class TestCompleteAnalysis1M:
         assert report.overview.size_estimate > 0
 
     def test_schema_contains_all_columns(
-        self, million_row_dataframe: DataFrame,
+        self,
+        million_row_dataframe: DataFrame,
     ) -> None:
         """Schema deve listar todas as 21 colunas esperadas."""
         report = analyze(million_row_dataframe)
 
         schema_names = {c.name for c in report.schema.columns}
         expected = {
-            "id", "nome", "email", "cidade", "estado",
-            "idade", "salario", "score", "categoria",
-            "data_cadastro", "ultimo_acesso", "ativo",
-            "dependentes", "tempo_casa_dias", "documento",
-            "cep", "observacao", "regiao", "coluna_constante",
-            "coluna_quase_constante", "timestamp_nulo",
+            "id",
+            "nome",
+            "email",
+            "cidade",
+            "estado",
+            "idade",
+            "salario",
+            "score",
+            "categoria",
+            "data_cadastro",
+            "ultimo_acesso",
+            "ativo",
+            "dependentes",
+            "tempo_casa_dias",
+            "documento",
+            "cep",
+            "observacao",
+            "regiao",
+            "coluna_constante",
+            "coluna_quase_constante",
+            "timestamp_nulo",
         }
         missing = expected - schema_names
         assert not missing, f"Colunas ausentes no schema: {missing}"
 
     def test_quality_report_has_dimensions(
-        self, million_row_dataframe: DataFrame,
+        self,
+        million_row_dataframe: DataFrame,
     ) -> None:
         """Relatório de qualidade deve conter todas as dimensões."""
         report = analyze(million_row_dataframe)
@@ -349,7 +365,8 @@ class TestCompleteAnalysis1M:
             assert len(dim.factors) > 0
 
     def test_quality_penalizers(
-        self, million_row_dataframe: DataFrame,
+        self,
+        million_row_dataframe: DataFrame,
     ) -> None:
         """Top penalizers devem ser identificados."""
         report = analyze(million_row_dataframe)
@@ -361,7 +378,8 @@ class TestCompleteAnalysis1M:
             assert p.severity in ("low", "medium", "high", "critical")
 
     def test_stats_contains_numeric(
-        self, million_row_dataframe: DataFrame,
+        self,
+        million_row_dataframe: DataFrame,
     ) -> None:
         """Estatísticas numéricas para colunas esperadas."""
         report = analyze(million_row_dataframe)
@@ -372,16 +390,15 @@ class TestCompleteAnalysis1M:
             assert col_name in numeric_names, f"{col_name} não está em numeric stats"
 
         # Validar estatísticas de salário
-        salario_stats = next(
-            s for s in report.stats.numeric if s.column_name == "salario"
-        )
+        salario_stats = next(s for s in report.stats.numeric if s.column_name == "salario")
         assert salario_stats.mean > 1000.0
         assert salario_stats.min >= 1200.0
         # Outliers injetados de 999999.99
         assert salario_stats.max >= 100000.0
 
     def test_stats_contains_categorical(
-        self, million_row_dataframe: DataFrame,
+        self,
+        million_row_dataframe: DataFrame,
     ) -> None:
         """Estatísticas categóricas para colunas esperadas."""
         report = analyze(million_row_dataframe)
@@ -390,16 +407,15 @@ class TestCompleteAnalysis1M:
         for col_name in ("categoria", "estado", "regiao"):
             assert col_name in cat_names, f"{col_name} não está em categorical stats"
 
-        categoria_stats = next(
-            s for s in report.stats.categorical if s.column_name == "categoria"
-        )
+        categoria_stats = next(s for s in report.stats.categorical if s.column_name == "categoria")
         assert categoria_stats.cardinality == 10  # 10 categorias
         assert categoria_stats.mode is not None
         assert 0.0 < categoria_stats.unique_ratio <= 1.0
         assert len(categoria_stats.top_values) >= 3
 
     def test_stats_contains_temporal(
-        self, million_row_dataframe: DataFrame,
+        self,
+        million_row_dataframe: DataFrame,
     ) -> None:
         """Estatísticas temporais para colunas de data/timestamp."""
         report = analyze(million_row_dataframe)
@@ -409,7 +425,8 @@ class TestCompleteAnalysis1M:
             assert "data_cadastro" in temp_names or "ultimo_acesso" in temp_names
 
     def test_stats_contains_text(
-        self, million_row_dataframe: DataFrame,
+        self,
+        million_row_dataframe: DataFrame,
     ) -> None:
         """Estatísticas de texto para colunas string longas."""
         report = analyze(million_row_dataframe)
@@ -419,7 +436,8 @@ class TestCompleteAnalysis1M:
         assert "observacao" in text_names or "nome" in text_names or "email" in text_names
 
     def test_stats_contains_boolean(
-        self, million_row_dataframe: DataFrame,
+        self,
+        million_row_dataframe: DataFrame,
     ) -> None:
         """Estatísticas booleanas para coluna ativo."""
         report = analyze(million_row_dataframe)
@@ -427,15 +445,14 @@ class TestCompleteAnalysis1M:
         bool_names = {s.column_name for s in report.stats.boolean}
         assert "ativo" in bool_names, f"ativo não está em boolean stats: {bool_names}"
 
-        ativo_stats = next(
-            s for s in report.stats.boolean if s.column_name == "ativo"
-        )
+        ativo_stats = next(s for s in report.stats.boolean if s.column_name == "ativo")
         assert ativo_stats.true_count > 0
         assert ativo_stats.false_count > 0
         assert 0.6 < ativo_stats.true_ratio < 0.95  # ~80%
 
     def test_correlations_generated(
-        self, million_row_dataframe: DataFrame,
+        self,
+        million_row_dataframe: DataFrame,
     ) -> None:
         """Correlações devem ser calculadas entre colunas numéricas."""
         report = analyze(million_row_dataframe)
@@ -449,7 +466,8 @@ class TestCompleteAnalysis1M:
             assert corr.column_a != corr.column_b
 
     def test_outliers_detected(
-        self, million_row_dataframe: DataFrame,
+        self,
+        million_row_dataframe: DataFrame,
     ) -> None:
         """Outliers devem ser detectados na coluna salário."""
         report = analyze(million_row_dataframe)
@@ -457,16 +475,15 @@ class TestCompleteAnalysis1M:
         if report.outliers.outliers:
             outlier_names = {s.column_name for s in report.outliers.outliers}
             if "salario" in outlier_names:
-                salario_out = next(
-                    s for s in report.outliers.outliers if s.column_name == "salario"
-                )
+                salario_out = next(s for s in report.outliers.outliers if s.column_name == "salario")
                 assert salario_out.count > 0
                 assert salario_out.ratio > 0.0
                 assert salario_out.bounds_lower is not None
                 assert salario_out.bounds_upper is not None
 
     def test_insights_generated(
-        self, million_row_dataframe: DataFrame,
+        self,
+        million_row_dataframe: DataFrame,
     ) -> None:
         """Insights devem ser gerados para o dataset."""
         report = analyze(million_row_dataframe)
@@ -478,7 +495,8 @@ class TestCompleteAnalysis1M:
             assert insight.severity in ("low", "medium", "high", "critical")
 
     def test_recommendations_generated(
-        self, million_row_dataframe: DataFrame,
+        self,
+        million_row_dataframe: DataFrame,
     ) -> None:
         """Recomendações devem ser geradas."""
         report = analyze(million_row_dataframe)
@@ -500,7 +518,8 @@ class TestAssessQuality1M:
     """Testa avaliação de qualidade isolada em 1M registros."""
 
     def test_assess_quality_returns_report(
-        self, million_row_dataframe: DataFrame,
+        self,
+        million_row_dataframe: DataFrame,
     ) -> None:
         """assess_quality() retorna QualityReport válido."""
         quality: QualityReport = assess_quality(million_row_dataframe)
@@ -511,7 +530,8 @@ class TestAssessQuality1M:
         assert len(quality.top_penalizers) > 0
 
     def test_assess_quality_dimension_names(
-        self, million_row_dataframe: DataFrame,
+        self,
+        million_row_dataframe: DataFrame,
     ) -> None:
         """Dimensões de qualidade devem ter nomes esperados."""
         quality = assess_quality(million_row_dataframe)
@@ -523,7 +543,8 @@ class TestAssessQuality1M:
                 assert 0.0 <= dim.score <= 100.0
 
     def test_assess_quality_penalizers_structure(
-        self, million_row_dataframe: DataFrame,
+        self,
+        million_row_dataframe: DataFrame,
     ) -> None:
         """Penalizadores devem ter estrutura completa."""
         quality = assess_quality(million_row_dataframe)
@@ -544,7 +565,8 @@ class TestConfigurations1M:
     """Testa configurações personalizadas com 1M registros."""
 
     def test_custom_eda_config(
-        self, million_row_dataframe: DataFrame,
+        self,
+        million_row_dataframe: DataFrame,
     ) -> None:
         """analyze() com EDAConfig personalizado."""
         config = EDAConfig(
@@ -561,7 +583,8 @@ class TestConfigurations1M:
         assert isinstance(report, EDAReport)
 
     def test_custom_quality_config(
-        self, million_row_dataframe: DataFrame,
+        self,
+        million_row_dataframe: DataFrame,
     ) -> None:
         """assess_quality() com QualityConfig personalizado."""
         config = QualityConfig(
@@ -581,7 +604,8 @@ class TestConfigurations1M:
         assert completeness_dim.weight == 0.40
 
     def test_analyze_with_sampling(
-        self, million_row_dataframe: DataFrame,
+        self,
+        million_row_dataframe: DataFrame,
     ) -> None:
         """Sampling abaixo do threshold deve ser acionado."""
         config = EDAConfig(sampling_threshold=100_000)
@@ -590,7 +614,8 @@ class TestConfigurations1M:
         assert report.overview.row_count >= 1_000_000
 
     def test_insights_disabled(
-        self, million_row_dataframe: DataFrame,
+        self,
+        million_row_dataframe: DataFrame,
     ) -> None:
         """Desabilitar insights deve retornar lista vazia."""
         config = EDAConfig(enable_insights=False)
@@ -599,7 +624,8 @@ class TestConfigurations1M:
         assert len(report.insights.insights) == 0
 
     def test_outlier_method_zscore(
-        self, million_row_dataframe: DataFrame,
+        self,
+        million_row_dataframe: DataFrame,
     ) -> None:
         """Detecção de outliers com método Z-score."""
         config = EDAConfig(outlier_method="zscore")
@@ -608,7 +634,8 @@ class TestConfigurations1M:
         assert len(report.outliers.outliers) >= 0
 
     def test_outlier_method_mad(
-        self, million_row_dataframe: DataFrame,
+        self,
+        million_row_dataframe: DataFrame,
     ) -> None:
         """Detecção de outliers com método MAD."""
         config = EDAConfig(outlier_method="mad")
@@ -626,7 +653,8 @@ class TestEdgeCases1M:
     """Testa casos extremos com o dataset de 1M registros."""
 
     def test_caching_between_calls(
-        self, million_row_dataframe: DataFrame,
+        self,
+        million_row_dataframe: DataFrame,
     ) -> None:
         """Chamadas sucessivas devem usar cache."""
         r1 = analyze(million_row_dataframe)
@@ -636,7 +664,8 @@ class TestEdgeCases1M:
         assert r1.quality.overall == r2.quality.overall
 
     def test_analyze_then_assess_quality(
-        self, million_row_dataframe: DataFrame,
+        self,
+        million_row_dataframe: DataFrame,
     ) -> None:
         """analyze() e assess_quality() no mesmo dataset."""
         report = analyze(million_row_dataframe)
@@ -647,7 +676,8 @@ class TestEdgeCases1M:
         assert abs(report.quality.overall - quality.overall) < 0.1
 
     def test_constant_column_in_schema(
-        self, million_row_dataframe: DataFrame,
+        self,
+        million_row_dataframe: DataFrame,
     ) -> None:
         """Coluna constante deve aparecer no schema."""
         report = analyze(million_row_dataframe)
@@ -656,26 +686,26 @@ class TestEdgeCases1M:
         assert "coluna_constante" in schema_names
 
     def test_near_constant_column_detected(
-        self, million_row_dataframe: DataFrame,
+        self,
+        million_row_dataframe: DataFrame,
     ) -> None:
         """Coluna quase constante deve gerar insight ou recomendação."""
         report = analyze(million_row_dataframe)
 
         has_near_constant_insight = any(
-            "coluna_quase_constante" in (i.column or "")
-            and "constant" in i.category.lower()
+            "coluna_quase_constante" in (i.column or "") and "constant" in i.category.lower()
             for i in report.insights.insights
         )
         has_near_constant_rec = any(
-            "coluna_quase_constante" in (r.column or "")
-            for r in report.recommendations.recommendations
+            "coluna_quase_constante" in (r.column or "") for r in report.recommendations.recommendations
         )
         assert has_near_constant_insight or has_near_constant_rec, (
             "Coluna quase constante não foi detectada nem como insight nem como recomendação"
         )
 
     def test_all_null_column_present(
-        self, million_row_dataframe: DataFrame,
+        self,
+        million_row_dataframe: DataFrame,
     ) -> None:
         """Coluna toda nula (timestamp_nulo) deve ser identificada."""
         report = analyze(million_row_dataframe)
@@ -686,7 +716,8 @@ class TestEdgeCases1M:
         assert schema_cols["timestamp_nulo"].null_count == total
 
     def test_string_statistics_for_document(
-        self, million_row_dataframe: DataFrame,
+        self,
+        million_row_dataframe: DataFrame,
     ) -> None:
         """Coluna documento deve ter estatísticas consistentes."""
         report = analyze(million_row_dataframe)
@@ -697,7 +728,8 @@ class TestEdgeCases1M:
         assert "documento" in all_names
 
     def test_various_string_lengths_in_observacao(
-        self, million_row_dataframe: DataFrame,
+        self,
+        million_row_dataframe: DataFrame,
     ) -> None:
         """Observacao deve ter comprimentos variados e alguns vazios."""
         report = analyze(million_row_dataframe)
@@ -720,7 +752,8 @@ class TestFormatting1M:
     """Testa formatação e representação das seções."""
 
     def test_overview_str_and_html(
-        self, million_row_dataframe: DataFrame,
+        self,
+        million_row_dataframe: DataFrame,
     ) -> None:
         """Overview deve ter representações text e HTML."""
         report = analyze(million_row_dataframe)
@@ -736,7 +769,8 @@ class TestFormatting1M:
         assert "Rows" in html_repr
 
     def test_schema_str_and_html(
-        self, million_row_dataframe: DataFrame,
+        self,
+        million_row_dataframe: DataFrame,
     ) -> None:
         """Schema deve ter representações text e HTML."""
         report = analyze(million_row_dataframe)
@@ -750,19 +784,20 @@ class TestFormatting1M:
         assert "id" in html_repr
 
     def test_stats_str_and_html(
-        self, million_row_dataframe: DataFrame,
+        self,
+        million_row_dataframe: DataFrame,
     ) -> None:
         """Estatísticas devem ter representações text e HTML."""
         report = analyze(million_row_dataframe)
 
         str_repr = str(report.stats)
-        html_repr = report.stats._repr_html_()
 
         if report.stats.numeric:
             assert "mean" in str_repr.lower()
 
     def test_correlations_str_and_html(
-        self, million_row_dataframe: DataFrame,
+        self,
+        million_row_dataframe: DataFrame,
     ) -> None:
         """Correlações devem ter representações text e HTML."""
         report = analyze(million_row_dataframe)
@@ -771,10 +806,9 @@ class TestFormatting1M:
         if report.correlations.correlations:
             assert "Method" in str_repr
 
-        html_repr = report.correlations._repr_html_()
-
     def test_outliers_str_and_html(
-        self, million_row_dataframe: DataFrame,
+        self,
+        million_row_dataframe: DataFrame,
     ) -> None:
         """Outliers devem ter representações text e HTML."""
         report = analyze(million_row_dataframe)
@@ -783,7 +817,8 @@ class TestFormatting1M:
         report.outliers._repr_html_()
 
     def test_insights_str_and_html(
-        self, million_row_dataframe: DataFrame,
+        self,
+        million_row_dataframe: DataFrame,
     ) -> None:
         """Insights devem ter representações text e HTML."""
         report = analyze(million_row_dataframe)
@@ -795,7 +830,8 @@ class TestFormatting1M:
             assert "[" in str_repr
 
     def test_recommendations_str_and_html(
-        self, million_row_dataframe: DataFrame,
+        self,
+        million_row_dataframe: DataFrame,
     ) -> None:
         """Recomendações devem ter representações text e HTML."""
         report = analyze(million_row_dataframe)
@@ -816,7 +852,8 @@ class TestPerformance1M:
     """Testes básicos de performance com 1M registros."""
 
     def test_analyze_completes_within_reasonable_time(
-        self, million_row_dataframe: DataFrame,
+        self,
+        million_row_dataframe: DataFrame,
     ) -> None:
         """analyze() deve completar em tempo razoável para 1M registros."""
         import time
@@ -831,7 +868,8 @@ class TestPerformance1M:
         print(f"\n  analyze(1M rows) completou em {elapsed:.2f}s")
 
     def test_assess_quality_faster_than_analysis(
-        self, million_row_dataframe: DataFrame,
+        self,
+        million_row_dataframe: DataFrame,
     ) -> None:
         """assess_quality() deve ser mais rápido que analyze()."""
         import time
@@ -849,6 +887,5 @@ class TestPerformance1M:
 
         # assess_quality é mais leve que analyze (apenas qualidade, sem correlações/insights)
         assert quality_time < analyze_time, (
-            f"assess_quality ({quality_time:.2f}s) deveria ser mais rápido "
-            f"que analyze ({analyze_time:.2f}s)"
+            f"assess_quality ({quality_time:.2f}s) deveria ser mais rápido que analyze ({analyze_time:.2f}s)"
         )

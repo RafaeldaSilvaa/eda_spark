@@ -77,8 +77,7 @@ class QualityPresenter(OutputPresenter):
                 suporta análise completa.
         """
         raise NotImplementedError(
-            "QualityPresenter does not support present_analysis. "
-            "Use AnalysisPresenter for complete reports."
+            "QualityPresenter does not support present_analysis. Use AnalysisPresenter for complete reports."
         )
 
     def present_quality(self, quality: Any) -> Any:

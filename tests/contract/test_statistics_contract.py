@@ -8,8 +8,6 @@ pode ser instanciada com todos os campos e que os tipos dos
 campos estão corretos.
 """
 
-from datetime import date
-from typing import Any
 
 import pytest
 
@@ -20,7 +18,6 @@ from spark_eda.domain.entities.statistic import (
     TemporalStats,
     TextStats,
 )
-from spark_eda.domain.value_objects.data_type import DataType
 
 pytestmark = pytest.mark.contract
 
@@ -69,8 +66,15 @@ class TestNumericStatsContract:
         """Verifica que NumericStats é imutável (frozen=True)."""
         # Arrange
         stats: NumericStats = NumericStats(
-            mean=1.0, std=0.5, min=0.0, q25=0.25, q50=0.5,
-            q75=0.75, max=1.0, skewness=0.0, kurtosis=0.0,
+            mean=1.0,
+            std=0.5,
+            min=0.0,
+            q25=0.25,
+            q50=0.5,
+            q75=0.75,
+            max=1.0,
+            skewness=0.0,
+            kurtosis=0.0,
         )
 
         # Act & Assert

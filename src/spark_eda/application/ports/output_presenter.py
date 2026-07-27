@@ -1,4 +1,5 @@
 """Interface de porta para apresentação de saída."""
+
 from __future__ import annotations
 
 from abc import ABC, abstractmethod

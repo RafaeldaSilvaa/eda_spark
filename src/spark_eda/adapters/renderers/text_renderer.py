@@ -18,6 +18,7 @@ def _severity_emoji(severity: str) -> str:
         "low": " ",
     }.get(severity, "?")
 
+
 _ANSI_RESET: str = "\033[0m"
 _ANSI_BOLD: str = "\033[1m"
 _ANSI_DIM: str = "\033[2m"

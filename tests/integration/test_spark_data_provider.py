@@ -8,7 +8,6 @@ DataFrames vazios e fingerprints.
 """
 
 from types import SimpleNamespace
-from typing import Any
 
 import pytest
 from pyspark.sql import DataFrame, SparkSession
@@ -86,9 +85,7 @@ class TestSparkDataProvider:
                 StructField("nome", StringType(), nullable=True),
             ],
         )
-        data: list[tuple[int, str]] = [
-            (i, f"item_{i}") for i in range(expected_row_count)
-        ]
+        data: list[tuple[int, str]] = [(i, f"item_{i}") for i in range(expected_row_count)]
         dataframe: DataFrame = spark_session.createDataFrame(data, schema=schema)
 
         # Act
@@ -124,9 +121,7 @@ class TestSparkDataProvider:
 
         # Assert
         for column_metadata in profile.columns:
-            assert column_metadata.null_count > 0, (
-                f"A coluna {column_metadata.name} deveria ter nulos detectados."
-            )
+            assert column_metadata.null_count > 0, f"A coluna {column_metadata.name} deveria ter nulos detectados."
 
     # ------------------------------------------------------------------
     # test_compute_profile_numeric_stats
@@ -152,9 +147,7 @@ class TestSparkDataProvider:
         # Assert
         coluna_altura_profile: ColumnProfile = profile.column_profiles["altura"]
         stats = coluna_altura_profile.stats
-        assert isinstance(stats, NumericStats), (
-            "Esperava-se NumericStats para a coluna 'altura'."
-        )
+        assert isinstance(stats, NumericStats), "Esperava-se NumericStats para a coluna 'altura'."
         assert stats.mean > 0.0
         assert stats.std > 0.0
         assert stats.min >= 0.0
@@ -214,10 +207,12 @@ class TestSparkDataProvider:
             [StructField("idade", IntegerType(), nullable=True)],
         )
         dataframe_a: DataFrame = spark_session.createDataFrame(
-            [("Alice",)], schema=schema_a,
+            [("Alice",)],
+            schema=schema_a,
         )
         dataframe_b: DataFrame = spark_session.createDataFrame(
-            [(30,)], schema=schema_b,
+            [(30,)],
+            schema=schema_b,
         )
 
         # Act

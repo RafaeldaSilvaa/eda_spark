@@ -1,4 +1,5 @@
 """DTO da seção de recomendações."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -87,28 +88,28 @@ class RecommendationsSection:
         sorted_recs: list[RecommendationDTO] = sorted(self.recommendations, key=lambda r: r.priority)
         items: str = "".join(
             f'<div style="display:flex;gap:12px;padding:12px 14px;margin-bottom:8px;'
-            f'background:var(--card-bg,#f8fafc);border-radius:8px;'
+            f"background:var(--card-bg,#f8fafc);border-radius:8px;"
             f'border:1px solid var(--border,#e2e8f0);">'
             f'<div style="flex-shrink:0;">'
             f'<span style="display:inline-block;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700;'
             f'color:white;background:{_priority_color(rec.priority)};">'
-            f'P{rec.priority}</span>'
+            f"P{rec.priority}</span>"
             f"</div>"
             f'<div style="flex:1;">'
             f'<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;flex-wrap:wrap;">'
             f'<span style="font-size:11px;font-weight:600;color:var(--muted,#64748b);'
             f'text-transform:uppercase;">{rec.category.replace("_", " ")}</span>'
-            f'{_column_tag(rec.column)}'
-            f'</div>'
+            f"{_column_tag(rec.column)}"
+            f"</div>"
             f'<div style="font-size:13px;color:var(--text,#1a1a2e);font-weight:500;margin-bottom:4px;">'
-            f'{rec.message}</div>'
+            f"{rec.message}</div>"
             f'<div style="font-size:12px;color:var(--muted,#64748b);line-height:1.4;">'
-            f'\u2192 {rec.action}</div>'
+            f"\u2192 {rec.action}</div>"
             f"</div>"
             f"</div>"
             for rec in sorted_recs
         )
-        return f'<div>{items}</div>'
+        return f"<div>{items}</div>"
 
     def __str__(self) -> str:
         """Renderiza recomendações como texto para terminal."""

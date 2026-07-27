@@ -1,4 +1,5 @@
 """DTO da seção de outliers."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -78,7 +79,7 @@ class OutlierSection:
             return '<div style="padding:12px;color:var(--muted,#64748b);font-size:13px;">No outliers detected.</div>'
 
         header: str = (
-            '<thead><tr>'
+            "<thead><tr>"
             '<th style="text-align:left;padding:8px 12px;border-bottom:2px solid var(--border,#e2e8f0);'
             'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Column</th>'
             '<th style="text-align:left;padding:8px 12px;border-bottom:2px solid var(--border,#e2e8f0);'
@@ -91,7 +92,7 @@ class OutlierSection:
             'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Severity</th>'
             '<th style="text-align:left;padding:8px 12px;border-bottom:2px solid var(--border,#e2e8f0);'
             'font-size:11px;text-transform:uppercase;color:var(--muted,#64748b);">Bounds</th>'
-            '</tr></thead>'
+            "</tr></thead>"
         )
         rows: str = "".join(
             f'<tr style="border-bottom:1px solid var(--border,#e2e8f0);">'
@@ -99,20 +100,20 @@ class OutlierSection:
             f'<td style="padding:8px 12px;color:var(--primary,#2563eb);">{s.method}</td>'
             f'<td style="padding:8px 12px;text-align:right;color:var(--text,#1a1a2e);">{format_number(s.count)}</td>'
             f'<td style="padding:8px 12px;text-align:right;color:var(--text,#1a1a2e);">'
-            f'{format_percentage(s.ratio)}</td>'
+            f"{format_percentage(s.ratio)}</td>"
             f'<td style="padding:8px 12px;text-align:center;">'
             f'<span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;'
             f'color:white;background:{_severity_color(_outlier_severity(s.ratio))};">'
-            f'{_outlier_severity(s.ratio).title()}</span></td>'
+            f"{_outlier_severity(s.ratio).title()}</span></td>"
             f'<td style="padding:8px 12px;font-size:12px;color:var(--muted,#64748b);">'
-            f'[{format_number(s.bounds_lower) if s.bounds_lower is not None else "\u2014"} .. '
-            f'{format_number(s.bounds_upper) if s.bounds_upper is not None else "\u2014"}]</td>'
+            f"[{format_number(s.bounds_lower) if s.bounds_lower is not None else '\u2014'} .. "
+            f"{format_number(s.bounds_upper) if s.bounds_upper is not None else '\u2014'}]</td>"
             f"</tr>"
             for s in self.outliers
         )
         return (
             f'<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:13px;">'
-            f'{header}<tbody>{rows}</tbody></table></div>'
+            f"{header}<tbody>{rows}</tbody></table></div>"
         )
 
     def __str__(self) -> str:

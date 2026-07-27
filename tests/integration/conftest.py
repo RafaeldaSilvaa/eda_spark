@@ -7,7 +7,6 @@ pelos testes de integração são definidas aqui.
 """
 
 from datetime import date
-from typing import Any
 
 import pytest
 from pyspark.sql import DataFrame, SparkSession
@@ -34,8 +33,7 @@ def spark_session() -> SparkSession:
         Sessão Spark configurada para testes de integração.
     """
     spark: SparkSession = (
-        SparkSession.builder
-        .master("local[1]")
+        SparkSession.builder.master("local[1]")
         .appName("test")
         .config("spark.sql.shuffle.partitions", "1")
         .getOrCreate()
@@ -75,8 +73,7 @@ def sample_dataframe(
         nome: str | None = f"item_{i:04d}" if i % 10 != 0 else None
         valor: float | None = float(i * 1.5) if i % 7 != 0 else None
         data_cad: date | None = (
-            date(2024, 1, 1) if i % 5 == 0
-            else (date(2024, 1, (i % 28) + 1) if i % 3 != 0 else None)
+            date(2024, 1, 1) if i % 5 == 0 else (date(2024, 1, (i % 28) + 1) if i % 3 != 0 else None)
         )
         data.append((i, nome, valor, data_cad, i % 2 == 0))
 
@@ -110,8 +107,7 @@ def clean_dataframe(
     )
 
     data: list[tuple[int, str, float, date, bool]] = [
-        (i, f"pessoa_{i:03d}", 1.50 + (i * 0.02), date(1990 + (i % 30), 1, (i % 28) + 1), i % 2 == 0)
-        for i in range(50)
+        (i, f"pessoa_{i:03d}", 1.50 + (i * 0.02), date(1990 + (i % 30), 1, (i % 28) + 1), i % 2 == 0) for i in range(50)
     ]
 
     return spark_session.createDataFrame(data, schema=schema)
@@ -194,12 +190,8 @@ def duplicate_dataframe(
         ],
     )
 
-    linhas_originais: list[tuple[int, float, str]] = [
-        (i, float(i * 10), f"original_{i}") for i in range(20)
-    ]
-    linhas_duplicadas: list[tuple[int, float, str]] = [
-        (i, float(i * 10), f"original_{i}") for i in range(5)
-    ]
+    linhas_originais: list[tuple[int, float, str]] = [(i, float(i * 10), f"original_{i}") for i in range(20)]
+    linhas_duplicadas: list[tuple[int, float, str]] = [(i, float(i * 10), f"original_{i}") for i in range(5)]
 
     data: list[tuple[int, float, str]] = linhas_originais + linhas_duplicadas
 

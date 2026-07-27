@@ -9,16 +9,15 @@ construídos diretamente, sem dependência de Spark.
 from spark_eda.domain.entities.column_metadata import ColumnMetadata
 from spark_eda.domain.entities.column_profile import ColumnProfile
 from spark_eda.domain.entities.data_profile import DataProfile
+from spark_eda.domain.entities.quality_score import QualityFactor
 from spark_eda.domain.entities.statistic import (
     CategoricalStats,
     NumericStats,
-    TextStats,
     TemporalStats,
+    TextStats,
 )
-from spark_eda.domain.entities.quality_score import QualityFactor
 from spark_eda.domain.services.quality_factors import FACTOR_REGISTRY
 from spark_eda.domain.value_objects.data_type import DataType
-from spark_eda.domain.value_objects.severity import Severity
 
 
 class TestCompletenessFactors:
@@ -52,9 +51,7 @@ class TestCompletenessFactors:
 
         factors: list[QualityFactor] = FACTOR_REGISTRY["completeness"](data_profile)
 
-        non_null_factor: QualityFactor = next(
-            f for f in factors if f.name == "Proporção de valores não nulos"
-        )
+        non_null_factor: QualityFactor = next(f for f in factors if f.name == "Proporção de valores não nulos")
         assert 0.85 <= non_null_factor.score <= 0.95
 
     def test_completeness_empty_strings_score(self) -> None:
@@ -85,9 +82,7 @@ class TestCompletenessFactors:
 
         factors: list[QualityFactor] = FACTOR_REGISTRY["completeness"](data_profile)
 
-        empty_factor: QualityFactor = next(
-            f for f in factors if f.name == "Proporção de strings vazias"
-        )
+        empty_factor: QualityFactor = next(f for f in factors if f.name == "Proporção de strings vazias")
         assert empty_factor.score > 0.9
 
 
@@ -122,9 +117,7 @@ class TestUniquenessFactors:
 
         factors: list[QualityFactor] = FACTOR_REGISTRY["uniqueness"](data_profile)
 
-        dup_factor: QualityFactor = next(
-            f for f in factors if f.name == "Proporção de duplicatas"
-        )
+        dup_factor: QualityFactor = next(f for f in factors if f.name == "Proporção de duplicatas")
         assert dup_factor.score < 1.0
         assert dup_factor.score > 0.0
 
@@ -156,9 +149,7 @@ class TestUniquenessFactors:
 
         factors: list[QualityFactor] = FACTOR_REGISTRY["uniqueness"](data_profile)
 
-        near_const_factor: QualityFactor = next(
-            f for f in factors if f.name == "Colunas quase-constantes"
-        )
+        near_const_factor: QualityFactor = next(f for f in factors if f.name == "Colunas quase-constantes")
         assert near_const_factor.score < 1.0
 
 
@@ -194,9 +185,7 @@ class TestConsistencyFactors:
 
         factors: list[QualityFactor] = FACTOR_REGISTRY["consistency"](data_profile)
 
-        type_factor: QualityFactor = next(
-            f for f in factors if f.name == "Consistência de tipos"
-        )
+        type_factor: QualityFactor = next(f for f in factors if f.name == "Consistência de tipos")
         assert type_factor.score < 1.0
 
 
@@ -232,9 +221,7 @@ class TestTimelinessFactors:
 
         factors: list[QualityFactor] = FACTOR_REGISTRY["timeliness"](data_profile)
 
-        invalid_dates_factor: QualityFactor = next(
-            f for f in factors if f.name == "Datas inválidas"
-        )
+        invalid_dates_factor: QualityFactor = next(f for f in factors if f.name == "Datas inválidas")
         assert invalid_dates_factor.score < 1.0
 
 
@@ -289,7 +276,5 @@ class TestAccuracyFactors:
 
         factors: list[QualityFactor] = FACTOR_REGISTRY["accuracy"](data_profile)
 
-        outlier_factor: QualityFactor = next(
-            f for f in factors if f.name == "Proporção de outliers"
-        )
+        outlier_factor: QualityFactor = next(f for f in factors if f.name == "Proporção de outliers")
         assert outlier_factor.score < 1.0

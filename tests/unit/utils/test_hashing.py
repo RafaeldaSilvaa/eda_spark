@@ -71,7 +71,7 @@ class TestComputeFingerprint:
         schema_json: str = '{"col": "x"}'
         config_json: str = '{"opt": 1}'
         expected: str = hashlib.sha256(
-            f"{schema_json}:::{config_json}".encode("utf-8"),
+            f"{schema_json}:::{config_json}".encode(),
         ).hexdigest()
 
         # Act

@@ -3,7 +3,6 @@ from __future__ import annotations
 """Fábricas de dados para testes — cria entidades de domínio e DataFrames de exemplo."""
 
 from datetime import date
-from typing import Any
 
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.types import (
@@ -20,7 +19,6 @@ from spark_eda.domain.entities.column_metadata import ColumnMetadata
 from spark_eda.domain.entities.column_profile import ColumnProfile
 from spark_eda.domain.entities.data_profile import DataProfile
 from spark_eda.domain.value_objects.data_type import DataType
-from spark_eda.domain.value_objects.inferred_type import InferredType
 
 
 def create_sample_dataframe(
@@ -54,8 +52,8 @@ def create_sample_dataframe(
     for i in range(rows):
         nome: str | None = f"item_{i:04d}" if i % 10 != 0 else None
         valor: float | None = float(i * 1.5) if i % 7 != 0 else None
-        data_cad: date | None = date(2024, 1, 1) if i % 5 == 0 else (
-            date(2024, 1, (i % 28) + 1) if i % 3 != 0 else None
+        data_cad: date | None = (
+            date(2024, 1, 1) if i % 5 == 0 else (date(2024, 1, (i % 28) + 1) if i % 3 != 0 else None)
         )
         data.append((i, nome, valor, data_cad, i % 2 == 0))
 
@@ -109,9 +107,7 @@ def create_data_profile(
     Returns:
         Instância de :class:`DataProfile` configurada.
     """
-    resolved_profiles: dict[str, ColumnProfile] = (
-        col_profiles if col_profiles is not None else {}
-    )
+    resolved_profiles: dict[str, ColumnProfile] = col_profiles if col_profiles is not None else {}
 
     if not resolved_profiles:
         for col in columns:

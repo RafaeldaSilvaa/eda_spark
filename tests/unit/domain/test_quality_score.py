@@ -9,15 +9,13 @@ sem dependência de Spark ou fixtures.
 from spark_eda.domain.entities.column_metadata import ColumnMetadata
 from spark_eda.domain.entities.column_profile import ColumnProfile
 from spark_eda.domain.entities.data_profile import DataProfile
+from spark_eda.domain.entities.quality_score import QualityDimension
 from spark_eda.domain.entities.statistic import (
     CategoricalStats,
     NumericStats,
-    TextStats,
 )
-from spark_eda.domain.entities.quality_score import QualityDimension
 from spark_eda.domain.services.quality_calculator import QualityCalculator
 from spark_eda.domain.value_objects.data_type import DataType
-from spark_eda.domain.value_objects.severity import Severity
 
 
 class TestQualityScore:

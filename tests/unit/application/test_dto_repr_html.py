@@ -7,39 +7,43 @@ no relatório de cobertura, incluindo branches de helpers.
 """
 
 from spark_eda.application.dto.correlation_section import (
-    _correlation_color,
-    _correlation_symbol,
     CorrelationEntry,
     CorrelationSection,
+    _correlation_color,
+    _correlation_symbol,
 )
 from spark_eda.application.dto.distribution_section import (
-    _truncate_text,
     DistributionSection,
-    HistogramBin,
     FrequencyEntry,
+    HistogramBin,
     TemporalPoint,
+    _truncate_text,
+)
+from spark_eda.application.dto.insights_section import (
+    InsightDTO,
+    InsightsSection,
+    _severity_icon,
+    _severity_marker,
 )
 from spark_eda.application.dto.insights_section import (
     _severity_color as ins_severity_color,
-    _severity_icon,
-    _severity_marker,
-    InsightDTO,
-    InsightsSection,
 )
 from spark_eda.application.dto.outlier_section import (
-    _outlier_severity,
-    _severity_color as out_severity_color,
-    _severity_emoji,
-    OutlierSummary,
     OutlierSection,
+    OutlierSummary,
+    _outlier_severity,
+    _severity_emoji,
+)
+from spark_eda.application.dto.outlier_section import (
+    _severity_color as out_severity_color,
 )
 from spark_eda.application.dto.overview_section import OverviewSection
 from spark_eda.application.dto.recommendations_section import (
+    RecommendationDTO,
+    RecommendationsSection,
     _priority_color,
     _priority_label,
     _priority_marker,
-    RecommendationDTO,
-    RecommendationsSection,
 )
 from spark_eda.application.dto.schema_section import SchemaColumn, SchemaSection
 from spark_eda.application.dto.stats_section import (
@@ -51,17 +55,20 @@ from spark_eda.application.dto.stats_section import (
     TextStatsDTO,
 )
 
-
 # =========================================================================
 # OVERVIEW
 # =========================================================================
 
+
 class TestOverviewSection:
     def test_repr_html(self) -> None:
         section = OverviewSection(
-            row_count=1500, column_count=25,
-            duplicate_count=30, duplicate_ratio=0.02,
-            missing_ratio=0.05, size_estimate=2_000_000,
+            row_count=1500,
+            column_count=25,
+            duplicate_count=30,
+            duplicate_ratio=0.02,
+            missing_ratio=0.05,
+            size_estimate=2_000_000,
         )
         html = section._repr_html_()
         assert "Rows" in html
@@ -72,9 +79,12 @@ class TestOverviewSection:
 
     def test_str(self) -> None:
         section = OverviewSection(
-            row_count=1500, column_count=25,
-            duplicate_count=30, duplicate_ratio=0.02,
-            missing_ratio=0.05, size_estimate=2_000_000,
+            row_count=1500,
+            column_count=25,
+            duplicate_count=30,
+            duplicate_ratio=0.02,
+            missing_ratio=0.05,
+            size_estimate=2_000_000,
         )
         result = str(section)
         assert "Overview" in result
@@ -84,6 +94,7 @@ class TestOverviewSection:
 # =========================================================================
 # SCHEMA
 # =========================================================================
+
 
 class TestSchemaSection:
     def test_repr_html(self) -> None:
@@ -125,6 +136,7 @@ class TestSchemaSection:
 # =========================================================================
 # STATS
 # =========================================================================
+
 
 class TestStatsSection:
     def _make_full_section(self) -> StatsSection:
@@ -183,7 +195,10 @@ class TestStatsSection:
         """Apenas seções com dados aparecem no __str__."""
         section = StatsSection(
             numeric=[NumericStatsDTO("x", 1.0, 0.5, 0.0, 0.5, 1.0, 1.5, 2.0, 0.0, -1.0)],
-            categorical=[], temporal=[], text=[], boolean=[],
+            categorical=[],
+            temporal=[],
+            text=[],
+            boolean=[],
         )
         result = str(section)
         assert "Numeric:" in result
@@ -197,7 +212,9 @@ class TestStatsSection:
         section = StatsSection(
             numeric=[],
             categorical=[CategoricalStatsDTO("cat", 3, "A", 0.95, [("A", 50)])],
-            temporal=[], text=[], boolean=[],
+            temporal=[],
+            text=[],
+            boolean=[],
         )
         result = str(section)
         assert "Numeric:" not in result
@@ -207,6 +224,7 @@ class TestStatsSection:
 # =========================================================================
 # CORRELATION
 # =========================================================================
+
 
 class TestCorrelationSection:
     def test_correlation_color_branches(self) -> None:
@@ -229,7 +247,11 @@ class TestCorrelationSection:
                 CorrelationEntry("a", "b", "pearson", 0.85),
                 CorrelationEntry("a", "c", "pearson", -0.4),
             ],
-            matrix={"a": {"a": 1.0, "b": 0.85, "c": -0.4}, "b": {"a": 0.85, "b": 1.0, "c": 0.1}, "c": {"a": -0.4, "b": 0.1, "c": 1.0}},
+            matrix={
+                "a": {"a": 1.0, "b": 0.85, "c": -0.4},
+                "b": {"a": 0.85, "b": 1.0, "c": 0.1},
+                "c": {"a": -0.4, "b": 0.1, "c": 1.0},
+            },
             method="pearson",
         )
         html = section._repr_html_()
@@ -267,6 +289,7 @@ class TestCorrelationSection:
 # =========================================================================
 # DISTRIBUTION
 # =========================================================================
+
 
 class TestDistributionSection:
     def test_repr_html_with_all_types(self) -> None:
@@ -389,6 +412,7 @@ class TestDistributionSection:
 # OUTLIER
 # =========================================================================
 
+
 class TestOutlierSection:
     def test_outlier_severity_branches(self) -> None:
         assert _outlier_severity(0.15) == "critical"
@@ -411,10 +435,12 @@ class TestOutlierSection:
         assert _severity_emoji("unknown") == "? "
 
     def test_repr_html(self) -> None:
-        section = OutlierSection(outliers=[
-            OutlierSummary("preco", "iqr", 15, 0.15, 10.0, 90.0),
-            OutlierSummary("idade", "zscore", 3, 0.03, None, None),
-        ])
+        section = OutlierSection(
+            outliers=[
+                OutlierSummary("preco", "iqr", 15, 0.15, 10.0, 90.0),
+                OutlierSummary("idade", "zscore", 3, 0.03, None, None),
+            ]
+        )
         html = section._repr_html_()
         assert "preco" in html
         assert "idade" in html
@@ -427,10 +453,12 @@ class TestOutlierSection:
         assert "No outliers" in html
 
     def test_str(self) -> None:
-        section = OutlierSection(outliers=[
-            OutlierSummary("preco", "iqr", 15, 0.15, 10.0, 90.0),
-            OutlierSummary("idade", "zscore", 3, 0.03, None, None),
-        ])
+        section = OutlierSection(
+            outliers=[
+                OutlierSummary("preco", "iqr", 15, 0.15, 10.0, 90.0),
+                OutlierSummary("idade", "zscore", 3, 0.03, None, None),
+            ]
+        )
         result = str(section)
         assert "preco" in result
         assert "Outliers" in result
@@ -450,6 +478,7 @@ class TestOutlierSection:
 # INSIGHTS
 # =========================================================================
 
+
 class TestInsightsSection:
     def test_severity_helpers(self) -> None:
         assert ins_severity_color("critical") == "#dc2626"
@@ -468,10 +497,12 @@ class TestInsightsSection:
         assert _severity_marker("unknown") == "?"
 
     def test_repr_html(self) -> None:
-        section = InsightsSection(insights=[
-            InsightDTO("NULLS", "high", "col_a", "Muitos nulos", 0.4),
-            InsightDTO("SKEWNESS", "low", "col_b", "Assimetria leve", 1.2),
-        ])
+        section = InsightsSection(
+            insights=[
+                InsightDTO("NULLS", "high", "col_a", "Muitos nulos", 0.4),
+                InsightDTO("SKEWNESS", "low", "col_b", "Assimetria leve", 1.2),
+            ]
+        )
         html = section._repr_html_()
         assert "NULLS" in html
         assert "col_a" in html
@@ -484,9 +515,11 @@ class TestInsightsSection:
         assert "No insights" in html
 
     def test_str(self) -> None:
-        section = InsightsSection(insights=[
-            InsightDTO("NULLS", "high", "col_a", "Muitos nulos", 0.4),
-        ])
+        section = InsightsSection(
+            insights=[
+                InsightDTO("NULLS", "high", "col_a", "Muitos nulos", 0.4),
+            ]
+        )
         result = str(section)
         assert "Insights" in result
         assert "NULLS" in result
@@ -507,6 +540,7 @@ class TestInsightsSection:
 # RECOMMENDATIONS
 # =========================================================================
 
+
 class TestRecommendationsSection:
     def test_priority_helpers(self) -> None:
         assert _priority_color(1) == "#dc2626"
@@ -525,10 +559,12 @@ class TestRecommendationsSection:
         assert _priority_marker(4) == "  "
 
     def test_repr_html(self) -> None:
-        section = RecommendationsSection(recommendations=[
-            RecommendationDTO("NULLS", 1, "col_a", "Muitos nulos", "Preencher valores"),
-            RecommendationDTO("OUTLIERS", 3, None, "Outliers detectados", "Revisar dados"),
-        ])
+        section = RecommendationsSection(
+            recommendations=[
+                RecommendationDTO("NULLS", 1, "col_a", "Muitos nulos", "Preencher valores"),
+                RecommendationDTO("OUTLIERS", 3, None, "Outliers detectados", "Revisar dados"),
+            ]
+        )
         html = section._repr_html_()
         assert "P1" in html
         assert "col_a" in html
@@ -541,10 +577,12 @@ class TestRecommendationsSection:
         assert "No recommendations" in html
 
     def test_str(self) -> None:
-        section = RecommendationsSection(recommendations=[
-            RecommendationDTO("NULLS", 1, "col_a", "Preencher", "Ação X"),
-            RecommendationDTO("OUTLIERS", 3, None, "Outliers", "Ação Y"),
-        ])
+        section = RecommendationsSection(
+            recommendations=[
+                RecommendationDTO("NULLS", 1, "col_a", "Preencher", "Ação X"),
+                RecommendationDTO("OUTLIERS", 3, None, "Outliers", "Ação Y"),
+            ]
+        )
         result = str(section)
         assert "Recommendations" in result
         assert "P1" in result

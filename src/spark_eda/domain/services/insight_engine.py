@@ -78,17 +78,19 @@ class InsightEngine:
                 else:
                     severity = Severity.MEDIUM
 
-                insights.append(Insight(
-                    category=InsightCategory.NULLS,
-                    severity=severity,
-                    column=column_metadata.name,
-                    message=(
-                        f"A coluna '{column_metadata.name}' possui "
-                        f"{null_ratio:.1%} de valores nulos "
-                        f"({column_metadata.null_count} de {total_column} registros)."
-                    ),
-                    metric_value=round(null_ratio, 4),
-                ))
+                insights.append(
+                    Insight(
+                        category=InsightCategory.NULLS,
+                        severity=severity,
+                        column=column_metadata.name,
+                        message=(
+                            f"A coluna '{column_metadata.name}' possui "
+                            f"{null_ratio:.1%} de valores nulos "
+                            f"({column_metadata.null_count} de {total_column} registros)."
+                        ),
+                        metric_value=round(null_ratio, 4),
+                    )
+                )
 
         return insights
 
@@ -120,18 +122,20 @@ class InsightEngine:
                 else:
                     severity = Severity.LOW
 
-                insights.append(Insight(
-                    category=InsightCategory.SKEWNESS,
-                    severity=severity,
-                    column=column_metadata.name,
-                    message=(
-                        f"A coluna '{column_metadata.name}' apresenta "
-                        f"assimetria de {stats.skewness:.2f} "
-                        f"(inclinação {direction}), sugerindo distribuição "
-                        f"não normal."
-                    ),
-                    metric_value=round(stats.skewness, 4),
-                ))
+                insights.append(
+                    Insight(
+                        category=InsightCategory.SKEWNESS,
+                        severity=severity,
+                        column=column_metadata.name,
+                        message=(
+                            f"A coluna '{column_metadata.name}' apresenta "
+                            f"assimetria de {stats.skewness:.2f} "
+                            f"(inclinação {direction}), sugerindo distribuição "
+                            f"não normal."
+                        ),
+                        metric_value=round(stats.skewness, 4),
+                    )
+                )
 
         return insights
 
@@ -155,18 +159,20 @@ class InsightEngine:
                 severity: Severity
                 severity = Severity.MEDIUM if stats.unique_ratio >= _NEAR_UNIQUE_RATIO else Severity.LOW
 
-                insights.append(Insight(
-                    category=InsightCategory.CARDINALITY,
-                    severity=severity,
-                    column=column_metadata.name,
-                    message=(
-                        f"A coluna '{column_metadata.name}' possui "
-                        f"{stats.cardinality} valores distintos "
-                        f"(unique ratio de {stats.unique_ratio:.1%}), "
-                        f"podendo ser candidata a chave."
-                    ),
-                    metric_value=round(stats.unique_ratio, 4),
-                ))
+                insights.append(
+                    Insight(
+                        category=InsightCategory.CARDINALITY,
+                        severity=severity,
+                        column=column_metadata.name,
+                        message=(
+                            f"A coluna '{column_metadata.name}' possui "
+                            f"{stats.cardinality} valores distintos "
+                            f"(unique ratio de {stats.unique_ratio:.1%}), "
+                            f"podendo ser candidata a chave."
+                        ),
+                        metric_value=round(stats.unique_ratio, 4),
+                    )
+                )
 
         return insights
 
@@ -188,30 +194,34 @@ class InsightEngine:
                 continue
 
             if stats.cardinality == 1:
-                insights.append(Insight(
-                    category=InsightCategory.CONSTANT,
-                    severity=Severity.MEDIUM,
-                    column=column_metadata.name,
-                    message=(
-                        f"A coluna '{column_metadata.name}' é constante "
-                        f"(cardinalidade 1 — todos os registros possuem "
-                        f"o mesmo valor)."
-                    ),
-                    metric_value=1.0,
-                ))
+                insights.append(
+                    Insight(
+                        category=InsightCategory.CONSTANT,
+                        severity=Severity.MEDIUM,
+                        column=column_metadata.name,
+                        message=(
+                            f"A coluna '{column_metadata.name}' é constante "
+                            f"(cardinalidade 1 — todos os registros possuem "
+                            f"o mesmo valor)."
+                        ),
+                        metric_value=1.0,
+                    )
+                )
             elif stats.cardinality <= _NEAR_CONSTANT_CARDINALITY and profile.row_count > _LARGE_ROW_COUNT:
-                insights.append(Insight(
-                    category=InsightCategory.NEAR_CONSTANT,
-                    severity=Severity.LOW,
-                    column=column_metadata.name,
-                    message=(
-                        f"A coluna '{column_metadata.name}' possui "
-                        f"apenas {stats.cardinality} valores distintos "
-                        f"para {profile.row_count} registros, "
-                        f"sendo praticamente constante."
-                    ),
-                    metric_value=round(stats.cardinality / profile.row_count, 4),
-                ))
+                insights.append(
+                    Insight(
+                        category=InsightCategory.NEAR_CONSTANT,
+                        severity=Severity.LOW,
+                        column=column_metadata.name,
+                        message=(
+                            f"A coluna '{column_metadata.name}' possui "
+                            f"apenas {stats.cardinality} valores distintos "
+                            f"para {profile.row_count} registros, "
+                            f"sendo praticamente constante."
+                        ),
+                        metric_value=round(stats.cardinality / profile.row_count, 4),
+                    )
+                )
 
         return insights
 
@@ -245,18 +255,20 @@ class InsightEngine:
                 else:
                     severity = Severity.LOW
 
-                insights.append(Insight(
-                    category=InsightCategory.DUPLICATES,
-                    severity=severity,
-                    column=None,
-                    message=(
-                        f"Taxa estimada de duplicatas de "
-                        f"{estimated_duplicate_ratio:.1%} com base no "
-                        f"unique ratio médio de {len(unique_ratios)} "
-                        f"colunas categóricas."
-                    ),
-                    metric_value=round(estimated_duplicate_ratio, 4),
-                ))
+                insights.append(
+                    Insight(
+                        category=InsightCategory.DUPLICATES,
+                        severity=severity,
+                        column=None,
+                        message=(
+                            f"Taxa estimada de duplicatas de "
+                            f"{estimated_duplicate_ratio:.1%} com base no "
+                            f"unique ratio médio de {len(unique_ratios)} "
+                            f"colunas categóricas."
+                        ),
+                        metric_value=round(estimated_duplicate_ratio, 4),
+                    )
+                )
 
         return insights
 
@@ -288,22 +300,23 @@ class InsightEngine:
                 bounds_info: str = ""
                 if outlier_info.bounds_lower is not None or outlier_info.bounds_upper is not None:
                     bounds_info = (
-                        f" (limites: [{outlier_info.bounds_lower or '-∞'}, "
-                        f"{outlier_info.bounds_upper or '∞'}])"
+                        f" (limites: [{outlier_info.bounds_lower or '-∞'}, {outlier_info.bounds_upper or '∞'}])"
                     )
 
-                insights.append(Insight(
-                    category=InsightCategory.OUTLIERS,
-                    severity=severity,
-                    column=column_metadata.name,
-                    message=(
-                        f"A coluna '{column_metadata.name}' possui "
-                        f"{outlier_info.ratio:.1%} de outliers "
-                        f"({outlier_info.count} registros, método "
-                        f"{outlier_info.method.value}){bounds_info}."
-                    ),
-                    metric_value=round(outlier_info.ratio, 4),
-                ))
+                insights.append(
+                    Insight(
+                        category=InsightCategory.OUTLIERS,
+                        severity=severity,
+                        column=column_metadata.name,
+                        message=(
+                            f"A coluna '{column_metadata.name}' possui "
+                            f"{outlier_info.ratio:.1%} de outliers "
+                            f"({outlier_info.count} registros, método "
+                            f"{outlier_info.method.value}){bounds_info}."
+                        ),
+                        metric_value=round(outlier_info.ratio, 4),
+                    )
+                )
 
         return insights
 
@@ -327,17 +340,19 @@ class InsightEngine:
             normalized_name: str = column_metadata.name.lower()
 
             if stats.min == 0.0 and (normalized_name.startswith("zero") or "zerado" in normalized_name):
-                insights.append(Insight(
-                    category=InsightCategory.ZERO_VALUES,
-                    severity=Severity.MEDIUM,
-                    column=column_metadata.name,
-                    message=(
-                        f"A coluna '{column_metadata.name}' possui "
-                        f"valores zerados ou indicação de zeragem "
-                        f"(mínimo = 0)."
-                    ),
-                    metric_value=0.0,
-                ))
+                insights.append(
+                    Insight(
+                        category=InsightCategory.ZERO_VALUES,
+                        severity=Severity.MEDIUM,
+                        column=column_metadata.name,
+                        message=(
+                            f"A coluna '{column_metadata.name}' possui "
+                            f"valores zerados ou indicação de zeragem "
+                            f"(mínimo = 0)."
+                        ),
+                        metric_value=0.0,
+                    )
+                )
 
         return insights
 
@@ -367,13 +382,15 @@ class InsightEngine:
                     else:
                         severity = Severity.LOW
 
-                    insights.append(Insight(
-                        category=InsightCategory.BUSINESS_PATTERN,
-                        severity=severity,
-                        column=column,
-                        message=f"Regra de negócio violada na coluna '{column}': {factor.reason}",
-                        metric_value=round(factor.score, 4),
-                    ))
+                    insights.append(
+                        Insight(
+                            category=InsightCategory.BUSINESS_PATTERN,
+                            severity=severity,
+                            column=column,
+                            message=f"Regra de negócio violada na coluna '{column}': {factor.reason}",
+                            metric_value=round(factor.score, 4),
+                        )
+                    )
 
         return insights
 

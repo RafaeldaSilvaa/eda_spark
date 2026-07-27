@@ -48,16 +48,31 @@ class ColumnClassifier:
             InferredType.IPV4: ("ip", "enderecoip", "ipaddress", "ipv4"),
             InferredType.CEP: ("cep", "codigopostal", "zipcode", "postalcode"),
             InferredType.PHONE_BR: (
-                "telefone", "phone", "celular", "fone", "tel",
-                "telefonecelular", "telemovel", "contato",
+                "telefone",
+                "phone",
+                "celular",
+                "fone",
+                "tel",
+                "telefonecelular",
+                "telemovel",
+                "contato",
             ),
             InferredType.CREDIT_CARD: (
-                "cartao", "card", "numerocartao", "ccnumber",
-                "creditcard", "bandeiracartao",
+                "cartao",
+                "card",
+                "numerocartao",
+                "ccnumber",
+                "creditcard",
+                "bandeiracartao",
             ),
             InferredType.TECHNICAL_KEY: (
-                "sk", "surrogatekey", "chavetecnica", "etl",
-                "dwid", "dwhid", "hashkey",
+                "sk",
+                "surrogatekey",
+                "chavetecnica",
+                "etl",
+                "dwid",
+                "dwhid",
+                "hashkey",
             ),
         }
 
@@ -66,7 +81,9 @@ class ColumnClassifier:
                 if pattern in normalized_name:
                     return inferred_type
 
-        if normalized_name == "id" or (normalized_name.endswith("id") and len(normalized_name) <= _AUTO_INCREMENT_MAX_LEN):  # noqa: E501
+        if normalized_name == "id" or (
+            normalized_name.endswith("id") and len(normalized_name) <= _AUTO_INCREMENT_MAX_LEN
+        ):
             return InferredType.AUTO_INCREMENT
 
         return None
@@ -86,51 +103,31 @@ class ColumnClassifier:
             :class:`InferredType` se um padrão foi detectado na maioria
             das amostras, ou ``None`` caso contrário.
         """
-        non_null_values: list[str] = [
-            v for v in sample_values if v is not None
-        ]
+        non_null_values: list[str] = [v for v in sample_values if v is not None]
 
         if len(non_null_values) < _MIN_SAMPLES_FOR_CLASSIFICATION:
             return None
 
         regex_patterns: dict[InferredType, re.Pattern[str]] = {
-            InferredType.CPF: re.compile(
-                r"^\d{3}\.?\d{3}\.?\d{3}-?\d{2}$"
-            ),
-            InferredType.CNPJ: re.compile(
-                r"^\d{2}\.?\d{3}\.?\d{3}/?\d{4}-?\d{2}$"
-            ),
-            InferredType.EMAIL: re.compile(
-                r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
-            ),
+            InferredType.CPF: re.compile(r"^\d{3}\.?\d{3}\.?\d{3}-?\d{2}$"),
+            InferredType.CNPJ: re.compile(r"^\d{2}\.?\d{3}\.?\d{3}/?\d{4}-?\d{2}$"),
+            InferredType.EMAIL: re.compile(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"),
             InferredType.UUID: re.compile(
                 r"^[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}$",
                 re.IGNORECASE,
             ),
-            InferredType.URL: re.compile(
-                r"^https?://[^\s]+$"
-            ),
-            InferredType.IPV4: re.compile(
-                r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$"
-            ),
-            InferredType.CEP: re.compile(
-                r"^\d{5}-?\d{3}$"
-            ),
-            InferredType.PHONE_BR: re.compile(
-                r"^\+?\d{1,3}\s?\(?\d{2}\)?\s?\d{4,5}-?\d{4}$"
-            ),
-            InferredType.CREDIT_CARD: re.compile(
-                r"^\d{4}-?\d{4}-?\d{4}-?\d{4}$"
-            ),
+            InferredType.URL: re.compile(r"^https?://[^\s]+$"),
+            InferredType.IPV4: re.compile(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$"),
+            InferredType.CEP: re.compile(r"^\d{5}-?\d{3}$"),
+            InferredType.PHONE_BR: re.compile(r"^\+?\d{1,3}\s?\(?\d{2}\)?\s?\d{4,5}-?\d{4}$"),
+            InferredType.CREDIT_CARD: re.compile(r"^\d{4}-?\d{4}-?\d{4}-?\d{4}$"),
         }
 
         best_type: InferredType | None = None
         best_match_rate: float = 0.0
 
         for inferred_type, pattern in regex_patterns.items():
-            matches: int = sum(
-                1 for v in non_null_values if pattern.match(v.strip())
-            )
+            matches: int = sum(1 for v in non_null_values if pattern.match(v.strip()))
             match_rate: float = matches / len(non_null_values)
 
             if match_rate > best_match_rate and match_rate > _CLASSIFICATION_MATCH_THRESHOLD:

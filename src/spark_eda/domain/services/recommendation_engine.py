@@ -66,37 +66,38 @@ class RecommendationEngine:
 
         priority: int = RecommendationEngine._priority_for_severity(insight.severity)
 
-        recommendations.append(Recommendation(
-            category=RecommendationCategory.NULL_TREATMENT,
-            priority=priority,
-            column=insight.column,
-            message=(
-                f"Coluna '{insight.column}' com "
-                f"{insight.metric_value:.1%} de valores nulos."
-            ),
-            action=(
-                f"Avaliar a causa dos nulos em '{insight.column}': "
-                f"se o dado não está disponível, considerar preenchimento "
-                f"com valor default, mediana/moda, ou registro separado. "
-                f"Se o nulo é esperado, documentar a regra de negócio."
-            ),
-        ))
-
-        if insight.severity in (Severity.CRITICAL, Severity.HIGH):
-            recommendations.append(Recommendation(
+        recommendations.append(
+            Recommendation(
                 category=RecommendationCategory.NULL_TREATMENT,
                 priority=priority,
                 column=insight.column,
-                message=(
-                    f"Alta taxa de nulos em '{insight.column}' pode "
-                    f"inviabilizar análises que dependem desta coluna."
-                ),
+                message=(f"Coluna '{insight.column}' com {insight.metric_value:.1%} de valores nulos."),
                 action=(
-                    f"Verificar a origem dos dados de '{insight.column}': "
-                    f"o campo é opcional na fonte? Houve falha de captura? "
-                    f"Se possível, enriquecer com fonte alternativa."
+                    f"Avaliar a causa dos nulos em '{insight.column}': "
+                    f"se o dado não está disponível, considerar preenchimento "
+                    f"com valor default, mediana/moda, ou registro separado. "
+                    f"Se o nulo é esperado, documentar a regra de negócio."
                 ),
-            ))
+            )
+        )
+
+        if insight.severity in (Severity.CRITICAL, Severity.HIGH):
+            recommendations.append(
+                Recommendation(
+                    category=RecommendationCategory.NULL_TREATMENT,
+                    priority=priority,
+                    column=insight.column,
+                    message=(
+                        f"Alta taxa de nulos em '{insight.column}' pode "
+                        f"inviabilizar análises que dependem desta coluna."
+                    ),
+                    action=(
+                        f"Verificar a origem dos dados de '{insight.column}': "
+                        f"o campo é opcional na fonte? Houve falha de captura? "
+                        f"Se possível, enriquecer com fonte alternativa."
+                    ),
+                )
+            )
 
         return recommendations
 
@@ -119,10 +120,7 @@ class RecommendationEngine:
                 category=RecommendationCategory.OUTLIER_TREATMENT,
                 priority=priority,
                 column=insight.column,
-                message=(
-                    f"Coluna '{insight.column}' com {insight.metric_value:.1%} "
-                    f"de outliers identificados."
-                ),
+                message=(f"Coluna '{insight.column}' com {insight.metric_value:.1%} de outliers identificados."),
                 action=(
                     f"Validar os {insight.metric_value:.1%} de outliers "
                     f"em '{insight.column}': são dados legítimos "
@@ -152,8 +150,7 @@ class RecommendationEngine:
                 priority=RecommendationEngine._priority_for_severity(insight.severity),
                 column=insight.column,
                 message=(
-                    f"Coluna '{insight.column}' com distribuição "
-                    f"assimétrica (skewness = {insight.metric_value})."
+                    f"Coluna '{insight.column}' com distribuição assimétrica (skewness = {insight.metric_value})."
                 ),
                 action=(
                     f"Para modelos sensíveis a distribuição, aplicar "
@@ -183,8 +180,7 @@ class RecommendationEngine:
                 priority=RecommendationEngine._priority_for_severity(insight.severity),
                 column=insight.column,
                 message=(
-                    f"Coluna '{insight.column}' possui alta cardinalidade "
-                    f"(unique ratio = {insight.metric_value:.1%})."
+                    f"Coluna '{insight.column}' possui alta cardinalidade (unique ratio = {insight.metric_value:.1%})."
                 ),
                 action=(
                     f"Se '{insight.column}' é chave primária ou candidata, "
@@ -214,10 +210,7 @@ class RecommendationEngine:
                 category=RecommendationCategory.SCHEMA,
                 priority=RecommendationEngine._priority_for_severity(insight.severity),
                 column=insight.column,
-                message=(
-                    f"Coluna '{insight.column}' é constante ou "
-                    f"praticamente constante."
-                ),
+                message=(f"Coluna '{insight.column}' é constante ou praticamente constante."),
                 action=(
                     f"Colunas constantes não agregam valor analítico. "
                     f"Considere remover '{insight.column}' do *dataset* "
@@ -244,10 +237,7 @@ class RecommendationEngine:
                 category=RecommendationCategory.SCHEMA,
                 priority=RecommendationEngine._priority_for_severity(insight.severity),
                 column=None,
-                message=(
-                    f"Taxa estimada de duplicatas de "
-                    f"{insight.metric_value:.1%}."
-                ),
+                message=(f"Taxa estimada de duplicatas de {insight.metric_value:.1%}."),
                 action=(
                     "Identificar as chaves naturais do dataset e aplicar "
                     "deduplicação baseada em regras de negócio "

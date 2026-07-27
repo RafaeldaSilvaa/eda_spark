@@ -1,4 +1,5 @@
 """DTO da seção de distribuição."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -73,7 +74,7 @@ class DistributionSection:
                 f'<div style="display:flex;align-items:center;margin-bottom:2px;font-size:11px;">'
                 f'<span style="width:100px;text-align:right;padding-right:8px;'
                 f'color:var(--muted,#64748b);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'
-                f'{format_number(b.lower)}</span>'
+                f"{format_number(b.lower)}</span>"
                 f'<div style="height:16px;width:{(b.count / max_count) * 100 if max_count else 0:.1f}%;'
                 f'background:var(--primary,#2563eb);border-radius:2px;min-width:2px;"></div>'
                 f'<span style="padding-left:6px;color:var(--text,#1a1a2e);">{b.count}</span>'
@@ -83,7 +84,7 @@ class DistributionSection:
             parts.append(
                 f'<div style="margin-bottom:16px;">'
                 f'<h4 style="margin:0 0 8px;font-size:13px;color:var(--text,#1a1a2e);">{col_name}</h4>'
-                f'{bars}'
+                f"{bars}"
                 f"</div>"
             )
 
@@ -95,7 +96,7 @@ class DistributionSection:
                 f'<div style="display:flex;align-items:center;margin-bottom:2px;font-size:11px;">'
                 f'<span style="width:140px;text-align:right;padding-right:8px;'
                 f'color:var(--muted,#64748b);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'
-                f'{e.label}</span>'
+                f"{e.label}</span>"
                 f'<div style="height:16px;width:{(e.count / max_count) * 100 if max_count else 0:.1f}%;'
                 f'background:var(--success,#16a34a);border-radius:2px;min-width:2px;"></div>'
                 f'<span style="padding-left:6px;color:var(--text,#1a1a2e);">{format_number(e.count)}</span>'
@@ -105,7 +106,7 @@ class DistributionSection:
             parts.append(
                 f'<div style="margin-bottom:16px;">'
                 f'<h4 style="margin:0 0 8px;font-size:13px;color:var(--text,#1a1a2e);">{col_name}</h4>'
-                f'{bars}'
+                f"{bars}"
                 f"</div>"
             )
 
@@ -117,7 +118,7 @@ class DistributionSection:
                 f'<div style="display:flex;align-items:center;margin-bottom:2px;font-size:11px;">'
                 f'<span style="width:100px;text-align:right;padding-right:8px;'
                 f'color:var(--muted,#64748b);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'
-                f'{p.period}</span>'
+                f"{p.period}</span>"
                 f'<div style="height:16px;width:{(p.count / max_count) * 100 if max_count else 0:.1f}%;'
                 f'background:var(--warning,#d97706);border-radius:2px;min-width:2px;"></div>'
                 f'<span style="padding-left:6px;color:var(--text,#1a1a2e);">{format_number(p.count)}</span>'
@@ -127,13 +128,12 @@ class DistributionSection:
             parts.append(
                 f'<div style="margin-bottom:16px;">'
                 f'<h4 style="margin:0 0 8px;font-size:13px;color:var(--text,#1a1a2e);">{col_name}</h4>'
-                f'{bars}'
+                f"{bars}"
                 f"</div>"
             )
 
         return "".join(parts) or (
-            '<div style="padding:12px;color:var(--muted,#64748b);font-size:13px;">'
-            "No distributions available.</div>"
+            '<div style="padding:12px;color:var(--muted,#64748b);font-size:13px;">No distributions available.</div>'
         )
 
     def __str__(self) -> str:
@@ -150,9 +150,7 @@ class DistributionSection:
             for b in bins:
                 bar_len: int = int((b.count / max_count) * 20) if max_count else 0
                 bar: str = bar_char * bar_len
-                lines.append(
-                    f"    {format_number(b.lower):>10s} |{bar:<20s} {b.count}"
-                )
+                lines.append(f"    {format_number(b.lower):>10s} |{bar:<20s} {b.count}")
 
         for col_name, entries in self.frequencies.items():
             if not entries:
@@ -162,9 +160,7 @@ class DistributionSection:
             for e in entries:
                 bar_len = int((e.count / max_count) * 20) if max_count else 0
                 bar = bar_char * bar_len
-                lines.append(
-                    f"    {_truncate_text(e.label, 20):>20s} |{bar:<20s} {e.count}"
-                )
+                lines.append(f"    {_truncate_text(e.label, 20):>20s} |{bar:<20s} {e.count}")
 
         for col_name, points in self.temporal_charts.items():
             if not points:

@@ -7,14 +7,13 @@ e invalidação completa do cache.
 """
 
 import time
-from datetime import datetime, timezone
-from typing import Any
+from datetime import UTC, datetime
 
 import pytest
 
 from spark_eda.adapters.providers.lru_cache_provider import LRUCacheProvider
-from spark_eda.domain.entities.dataset_analysis import DatasetAnalysis
 from spark_eda.domain.entities.data_profile import DataProfile
+from spark_eda.domain.entities.dataset_analysis import DatasetAnalysis
 from spark_eda.domain.entities.quality_score import QualityScore
 
 pytestmark = pytest.mark.integration
@@ -39,7 +38,7 @@ def _create_dummy_analysis(value: str = "analysis") -> DatasetAnalysis:
         correlations=[],
         insights=[],
         recommendations=[],
-        timestamps=datetime.now(timezone.utc),
+        timestamps=datetime.now(UTC),
     )
 
 
@@ -147,9 +146,7 @@ class TestLRUCacheProvider:
     ) -> None:
         """Verifica que ao exceder max_size a entrada mais antiga é removida."""
         # Arrange
-        valores: list[DatasetAnalysis] = [
-            _create_dummy_analysis(f"evict_{i}") for i in range(5)
-        ]
+        valores: list[DatasetAnalysis] = [_create_dummy_analysis(f"evict_{i}") for i in range(5)]
         for i, valor in enumerate(valores):
             cache.set(key=f"chave_{i}", value=valor, ttl_seconds=60)
 
@@ -180,11 +177,7 @@ class TestLRUCacheProvider:
 
         # Act
         cache.invalidate()
-        resultados: list[DatasetAnalysis | QualityScore | None] = [
-            cache.get(key=f"chave_{i}") for i in range(3)
-        ]
+        resultados: list[DatasetAnalysis | QualityScore | None] = [cache.get(key=f"chave_{i}") for i in range(3)]
 
         # Assert
-        assert all(r is None for r in resultados), (
-            "Todas as entradas deveriam ter sido removidas após invalidate()."
-        )
+        assert all(r is None for r in resultados), "Todas as entradas deveriam ter sido removidas após invalidate()."

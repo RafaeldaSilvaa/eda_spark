@@ -185,12 +185,18 @@ class TestRecommendationEngine:
 
     def test_recommendations_sorted_by_priority(self) -> None:
         low_insight: Insight = Insight(
-            column="a", category=InsightCategory.NULLS, severity=Severity.LOW,
-            message="baixo", metric_value=0.01,
+            column="a",
+            category=InsightCategory.NULLS,
+            severity=Severity.LOW,
+            message="baixo",
+            metric_value=0.01,
         )
         high_insight: Insight = Insight(
-            column="b", category=InsightCategory.OUTLIERS, severity=Severity.CRITICAL,
-            message="critico", metric_value=0.5,
+            column="b",
+            category=InsightCategory.OUTLIERS,
+            severity=Severity.CRITICAL,
+            message="critico",
+            metric_value=0.5,
         )
         engine: RecommendationEngine = RecommendationEngine()
         result: list[Recommendation] = engine.generate([low_insight, high_insight], _any_quality())
@@ -221,16 +227,22 @@ class TestRecommendationEngine:
         ]
         for severity, expected_priority in pairs:
             insight: Insight = Insight(
-                column="c", category=InsightCategory.CONSTANT,
-                severity=severity, message="test", metric_value=None,
+                column="c",
+                category=InsightCategory.CONSTANT,
+                severity=severity,
+                message="test",
+                metric_value=None,
             )
             result: list[Recommendation] = engine.generate([insight], _any_quality())
             assert result[0].priority == expected_priority, f"Failed for {severity}"
 
     def test_unknown_severity_defaults_to_priority_5(self) -> None:
         insight: Insight = Insight(
-            column="c", category=InsightCategory.CONSTANT,
-            severity=None, message="test", metric_value=None,  # type: ignore[arg-type]
+            column="c",
+            category=InsightCategory.CONSTANT,
+            severity=None,
+            message="test",
+            metric_value=None,  # type: ignore[arg-type]
         )
         engine: RecommendationEngine = RecommendationEngine()
         result: list[Recommendation] = engine.generate([insight], _any_quality())

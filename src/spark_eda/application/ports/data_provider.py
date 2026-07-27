@@ -1,4 +1,5 @@
 """Interface de porta para provedores de dados Spark."""
+
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
