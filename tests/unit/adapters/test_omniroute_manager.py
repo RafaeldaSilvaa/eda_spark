@@ -7,18 +7,14 @@ subprocesso, healthcheck, stop e atexit.
 """
 
 import atexit as atexit_module
+from collections.abc import Callable
 from unittest import mock
 
 import httpx
 
 from spark_eda.adapters.omniroute.manager import OmniRouteManager
 
-
-_BUILTINS_IMPORT: object = __import__
-
-
-def _raise(exc: Exception) -> None:
-    raise exc
+_BUILTINS_IMPORT: Callable[..., object] = __import__
 
 
 class TestOmniRouteManager:
@@ -114,9 +110,9 @@ class TestOmniRouteManager:
         """atexit.register deve ser chamado para stop no __init__."""
         # Capture original before patching to avoid recursion
         original_register = atexit_module.register
-        registered_funcs: list = []
+        registered_funcs: list[object] = []
 
-        def tracking_register(func, *args, **kwargs):
+        def tracking_register(func: Callable[..., object], *args: object, **kwargs: object) -> object:
             registered_funcs.append(func)
             return original_register(func, *args, **kwargs)
 
@@ -331,9 +327,9 @@ class TestOmniRouteManager:
     def test_find_node_import_error_falls_back_to_shutil(self) -> None:
         from spark_eda.adapters.omniroute.manager import _find_node
 
-        orig_import = _BUILTINS_IMPORT
+        orig_import: Callable[..., object] = _BUILTINS_IMPORT
 
-        def _mock_import(name, *args, **kwargs):
+        def _mock_import(name: str, *args: object, **kwargs: object) -> object:
             if name == "nodejs":
                 raise ImportError(f"No module named '{name}'")
             return orig_import(name, *args, **kwargs)
@@ -348,9 +344,9 @@ class TestOmniRouteManager:
     def test_find_node_not_found_anywhere_returns_none(self) -> None:
         from spark_eda.adapters.omniroute.manager import _find_node
 
-        orig_import = _BUILTINS_IMPORT
+        orig_import: Callable[..., object] = _BUILTINS_IMPORT
 
-        def _mock_import(name, *args, **kwargs):
+        def _mock_import(name: str, *args: object, **kwargs: object) -> object:
             if name == "nodejs":
                 raise ImportError(f"No module named '{name}'")
             return orig_import(name, *args, **kwargs)
@@ -409,9 +405,9 @@ class TestOmniRouteManager:
     def test_npm_install_import_error_returns_false(self) -> None:
         from spark_eda.adapters.omniroute.manager import _npm_install
 
-        orig_import = _BUILTINS_IMPORT
+        orig_import: Callable[..., object] = _BUILTINS_IMPORT
 
-        def _mock_import(name, *args, **kwargs):
+        def _mock_import(name: str, *args: object, **kwargs: object) -> object:
             if name == "nodejs":
                 raise ImportError(f"No module named '{name}'")
             return orig_import(name, *args, **kwargs)

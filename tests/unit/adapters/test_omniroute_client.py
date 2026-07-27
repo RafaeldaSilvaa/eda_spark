@@ -15,7 +15,7 @@ from spark_eda.adapters.omniroute.client import OmniRouteClient
 from spark_eda.adapters.omniroute.models import AiCommentary
 
 
-def _make_valid_response_data() -> dict:
+def _make_valid_response_data() -> dict[str, object]:
     """Retorna dados de resposta JSON válidos do OmniRoute."""
     return {
         "choices": [
@@ -219,7 +219,7 @@ class TestOmniRouteClient:
     def test_analyze_with_empty_choices_returns_empty(self) -> None:
         """analyze deve retornar AiCommentary vazio quando choices
         está vazio."""
-        response_data = {"choices": []}
+        response_data: dict[str, object] = {"choices": []}
 
         with mock.patch("spark_eda.adapters.omniroute.client.httpx.post") as mock_post:
             mock_response = mock.MagicMock(spec=httpx.Response)
