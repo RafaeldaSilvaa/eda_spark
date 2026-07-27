@@ -203,6 +203,7 @@ class DataProvider(ABC):
         """
         ...
 
+
 # adapters/providers/spark_data_provider.py
 class SparkDataProvider(DataProvider):
     def compute_profile(self, df: DataFrame, config: EDAConfig) -> DataProfile:
@@ -272,8 +273,10 @@ AssessQualityUseCase            QualityCalculator              QualityFactor Reg
 # domain/services/quality_calculator.py
 FACTOR_REGISTRY: dict[str, Callable[[DataProfile, float], QualityFactor]] = {}
 
+
 def registrar_factor(nome: str) -> Callable:
     """Decorator que registra um fator de qualidade no registry global."""
+
 
 class QualityCalculator:
     def compute(self, profile: DataProfile) -> QualityScore:
@@ -287,11 +290,12 @@ class QualityCalculator:
             factors.append(factor)
         return QualityScore.from_factors(factors)
 
+
 # domain/entities/quality_score.py
 @dataclass(frozen=True)
 class QualityFactor:
     name: str
-    score: float           # 0.0 - 1.0
+    score: float  # 0.0 - 1.0
     weight_within_dimension: float
     contribution_to_total: float
     reason: str
@@ -376,6 +380,7 @@ class DataProvider(ABC):
     @abstractmethod
     def compute_profile(self, df: DataFrame, config: EDAConfig) -> DataProfile: ...
 
+
 # use_cases/ports/cache_provider.py
 class CacheProvider(ABC):
     @abstractmethod
@@ -387,6 +392,7 @@ class CacheProvider(ABC):
     @abstractmethod
     def clear(self) -> None: ...
 
+
 # use_cases/ports/output_presenter.py
 class OutputPresenter(ABC):
     @abstractmethod
@@ -394,14 +400,18 @@ class OutputPresenter(ABC):
     @abstractmethod
     def present_quality(self, score: QualityScore) -> QualityReport: ...
 
+
 # use_cases/analyze_dataset.py
 class AnalyzeDatasetUseCase:
-    def __init__(self, provider: DataProvider, cache: CacheProvider,
-                 quality_calc: QualityCalculator, classifier: ColumnClassifier):
-        ...
+    def __init__(
+        self,
+        provider: DataProvider,
+        cache: CacheProvider,
+        quality_calc: QualityCalculator,
+        classifier: ColumnClassifier,
+    ): ...
 
-    def execute(self, df: DataFrame, config: EDAConfig) -> DatasetAnalysis:
-        ...
+    def execute(self, df: DataFrame, config: EDAConfig) -> DatasetAnalysis: ...
 ```
 
 **State Management**: Use case instances are stateless (all dependencies injected). State only lives in the returned `DatasetAnalysis` entity.
@@ -478,6 +488,7 @@ class Section(ABC):
     @abstractmethod
     def __str__(self) -> str: ...
 
+
 # adapters/dto/eda_report.py
 @dataclass(frozen=True)
 class EDAReport:
@@ -492,11 +503,12 @@ class EDAReport:
     recommendations: RecommendationsSection | None
     metadata: ReportMetadata
 
-    def _repr_html_(self) -> str: ...   # Jupyter auto-display
-    def __str__(self) -> str: ...       # terminal display
+    def _repr_html_(self) -> str: ...  # Jupyter auto-display
+    def __str__(self) -> str: ...  # terminal display
     def to_dict(self) -> dict: ...
     @classmethod
     def from_dict(cls, data: dict) -> EDAReport: ...
+
 
 # adapters/renderers/html_renderer.py
 class HTMLRenderer:
@@ -556,6 +568,7 @@ class BusinessType(str, Enum):
     URL = "url"
     UNKNOWN = "unknown"
 
+
 # adapters/providers/column_inferrer.py
 class ColumnClassifier:
     def __init__(self, spark: SparkSession, config: EDAConfig):
@@ -564,7 +577,7 @@ class ColumnClassifier:
 
     def classify(self, df: DataFrame) -> dict[str, BusinessType]:
         """Classifica colunas por nome e validação regex via Spark rlike().
-        
+
         1. Name-based match: se nome da coluna contém keyword → tipo candidato
         2. Regex validation: para colunas string ambíguas, verifica via rlike()
            se >80% dos non-null values match o pattern
@@ -615,6 +628,7 @@ class CacheProvider(ABC):
     @abstractmethod
     def clear(self) -> None: ...
 
+
 # adapters/providers/lru_cache_provider.py
 class LRUCacheProvider(CacheProvider):
     def __init__(self, capacity: int = 128):
@@ -632,6 +646,7 @@ class LRUCacheProvider(CacheProvider):
                 return None
             self._cache.move_to_end(key)  # LRU update
             return entry.value
+
     ...
 ```
 
@@ -684,6 +699,7 @@ class SparkConfig:
         se alguma chave for inválida."""
         ...
 
+
 @dataclass(frozen=True)
 class EDAConfig:
     spark: SparkConfig = field(default_factory=SparkConfig)
@@ -698,8 +714,10 @@ class EDAConfig:
     @classmethod
     def from_yaml(cls, path: str) -> EDAConfig: ...
 
+
 # framework/spark_session.py
 _active_session: SparkSession | None = None
+
 
 def get_or_create_spark(config: EDAConfig) -> SparkSession:
     global _active_session
@@ -710,14 +728,23 @@ def get_or_create_spark(config: EDAConfig) -> SparkSession:
     _active_session = builder.getOrCreate()
     return _active_session
 
+
 # framework/exceptions.py
 class EDAException(Exception):
     """Base exception for all spark_eda errors."""
+
     def __init__(self, message: str, cause: Exception | None = None): ...
 
+
 class ConfigurationError(EDAException): ...
+
+
 class ProfilingError(EDAException): ...
+
+
 class QualityError(EDAException): ...
+
+
 class ClassificationError(EDAException): ...
 ```
 

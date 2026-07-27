@@ -31,27 +31,28 @@ report = spark_eda.analyze(df)
 score = spark_eda.assess_quality(df)  # returns QualityReport
 
 # Sections are individually accessible
-report.overview       # DatasetOverview
-report.schema         # SchemaReport
-report.quality        # QualityReport (embedded or standalone)
-report.stats          # StatisticsReport
+report.overview  # DatasetOverview
+report.schema  # SchemaReport
+report.quality  # QualityReport (embedded or standalone)
+report.stats  # StatisticsReport
 report.distributions  # DistributionReport
-report.correlations   # CorrelationReport
-report.outliers       # OutlierReport
-report.insights       # InsightsReport
-report.recommendations # RecommendationsReport
+report.correlations  # CorrelationReport
+report.outliers  # OutlierReport
+report.insights  # InsightsReport
+report.recommendations  # RecommendationsReport
 
 # Each section is self-renderable in Jupyter (HTML) and terminal (text)
-display(report.overview)      # Jupyter HTML widget
-print(report.overview)        # Terminal text
+display(report.overview)  # Jupyter HTML widget
+print(report.overview)  # Terminal text
 
 # Advanced config via dataclass
 from spark_eda import EDAConfig
+
 config = EDAConfig(
     max_categories=50,
     correlation_methods=["pearson", "spearman", "cramers_v"],
     outlier_method="iqr",
-    enable_insights=True
+    enable_insights=True,
 )
 report = spark_eda.analyze(df, config=config)
 ```
@@ -728,6 +729,7 @@ RULES:
 @dataclass
 class AnalysisCache:
     """Intelligent LRU cache for EDA results."""
+
     max_size: int = 10
     ttl_seconds: int = 3600  # 1 hour default
 
@@ -778,7 +780,8 @@ Every transformation is written to maximize Catalyst optimization opportunities:
 ```python
 # GOOD: Filter pushdown + column pruning happen naturally
 df = spark.read.parquet("data/")
-result = (df
+result = (
+    df
     .select("col_a", "col_b", "col_c")  # column pruning
     .filter(F.col("col_a").isNotNull())  # filter pushdown
     .agg(...)
@@ -804,18 +807,19 @@ result = df.agg(...).filter(F.col("col_a").isNotNull())
 # Pattern for business column detection — NO UDFs
 import pyspark.sql.functions as F
 
+
 def infer_column_types(df: DataFrame) -> dict[str, list[str]]:
     """Detect business column types using pure Spark expressions."""
 
     patterns = {
-        "cpf":     r"^\d{3}\.\d{3}\.\d{3}-\d{2}$",
-        "cnpj":    r"^\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2}$",
-        "email":   r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
-        "uuid":    r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
-        "cep":     r"^\d{5}-?\d{3}$",
+        "cpf": r"^\d{3}\.\d{3}\.\d{3}-\d{2}$",
+        "cnpj": r"^\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2}$",
+        "email": r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
+        "uuid": r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+        "cep": r"^\d{5}-?\d{3}$",
         "phone_br": r"^\(?\d{2}\)?\s?\d{4,5}-?\d{4}$",
-        "url":     r"^https?://[^\s/$.?#].[^\s]*$",
-        "ipv4":    r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$",
+        "url": r"^https?://[^\s/$.?#].[^\s]*$",
+        "ipv4": r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$",
     }
 
     # Sample a fraction of data to check patterns efficiently
@@ -829,11 +833,7 @@ def infer_column_types(df: DataFrame) -> dict[str, list[str]]:
             for pattern_name, regex in patterns.items():
                 alias = f"{col_name}__{pattern_name}"
                 # Check if >80% of non-null values match
-                match_ratio = (
-                    F.avg(
-                        F.when(F.col(col_name).rlike(regex), 1).otherwise(0)
-                    ).alias(alias)
-                )
+                match_ratio = F.avg(F.when(F.col(col_name).rlike(regex), 1).otherwise(0)).alias(alias)
                 col_matches[alias] = match_ratio
             match_exprs.extend(col_matches.values())
 
@@ -1240,8 +1240,10 @@ Nomes de variáveis, funções, classes e módulos devem ser **auto-explicativos
 # ❌ RUIM — abreviado, ambíguo
 def calc_qs(df, cfg): ...
 
+
 # ✅ BOM — completamente explicativo
 def calculate_quality_score(dataframe: DataFrame, config: QualityConfig) -> QualityScore: ...
+
 
 # ❌ RUIM — genérico
 valores = [1, 2, 3]
@@ -1338,6 +1340,7 @@ Cada template explicita EM QUAL CAMADA da Clean Architecture ele vive.
 Responsabilidade: [descrição]. Opera APENAS sobre entidades do domínio.
 Sem dependência de Spark, I/O, ou qualquer framework.
 """
+
 from __future__ import annotations
 
 from spark_eda.domain.entities.data_profile import DataProfile
@@ -1389,6 +1392,7 @@ class MeuResultado:
         valor_principal: Métrica principal calculada.
         detalhes: Informações adicionais.
     """
+
     nome: str
     valor_principal: float
     detalhes: dict[str, Any]
@@ -1405,6 +1409,7 @@ uma ENTIDADE do domínio (DataProfile, ColumnProfile, etc.).
 
 Esta strategy NUNCA retorna dicts ou tuplas — sempre entidades.
 """
+
 from __future__ import annotations
 
 from pyspark.sql import DataFrame, functions as F
@@ -1481,6 +1486,7 @@ Um fator de qualidade tem **duas implementações separadas** por camada:
 Esta função é CHAMADA pelo SparkDataProvider durante a fase de qualidade.
 Retorna métricas BRUTAS, não normalizadas.
 """
+
 from __future__ import annotations
 
 from pyspark.sql import DataFrame, functions as F
@@ -1495,6 +1501,7 @@ class NearConstantMetrics:
         total_colunas: Total de colunas analisadas.
         proporção_afetadas: Razão entre afetadas e total.
     """
+
     colunas_afetadas: tuple[str, ...]
     total_colunas: int
     proporção_afetadas: float
@@ -1532,6 +1539,7 @@ def computar_metricas(df: DataFrame, colunas: list[str]) -> NearConstantMetrics:
 
 PURO — sem Spark. Recebe métricas brutas, retorna QualityFactor.
 """
+
 from __future__ import annotations
 
 from spark_eda.domain.entities.quality_score import QualityFactor
@@ -1594,6 +1602,7 @@ Cada camada tem seu próprio padrão de teste:
 
 Camada: DOMAIN. Não precisa de Spark, Docker, ou fixtures complexas.
 """
+
 from __future__ import annotations
 
 from spark_eda.domain.entities.data_profile import DataProfile
@@ -1650,6 +1659,7 @@ class TestQualityCalculator:
 
 Camada: USE CASES. Depende de domain (real) + ports (mockadas).
 """
+
 from __future__ import annotations
 
 from unittest.mock import Mock
@@ -1715,6 +1725,7 @@ class TestAnalyzeDatasetUseCase:
 
 Camada: ADAPTER. Requer PySpark (executar via Docker).
 """
+
 from __future__ import annotations
 
 import pytest
@@ -1731,11 +1742,13 @@ class TestSparkDataProvider:
     @classmethod
     def setup_class(cls):
         """Inicializa SparkSession uma vez (Docker)."""
-        cls.spark = SparkSession.builder \
-            .master("local[1]") \
-            .appName("test") \
-            .config("spark.sql.shuffle.partitions", "1") \
+        cls.spark = (
+            SparkSession.builder
+            .master("local[1]")
+            .appName("test")
+            .config("spark.sql.shuffle.partitions", "1")
             .getOrCreate()
+        )
 
     def test_deve_computar_profile_corretamente(self):
         """Provider deve retornar DataProfile com métricas corretas."""
@@ -1773,11 +1786,14 @@ RegistryFn = Callable[[Any, float], QualityFactor]
 
 FACTOR_REGISTRY: dict[str, RegistryFn] = {}
 
+
 def registrar(nome: str):
     """Decorator para registrar um fator de qualidade no domínio."""
+
     def decorator(fn: RegistryFn) -> RegistryFn:
         FACTOR_REGISTRY[nome] = fn
         return fn
+
     return decorator
 
 
@@ -1793,11 +1809,14 @@ SparkFactorFn = Callable[[DataFrame, list[str]], Any]
 
 SPARK_FACTOR_REGISTRY: dict[str, SparkFactorFn] = {}
 
+
 def registrar_spark(nome: str):
     """Decorator para registrar um fator de computação Spark."""
+
     def decorator(fn: SparkFactorFn) -> SparkFactorFn:
         SPARK_FACTOR_REGISTRY[nome] = fn
         return fn
+
     return decorator
 
 
@@ -1805,10 +1824,12 @@ def registrar_spark(nome: str):
 # Exemplo de uso: implementação completa de um fator
 # ───────────────────────────────────────────────────────────────────────────
 
+
 # 1. ADAPTER: computação Spark (adapters/providers/quality_factors/near_constant.py)
 @registrar_spark("near_constant_columns")
 def computar_near_constant(df: DataFrame, colunas: list[str]) -> NearConstantMetrics:
     """..."""
+
 
 # 2. DOMAIN: score puro (domain/services/quality_factors/near_constant.py)
 @registrar("near_constant_columns")

@@ -124,18 +124,23 @@ class AiCommentary:
     recommendations: str | None = None
     executive_analysis: str | None = None
 
+
 class OmniRouteManager:
     def ensure_running(self) -> bool: ...
     # Returns True if OmniRoute is healthy on localhost:20128
     # On first call: find Node.js, npm install, start subprocess
     # On subsequent: healthcheck, restart if dead
     def stop(self) -> None: ...
+
     # Kill subprocess, cleanup (registered via atexit)
+
 
 class OmniRouteClient:
     def __init__(self, base_url: str, timeout: int = 30) -> None: ...
     def analyze(self, prompt: str) -> AiCommentary: ...
+
     # raises OmniRouteError on connection/timeout/parse failures
+
 
 class PromptBuilder:
     @staticmethod

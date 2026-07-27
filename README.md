@@ -249,9 +249,9 @@ config = EDAConfig(
     outlier_method="iqr",
     enable_insights=True,
     enable_recommendations=True,
-    ai_enabled=True,                  # AI commentary enabled by default
+    ai_enabled=True,  # AI commentary enabled by default
     omniroute_url="http://localhost:20128/v1",
-    omniroute_timeout=60,             # Seconds before AI call times out
+    omniroute_timeout=60,  # Seconds before AI call times out
 )
 report = spark_eda.analyze(df, config=config)
 ```
@@ -277,8 +277,8 @@ if commentary:
     print(commentary.executive_analysis)
 
 # Each section renders itself
-print(overview)       # → Terminal-formatted text
-display(schema)       # → HTML table in Jupyter
+print(overview)  # → Terminal-formatted text
+display(schema)  # → HTML table in Jupyter
 ```
 
 ### AI Commentary
@@ -294,15 +294,15 @@ report = spark_eda.analyze(df, config=config)
 # Access per-section commentary
 report = spark_eda.analyze(df)
 if report.commentary:
-    report.commentary.overview          # str | None
-    report.commentary.schema            # str | None
-    report.commentary.quality           # str | None
-    report.commentary.stats             # str | None
-    report.commentary.distributions     # str | None
-    report.commentary.correlations      # str | None
-    report.commentary.outliers          # str | None
-    report.commentary.insights          # str | None
-    report.commentary.recommendations   # str | None
+    report.commentary.overview  # str | None
+    report.commentary.schema  # str | None
+    report.commentary.quality  # str | None
+    report.commentary.stats  # str | None
+    report.commentary.distributions  # str | None
+    report.commentary.correlations  # str | None
+    report.commentary.outliers  # str | None
+    report.commentary.insights  # str | None
+    report.commentary.recommendations  # str | None
     report.commentary.executive_analysis  # str | None — cross-cutting synthesis
 ```
 
@@ -314,18 +314,17 @@ from spark_eda import EDAConfig, QualityConfig
 # EDA configuration
 eda_config = EDAConfig(
     # Core
-    max_categories=50,             # Max categories for frequency analysis
-    correlation_methods=None,      # Auto-select or ["pearson", "spearman", ...]
-    outlier_method="iqr",          # "iqr" | "zscore" | "mad"
+    max_categories=50,  # Max categories for frequency analysis
+    correlation_methods=None,  # Auto-select or ["pearson", "spearman", ...]
+    outlier_method="iqr",  # "iqr" | "zscore" | "mad"
     enable_insights=True,
     enable_recommendations=True,
-    sampling_threshold=10_000_000, # Use sampling above this row count
-
+    sampling_threshold=10_000_000,  # Use sampling above this row count
     # AI Commentary
-    ai_enabled=True,               # Set False to disable AI entirely
+    ai_enabled=True,  # Set False to disable AI entirely
     omniroute_url="http://localhost:20128/v1",
-    omniroute_timeout=30,          # HTTP timeout for AI calls (seconds)
-    omniroute_cache_dir=None,      # npm cache dir (default: ~/.cache/spark_eda/omniroute/)
+    omniroute_timeout=30,  # HTTP timeout for AI calls (seconds)
+    omniroute_cache_dir=None,  # npm cache dir (default: ~/.cache/spark_eda/omniroute/)
 )
 
 # Quality-only configuration
@@ -414,15 +413,15 @@ In terminals, the output is a well-formatted text report with:
 Every section is accessible as a typed object with typed attributes:
 
 ```python
-report.overview.row_count          # int
-report.schema.columns["age"]       # ColumnMetadata
-report.stats.numeric["age"]        # NumericStats
-report.quality.score               # float (0–100)
-report.quality.dimensions          # dict[str, QualityDimension]
-report.quality.factors             # dict[str, list[QualityFactor]]
-report.insights.items              # list[Insight]
-report.recommendations.items       # list[Recommendation]
-report.commentary                  # AiCommentary | None — AI commentary if available
+report.overview.row_count  # int
+report.schema.columns["age"]  # ColumnMetadata
+report.stats.numeric["age"]  # NumericStats
+report.quality.score  # float (0–100)
+report.quality.dimensions  # dict[str, QualityDimension]
+report.quality.factors  # dict[str, list[QualityFactor]]
+report.insights.items  # list[Insight]
+report.recommendations.items  # list[Recommendation]
+report.commentary  # AiCommentary | None — AI commentary if available
 ```
 
 ### JSON Export
